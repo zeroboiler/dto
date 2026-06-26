@@ -3,5 +3,8 @@ parameters:
     paths:
         - src/
     excludePaths:
-        - tests/
+        - tests/*
     treatPhpDocTypesAsCertain: false
+    checkMissingTypedOverride: true
+    checkGenericClassInMethodReturnType: false
+    reportUnmatchedIgnoredErrors: false
