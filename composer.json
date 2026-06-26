@@ -1,0 +1,51 @@
+{
+    "name": "zeroboiler/dto",
+    "description": "Zero-boilerplate type-safe DTO system with attribute-based validation, serialization and request mapping for Laravel",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.1.0",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.5",
+        "illuminate/contracts": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/validation": "^13.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0",
+        "laravel/pint": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroBoiler\\DTO\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZeroBoiler\\DTO\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "analyse": "phpstan analyse",
+        "lint": "pint"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ZeroBoiler\\DTO\\DTOSServiceProvider"
+            ],
+            "aliases": {
+                "DTO": "ZeroBoiler\\DTO\\Facades\\DTO"
+            }
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

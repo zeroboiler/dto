@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ZeroBoiler\DTO\Attributes;
+
+use Attribute;
+
+/**
+ * Validate property as UUID.
+ *
+ *   #[Uuid]
+ *   public string $id;
+ */
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class Uuid
+{
+    public function __construct(
+        public ?string $message = null,
+    ) {}
+}

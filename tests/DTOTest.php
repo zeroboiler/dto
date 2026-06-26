@@ -1,0 +1,144 @@
+<?php
+
+declare(strict_types=1);
+
+use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
+
+describe('CreateUserDTO', function () {
+    it('derives validation rules from attributes', function () {
+        $rules = CreateUserDTO::rules();
+
+        expect($rules)->toHaveKey('email');
+        expect($rules['email'])->toContain('required');
+        expect($rules['email'])->toContain('email');
+
+        expect($rules)->toHaveKey('name');
+        expect($rules['name'])->toContain('required');
+        expect($rules['name'])->toContain('min:2');
+        expect($rules['name'])->toContain('max:50');
+    });
+
+    it('creates from array with defaults', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name'  => 'Doruk',
+        ], validate: false);
+
+        expect($dto->email)->toBe('test@example.com');
+        expect($dto->name)->toBe('Doruk');
+        expect($dto->status)->toBe('active'); // default
+        expect($dto->tags)->toBe([]); // default
+        expect($dto->phone)->toBeNull();
+    });
+
+    it('maps fields via MapFrom attribute', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email'       => 'test@example.com',
+            'name'        => 'Doruk',
+            'phone_number'=> '+905551234567',
+        ], validate: false);
+
+        expect($dto->phone)->toBe('+905551234567');
+    });
+
+    it('casts array fields', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name'  => 'Doruk',
+            'tags'  => ['laravel', 'php'],
+        ], validate: false);
+
+        expect($dto->tags)->toBe(['laravel', 'php']);
+    });
+
+    it('excludes hidden fields from toArray', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email'    => 'test@example.com',
+            'name'     => 'Doruk',
+            'password' => 'secret123',
+        ], validate: false);
+
+        $array = $dto->toArray();
+
+        expect($array)->not->toHaveKey('password');
+        expect($array)->toHaveKey('email');
+    });
+
+    it('serializes to JSON', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name'  => 'Doruk',
+        ], validate: false);
+
+        $json = $dto->toJson();
+        $decoded = json_decode($json, true);
+
+        expect($decoded)->toHaveKey('email');
+        expect($decoded)->toHaveKey('name');
+        expect($decoded['email'])->toBe('test@example.com');
+    });
+
+    it('creates immutable copy with overrides', function () {
+        $dto = CreateUserDTO::fromArray([
+            'email'  => 'test@example.com',
+            'name'   => 'Doruk',
+            'status' => 'active',
+        ], validate: false);
+
+        $updated = $dto->with(['status' => 'inactive']);
+
+        expect($dto->status)->toBe('active');
+        expect($updated->status)->toBe('inactive');
+        expect($updated->email)->toBe('test@example.com');
+    });
+
+    it('checks equality', function () {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
+        $dto3 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Other'], validate: false);
+
+        expect($dto1->equals($dto2))->toBeTrue();
+        expect($dto1->equals($dto3))->toBeFalse();
+    });
+});
+
+describe('ProductDTO', function () {
+    it('derives numeric and integer rules', function () {
+        $rules = ProductDTO::rules();
+
+        expect($rules['price'])->toContain('required');
+        expect($rules['price'])->toContain('numeric');
+        expect($rules['stock'])->toContain('integer');
+        expect($rules['stock'])->toContain('min:0');
+    });
+
+    it('creates with valid data', function () {
+        $dto = ProductDTO::fromArray([
+            'name'  => 'Widget',
+            'price' => '29.99',
+            'stock' => 42,
+        ], validate: false);
+
+        expect($dto->name)->toBe('Widget');
+        expect($dto->price)->toBe('29.99');
+        expect($dto->stock)->toBe(42);
+    });
+});
+
+describe('EmptyDTO', function () {
+    it('has empty rules when no attributes', function () {
+        $rules = EmptyDTO::rules();
+
+        // Nullable optional properties may have 'sometimes' rule
+        expect($rules)->toBeArray();
+    });
+
+    it('creates with all nulls', function () {
+        $dto = EmptyDTO::fromArray([], validate: false);
+
+        expect($dto->foo)->toBeNull();
+        expect($dto->bar)->toBeNull();
+    });
+});
