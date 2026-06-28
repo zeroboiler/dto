@@ -103,10 +103,13 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
 
         foreach ($metadata['properties'] as $name => $prop) {
             $sourceKey = $prop['map_from'] ?? $name;
+
+            // Only apply default when the key is entirely missing from the input.
+            // If the caller explicitly passes null or '', that is an intentional value.
+            $hasKey = array_key_exists($sourceKey, $data) || Arr::has($data, $sourceKey);
             $value = Arr::get($data, $sourceKey);
 
-            // Apply default if missing or empty (null, empty string)
-            if (($value === null || $value === '') && array_key_exists('default', $prop)) {
+            if (! $hasKey && $prop['has_default']) {
                 $value = $prop['default'];
             }
 
@@ -362,9 +365,15 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                     $instance instanceof CastAttribute => $propMeta['cast'] = $instance->type,
                     $instance instanceof MapFrom => $propMeta['map_from'] = $instance->key,
                     $instance instanceof Hidden => $propMeta['hidden'] = true,
-                    $instance instanceof DefaultValueAttribute => $propMeta['default'] = $instance->value,
+                    $instance instanceof DefaultValueAttribute => null,
                     default => null,
                 };
+
+                // Handle DefaultValue attribute separately (needs to set two fields)
+                if ($instance instanceof DefaultValueAttribute) {
+                    $propMeta['default'] = $instance->value;
+                    $propMeta['has_default'] = true;
+                }
 
                 // Collect custom messages
                 if (property_exists($instance, 'message') && $instance->message !== null) {
