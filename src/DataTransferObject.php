@@ -105,8 +105,8 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             $sourceKey = $prop['map_from'] ?? $name;
             $value = Arr::get($data, $sourceKey);
 
-            // Apply default if missing
-            if ($value === null && array_key_exists('default', $prop)) {
+            // Apply default if missing or empty (null, empty string)
+            if (($value === null || $value === '') && array_key_exists('default', $prop)) {
                 $value = $prop['default'];
             }
 
@@ -255,13 +255,13 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * @param  array<string, mixed>  $overrides
      */
-    public function with(array $overrides): static
+    public function with(array $overrides, bool $validate = true): static
     {
         // Use all property values (including hidden) to avoid data loss
         $data = $this->allValues();
         $data = array_merge($data, $overrides);
 
-        return static::fromArray($data, validate: false);
+        return static::fromArray($data, validate: $validate);
     }
 
     /**
