@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
-describe('CreateUserDTO', function () {
-    it('derives validation rules from attributes', function () {
+describe('CreateUserDTO', function (): void {
+    it('derives validation rules from attributes', function (): void {
         $rules = CreateUserDTO::rules();
 
         expect($rules)->toHaveKey('email');
@@ -20,10 +24,10 @@ describe('CreateUserDTO', function () {
         expect($rules['name'])->toContain('max:50');
     });
 
-    it('creates from array with defaults', function () {
+    it('creates from array with defaults', function (): void {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
-            'name'  => 'Doruk',
+            'name' => 'Doruk',
         ], validate: false);
 
         expect($dto->email)->toBe('test@example.com');
@@ -33,30 +37,30 @@ describe('CreateUserDTO', function () {
         expect($dto->phone)->toBeNull();
     });
 
-    it('maps fields via MapFrom attribute', function () {
+    it('maps fields via MapFrom attribute', function (): void {
         $dto = CreateUserDTO::fromArray([
-            'email'       => 'test@example.com',
-            'name'        => 'Doruk',
-            'phone_number'=> '+905551234567',
+            'email' => 'test@example.com',
+            'name' => 'Doruk',
+            'phone_number' => '+905551234567',
         ], validate: false);
 
         expect($dto->phone)->toBe('+905551234567');
     });
 
-    it('casts array fields', function () {
+    it('casts array fields', function (): void {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
-            'name'  => 'Doruk',
-            'tags'  => ['laravel', 'php'],
+            'name' => 'Doruk',
+            'tags' => ['laravel', 'php'],
         ], validate: false);
 
         expect($dto->tags)->toBe(['laravel', 'php']);
     });
 
-    it('excludes hidden fields from toArray', function () {
+    it('excludes hidden fields from toArray', function (): void {
         $dto = CreateUserDTO::fromArray([
-            'email'    => 'test@example.com',
-            'name'     => 'Doruk',
+            'email' => 'test@example.com',
+            'name' => 'Doruk',
             'password' => 'secret123',
         ], validate: false);
 
@@ -66,10 +70,10 @@ describe('CreateUserDTO', function () {
         expect($array)->toHaveKey('email');
     });
 
-    it('serializes to JSON', function () {
+    it('serializes to JSON', function (): void {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
-            'name'  => 'Doruk',
+            'name' => 'Doruk',
         ], validate: false);
 
         $json = $dto->toJson();
@@ -80,10 +84,10 @@ describe('CreateUserDTO', function () {
         expect($decoded['email'])->toBe('test@example.com');
     });
 
-    it('creates immutable copy with overrides', function () {
+    it('creates immutable copy with overrides', function (): void {
         $dto = CreateUserDTO::fromArray([
-            'email'  => 'test@example.com',
-            'name'   => 'Doruk',
+            'email' => 'test@example.com',
+            'name' => 'Doruk',
             'status' => 'active',
         ], validate: false);
 
@@ -94,7 +98,7 @@ describe('CreateUserDTO', function () {
         expect($updated->email)->toBe('test@example.com');
     });
 
-    it('checks equality', function () {
+    it('checks equality', function (): void {
         $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
         $dto2 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
         $dto3 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Other'], validate: false);
@@ -104,8 +108,8 @@ describe('CreateUserDTO', function () {
     });
 });
 
-describe('ProductDTO', function () {
-    it('derives numeric and integer rules', function () {
+describe('ProductDTO', function (): void {
+    it('derives numeric and integer rules', function (): void {
         $rules = ProductDTO::rules();
 
         expect($rules['price'])->toContain('required');
@@ -114,9 +118,9 @@ describe('ProductDTO', function () {
         expect($rules['stock'])->toContain('min:0');
     });
 
-    it('creates with valid data', function () {
+    it('creates with valid data', function (): void {
         $dto = ProductDTO::fromArray([
-            'name'  => 'Widget',
+            'name' => 'Widget',
             'price' => '29.99',
             'stock' => 42,
         ], validate: false);
@@ -127,15 +131,15 @@ describe('ProductDTO', function () {
     });
 });
 
-describe('EmptyDTO', function () {
-    it('has empty rules when no attributes', function () {
+describe('EmptyDTO', function (): void {
+    it('has empty rules when no attributes', function (): void {
         $rules = EmptyDTO::rules();
 
         // Nullable optional properties may have 'sometimes' rule
         expect($rules)->toBeArray();
     });
 
-    it('creates with all nulls', function () {
+    it('creates with all nulls', function (): void {
         $dto = EmptyDTO::fromArray([], validate: false);
 
         expect($dto->foo)->toBeNull();

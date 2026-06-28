@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
@@ -9,14 +12,14 @@ use Attribute;
 /**
  * Provide a default value when source key is missing.
  *
- *   #[Default('active')]
+ *   #[DefaultValue('active')]
  *   public string $status;
  *
- *   #[Default([])]
+ *   #[DefaultValue([])]
  *   public array $tags;
  */
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
-final class Default
+final class DefaultValue
 {
     public function __construct(
         public mixed $value = null,

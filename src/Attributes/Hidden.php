@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
@@ -13,6 +16,4 @@ use Attribute;
  *   public string $password;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Hidden
-{
-}
+final class Hidden {}

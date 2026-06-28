@@ -1,12 +1,16 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 use ZeroBoiler\DTO\Casts\DTOCast;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 
-describe('DTOCast', function () {
-    it('casts JSON to DTO instance', function () {
+describe('DTOCast', function (): void {
+    it('casts JSON to DTO instance', function (): void {
         $cast = new DTOCast(CreateUserDTO::class);
 
         $result = $cast->get(
@@ -14,7 +18,7 @@ describe('DTOCast', function () {
             key: 'payload',
             value: json_encode([
                 'email' => 'cast@example.com',
-                'name'  => 'Cast Test',
+                'name' => 'Cast Test',
             ]),
             attributes: [],
         );
@@ -23,7 +27,7 @@ describe('DTOCast', function () {
         expect($result->email)->toBe('cast@example.com');
     });
 
-    it('returns null for null value', function () {
+    it('returns null for null value', function (): void {
         $cast = new DTOCast(CreateUserDTO::class);
 
         $result = $cast->get(
@@ -36,10 +40,10 @@ describe('DTOCast', function () {
         expect($result)->toBeNull();
     });
 
-    it('sets DTO to JSON string', function () {
+    it('sets DTO to JSON string', function (): void {
         $dto = CreateUserDTO::fromArray([
             'email' => 'set@example.com',
-            'name'  => 'Set Test',
+            'name' => 'Set Test',
         ], validate: false);
 
         $cast = new DTOCast(CreateUserDTO::class);
@@ -55,7 +59,7 @@ describe('DTOCast', function () {
         expect($decoded['email'])->toBe('set@example.com');
     });
 
-    it('handles array input in set', function () {
+    it('handles array input in set', function (): void {
         $cast = new DTOCast(CreateUserDTO::class);
 
         $result = $cast->set(

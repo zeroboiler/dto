@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Support;
 
 use ReflectionClass;
+use ZeroBoiler\DTO\Attributes\DefaultValue;
+use ZeroBoiler\DTO\Attributes\Hidden;
 
 /**
  * Generate OpenAPI schema from a DTO class.
@@ -23,7 +29,7 @@ class OpenApiSchemaGenerator
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
-            return ['type' => 'object', 'properties' => new \stdClass()];
+            return ['type' => 'object', 'properties' => new \stdClass];
         }
 
         $properties = [];
@@ -32,7 +38,28 @@ class OpenApiSchemaGenerator
         foreach ($constructor->getParameters() as $param) {
             $name = $param->getName();
             $type = $param->getType();
-            $isRequired = !$param->isDefaultValueAvailable() && !$type?->allowsNull();
+
+            // Check for DefaultValue attribute early to determine if field is required
+            $hasDefaultValueAttr = false;
+            $defaultValue = null;
+
+            $propReflection = $reflection->hasProperty($name)
+                ? new \ReflectionProperty($dtoClass, $name)
+                : null;
+
+            if ($propReflection instanceof \ReflectionProperty) {
+                foreach ($propReflection->getAttributes() as $attr) {
+                    if ($attr->getName() === DefaultValue::class) {
+                        $instance = $attr->newInstance();
+                        $hasDefaultValueAttr = true;
+                        $defaultValue = $instance->value;
+
+                        break;
+                    }
+                }
+            }
+
+            $isRequired = ! $param->isDefaultValueAvailable() && ! $hasDefaultValueAttr && ! $type?->allowsNull();
 
             if ($isRequired) {
                 $required[] = $name;
@@ -40,27 +67,19 @@ class OpenApiSchemaGenerator
 
             $propSchema = ['type' => self::inferType($type)];
 
-            if (!$isRequired) {
+            if (! $isRequired) {
                 $propSchema['nullable'] = true;
             }
 
+            if ($hasDefaultValueAttr) {
+                $propSchema['default'] = $defaultValue;
+            }
+
             // Check for Hidden attribute
-            $propReflection = $reflection->hasProperty($name)
-                ? new \ReflectionProperty($dtoClass, $name)
-                : null;
-
-            if ($propReflection) {
+            if ($propReflection instanceof \ReflectionProperty) {
                 foreach ($propReflection->getAttributes() as $attr) {
-                    if ($attr->getName() === \ZeroBoiler\DTO\Attributes\Hidden::class) {
+                    if ($attr->getName() === Hidden::class) {
                         continue 2;
-                    }
-                }
-
-                // Add description from Description attribute if present
-                foreach ($propReflection->getAttributes() as $attr) {
-                    if ($attr->getName() === \ZeroBoiler\DTO\Attributes\Default::class) {
-                        $instance = $attr->newInstance();
-                        $propSchema['default'] = $instance->value;
                     }
                 }
             }
@@ -73,7 +92,7 @@ class OpenApiSchemaGenerator
             'properties' => (object) $properties,
         ];
 
-        if (!empty($required)) {
+        if ($required !== []) {
             $schema['required'] = $required;
         }
 

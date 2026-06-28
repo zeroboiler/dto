@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
@@ -10,20 +13,18 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
-use Rector\Laravel\Set\LaravelLevelSetList;
-use Rector\Laravel\Set\LaravelSetList;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
+        __DIR__.'/src',
+        __DIR__.'/tests',
     ]);
 
     $rectorConfig->skip([
-        __DIR__ . '/tests/Fixtures',
+        __DIR__.'/tests/Fixtures',
     ]);
 
     // PHP upgrades
@@ -38,10 +39,11 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     // Laravel
-    $rectorConfig->sets([
-        LaravelSetList::LARAVEL_130,
-        LaravelLevelSetList::UP_TO_LARAVEL_130,
-    ]);
+    // TODO: Install rector/rector-laravel package to enable Laravel rules
+    // $rectorConfig->sets([
+    //     \Rector\Laravel\Set\LaravelSetList::LARAVEL_130,
+    //     \Rector\Laravel\Set\LaravelLevelSetList::UP_TO_LARAVEL_130,
+    // ]);
 
     // PHPUnit → Pest
     $rectorConfig->sets([

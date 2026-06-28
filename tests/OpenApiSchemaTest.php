@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 
-describe('OpenApiSchemaGenerator', function () {
-    it('generates schema with properties', function () {
+describe('OpenApiSchemaGenerator', function (): void {
+    it('generates schema with properties', function (): void {
         $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
 
         expect($schema['type'])->toBe('object');
@@ -16,7 +20,7 @@ describe('OpenApiSchemaGenerator', function () {
         expect($schema['required'])->toContain('name');
     });
 
-    it('marks required fields', function () {
+    it('marks required fields', function (): void {
         $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
 
         expect($schema['required'])->toContain('email');
@@ -25,7 +29,7 @@ describe('OpenApiSchemaGenerator', function () {
         expect($schema['required'])->not->toContain('status');
     });
 
-    it('excludes hidden properties', function () {
+    it('excludes hidden properties', function (): void {
         $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
         $props = (array) $schema['properties'];
 
@@ -33,7 +37,7 @@ describe('OpenApiSchemaGenerator', function () {
         expect($props)->toHaveKey('email');
     });
 
-    it('infers property types', function () {
+    it('infers property types', function (): void {
         $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
         $props = (array) $schema['properties'];
 
@@ -41,7 +45,7 @@ describe('OpenApiSchemaGenerator', function () {
         expect($props['tags']['type'])->toBe('array');
     });
 
-    it('handles empty DTO', function () {
+    it('handles empty DTO', function (): void {
         $schema = OpenApiSchemaGenerator::generate(EmptyDTO::class);
 
         expect($schema['type'])->toBe('object');

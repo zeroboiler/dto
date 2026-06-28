@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Tests\Fixtures;
 
 use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\Default;
+use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Email;
 use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\MapFrom;
@@ -23,7 +23,7 @@ class CreateUserDTO extends DataTransferObject
         #[Required, Min(2), Max(50)]
         public readonly string $name,
 
-        #[Default('active')]
+        #[DefaultValue('active')]
         public readonly string $status,
 
         #[Cast('array')]

@@ -1,15 +1,20 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use ZeroBoiler\DTO\DataTransferObject;
 
 /**
- * @method static array validate(string $dtoClass, array $data)
- * @method static \ZeroBoiler\DTO\DataTransferObject make(string $dtoClass, array $data)
- * @method static array schema(string $dtoClass)
+ * @method static array<string, mixed> validate(string $dtoClass, array<string, mixed> $data)
+ * @method static DataTransferObject make(string $dtoClass, array<string, mixed> $data)
+ * @method static array<string, mixed> schema(string $dtoClass)
  */
 final class DTO extends Facade
 {

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
@@ -16,7 +20,7 @@ use ReflectionProperty;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Cast as CastAttribute;
 use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
-use ZeroBoiler\DTO\Attributes\Default as DefaultAttribute;
+use ZeroBoiler\DTO\Attributes\DefaultValue as DefaultValueAttribute;
 use ZeroBoiler\DTO\Attributes\Email;
 use ZeroBoiler\DTO\Attributes\Enum as EnumAttribute;
 use ZeroBoiler\DTO\Attributes\Hidden;
@@ -30,7 +34,6 @@ use ZeroBoiler\DTO\Attributes\Pattern;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
-use ZeroBoiler\DTO\Exceptions\DTOException;
 
 /**
  * Base Data Transfer Object — zero boilerplate hydration, validation and serialization.
@@ -46,7 +49,7 @@ use ZeroBoiler\DTO\Exceptions\DTOException;
  *           #[Required, Min(2), Max(50)]
  *           public readonly string $name,
  *
- *           #[Default('active')]
+ *           #[DefaultValue('active')]
  *           public readonly string $status,
  *
  *           #[Cast('array')]
@@ -58,6 +61,10 @@ use ZeroBoiler\DTO\Exceptions\DTOException;
  *   $dto = CreateUserDTO::fromArray($data);
  *   $array = $dto->toArray();
  *   $json = $dto->toJson();
+ *
+ * @implements Arrayable<string, mixed>
+ *
+ * @phpstan-consistent-constructor
  */
 abstract class DataTransferObject implements Arrayable, JsonSerializable
 {
@@ -69,7 +76,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * @param  array<string, mixed>  $data
      * @param  bool  $validate  Run validation before hydration
-     * @return static
+     *
      * @throws ValidationException
      */
     public static function fromArray(array $data, bool $validate = true): static
@@ -78,7 +85,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             static::validateArray($data);
         }
 
-        $metadata = static::resolveMetadata();
+        $metadata = self::resolveMetadata();
         $args = [];
 
         foreach ($metadata['properties'] as $name => $prop) {
@@ -92,7 +99,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
 
             // Apply casting
             if ($prop['cast'] !== null && $value !== null) {
-                $value = static::castValue($value, $prop['cast']);
+                $value = self::castValue($value, $prop['cast']);
             }
 
             $args[$name] = $value;
@@ -106,9 +113,6 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * Uses request input (merges route params, query and body).
      *
-     * @param  Request  $request
-     * @param  bool  $validate
-     * @return static
      * @throws ValidationException
      */
     public static function fromRequest(Request $request, bool $validate = true): static
@@ -120,12 +124,13 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      * Validate an array of data against DTO rules.
      *
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>  Validated data
+     * @return array<string, mixed> Validated data
+     *
      * @throws ValidationException
      */
     public static function validateArray(array $data): array
     {
-        $metadata = static::resolveMetadata();
+        $metadata = self::resolveMetadata();
 
         /** @var ValidatorContract $validator */
         $validator = Validator::make($data, $metadata['rules'], $metadata['messages']);
@@ -140,7 +145,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      */
     public static function rules(): array
     {
-        return static::resolveMetadata()['rules'];
+        return self::resolveMetadata()['rules'];
     }
 
     /**
@@ -150,7 +155,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      */
     public function toArray(): array
     {
-        $metadata = static::resolveMetadata();
+        $metadata = self::resolveMetadata();
         $result = [];
 
         foreach ($metadata['properties'] as $name => $prop) {
@@ -206,7 +211,6 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      * Create a new instance with modified values (immutable update).
      *
      * @param  array<string, mixed>  $overrides
-     * @return static
      */
     public function with(array $overrides): static
     {
@@ -247,8 +251,8 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         if ($constructor === null) {
             return self::$_metadataCache[$class] = [
                 'properties' => [],
-                'rules'      => [],
-                'messages'   => [],
+                'rules' => [],
+                'messages' => [],
             ];
         }
 
@@ -261,18 +265,18 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             $type = $param->getType();
 
             // Check if property exists on class
-            if (!$reflection->hasProperty($name)) {
+            if (! $reflection->hasProperty($name)) {
                 continue;
             }
 
             $propReflection = new ReflectionProperty($class, $name);
             $propMeta = [
-                'map_from'    => null,
-                'default'     => null,
+                'map_from' => null,
+                'default' => null,
                 'has_default' => $param->isDefaultValueAvailable(),
-                'cast'        => null,
-                'hidden'      => false,
-                'nullable'    => $type?->allowsNull() ?? true,
+                'cast' => null,
+                'hidden' => false,
+                'nullable' => $type?->allowsNull() ?? true,
             ];
 
             // Use default value from constructor parameter
@@ -284,7 +288,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             $propMessages = [];
 
             // If nullable and not required, add "sometimes" or "nullable"
-            if ($propMeta['nullable'] && !$param->isDefaultValueAvailable()) {
+            if ($propMeta['nullable'] && ! $param->isDefaultValueAvailable()) {
                 $propRules[] = 'sometimes';
             }
 
@@ -295,33 +299,33 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                 match (true) {
                     $instance instanceof Required => $propRules[] = 'required',
                     $instance instanceof Email => $propRules[] = 'email',
-                    $instance instanceof Max => $propRules[] = 'max:' . $instance->value,
-                    $instance instanceof Min => $propRules[] = 'min:' . $instance->value,
+                    $instance instanceof Max => $propRules[] = 'max:'.$instance->value,
+                    $instance instanceof Min => $propRules[] = 'min:'.$instance->value,
                     $instance instanceof Url => $propRules[] = 'url',
-                    $instance instanceof Pattern => $propRules[] = 'regex:' . $instance->regex,
-                    $instance instanceof In => $propRules[] = 'in:' . implode(',', $instance->values),
+                    $instance instanceof Pattern => $propRules[] = 'regex:'.$instance->regex,
+                    $instance instanceof In => $propRules[] = 'in:'.implode(',', $instance->values),
                     $instance instanceof Integer => $propRules[] = 'integer',
                     $instance instanceof Numeric => $propRules[] = 'numeric',
                     $instance instanceof Boolean => $propRules[] = 'boolean',
                     $instance instanceof Uuid => $propRules[] = 'uuid',
                     $instance instanceof DateAttribute => $propRules[] = $instance->format
-                        ? 'date_format:' . $instance->format
+                        ? 'date_format:'.$instance->format
                         : 'date',
-                    $instance instanceof EnumAttribute => $propRules[] = 'in:' . implode(
+                    $instance instanceof EnumAttribute => $propRules[] = 'in:'.implode(
                         ',',
-                        array_map(fn($c) => $c->value, $instance->enumClass::cases())
+                        array_map(fn (\BackedEnum $c): int|string => $c->value, $instance->enumClass::cases())
                     ),
                     $instance instanceof CastAttribute => $propMeta['cast'] = $instance->type,
                     $instance instanceof MapFrom => $propMeta['map_from'] = $instance->key,
                     $instance instanceof Hidden => $propMeta['hidden'] = true,
-                    $instance instanceof DefaultAttribute => $propMeta['default'] = $instance->value,
+                    $instance instanceof DefaultValueAttribute => $propMeta['default'] = $instance->value,
                     default => null,
                 };
 
                 // Collect custom messages
                 if (property_exists($instance, 'message') && $instance->message !== null) {
-                    $attrClass = (new ReflectionClass($instance))->getShortName();
-                    $ruleKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $attrClass));
+                    $attrClass = new ReflectionClass($instance)->getShortName();
+                    $ruleKey = strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', $attrClass));
                     $messages["{$name}.{$ruleKey}"] = $instance->message;
                 }
             }
@@ -330,24 +334,24 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             if ($type instanceof \ReflectionNamedType) {
                 $typeName = $type->getName();
                 if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array'], true)) {
-                    if (!in_array('integer', $propRules) && $typeName === 'int') {
+                    if (! in_array('integer', $propRules) && $typeName === 'int') {
                         $propRules[] = 'integer';
-                    } elseif (!in_array('numeric', $propRules) && $typeName === 'float') {
+                    } elseif (! in_array('numeric', $propRules) && $typeName === 'float') {
                         $propRules[] = 'numeric';
                     }
                 }
             }
 
             $properties[$name] = $propMeta;
-            if (!empty($propRules)) {
+            if ($propRules !== []) {
                 $rules[$name] = array_unique($propRules);
             }
         }
 
         return self::$_metadataCache[$class] = [
             'properties' => $properties,
-            'rules'      => $rules,
-            'messages'   => $messages,
+            'rules' => $rules,
+            'messages' => $messages,
         ];
     }
 
@@ -361,7 +365,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             'float', 'double' => (float) $value,
             'string' => (string) $value,
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
-            'array' => is_array($value) ? $value : (strlen((string)$value) > 0 ? json_decode((string)$value, true) : []),
+            'array' => is_array($value) ? $value : ((string) $value !== '' ? json_decode((string) $value, true) : []),
             default => $value,
         };
     }

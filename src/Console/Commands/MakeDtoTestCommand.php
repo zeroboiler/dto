@@ -1,11 +1,14 @@
 <?php
 
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 /**
  * Generate Pest tests for a DTO class.
@@ -22,7 +25,7 @@ final class MakeDtoTestCommand extends Command
     {
         $dtoClass = (string) $this->argument('class');
 
-        if (!class_exists($dtoClass)) {
+        if (! class_exists($dtoClass)) {
             $this->error("DTO class '{$dtoClass}' not found.");
 
             return self::FAILURE;
@@ -31,13 +34,13 @@ final class MakeDtoTestCommand extends Command
         $shortName = class_basename($dtoClass);
         $defaultDir = base_path('tests/Unit/DTO');
         $dir = (string) ($this->option('dir') ?? $defaultDir);
-        $path = rtrim($dir, '/') . "/{$shortName}Test.php";
+        $path = rtrim($dir, '/')."/{$shortName}Test.php";
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
-        if (file_exists($path) && !$this->confirm("File {$path} already exists. Overwrite?")) {
+        if (file_exists($path) && ! $this->confirm("File {$path} already exists. Overwrite?")) {
             $this->info('Cancelled.');
 
             return self::SUCCESS;
@@ -46,7 +49,7 @@ final class MakeDtoTestCommand extends Command
         $rules = $dtoClass::rules();
         $ruleStrings = [];
         foreach ($rules as $field => $fieldRules) {
-            $ruleStrings[] = "    '{$field}' => [" . implode(', ', array_map(fn($r) => "'{$r}'", $fieldRules)) . "],";
+            $ruleStrings[] = "    '{$field}' => [".implode(', ', array_map(fn ($r): string => "'{$r}'", $fieldRules)).'],';
         }
         $rulesStr = implode("\n", $ruleStrings);
 
@@ -101,7 +104,7 @@ describe('{$shortName}', function () {
 PHP;
 
         file_put_contents($path, $content);
-        $relative = str_replace(base_path() . '/', '', $path);
+        $relative = str_replace(base_path().'/', '', $path);
         $this->info("Generated: {$relative}");
 
         return self::SUCCESS;

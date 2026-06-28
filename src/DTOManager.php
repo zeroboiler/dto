@@ -1,8 +1,13 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
+
+use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
 /**
  * Runtime DTO helper — accessible via `DTO` facade or injected.
@@ -26,7 +31,6 @@ final class DTOManager
      *
      * @param  class-string<DataTransferObject>  $dtoClass
      * @param  array<string, mixed>  $data
-     * @return DataTransferObject
      */
     public function make(string $dtoClass, array $data): DataTransferObject
     {
@@ -41,6 +45,6 @@ final class DTOManager
      */
     public function schema(string $dtoClass): array
     {
-        return \ZeroBoiler\DTO\Support\OpenApiSchemaGenerator::generate($dtoClass);
+        return OpenApiSchemaGenerator::generate($dtoClass);
     }
 }

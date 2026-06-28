@@ -1,11 +1,13 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
 /**
@@ -24,7 +26,7 @@ final class MakeDtoSchemaCommand extends Command
     {
         $dtoClass = (string) $this->argument('class');
 
-        if (!class_exists($dtoClass)) {
+        if (! class_exists($dtoClass)) {
             $this->error("DTO class '{$dtoClass}' not found.");
 
             return self::FAILURE;
@@ -35,7 +37,7 @@ final class MakeDtoSchemaCommand extends Command
         if ($this->option('json')) {
             $this->line(json_encode($schema, JSON_PRETTY_PRINT));
         } else {
-            $this->info('Schema for: ' . class_basename($dtoClass));
+            $this->info('Schema for: '.class_basename($dtoClass));
             $this->newLine();
             $this->line(json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
