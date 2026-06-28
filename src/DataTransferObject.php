@@ -72,6 +72,19 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     private static array $_metadataCache = [];
 
     /**
+     * Flush the metadata cache for a specific class or all classes.
+     * Useful in long-running processes (Octane, Swoole) and tests.
+     */
+    public static function flushMetadataCache(?string $class = null): void
+    {
+        if ($class !== null) {
+            unset(self::$_metadataCache[$class]);
+        } else {
+            self::$_metadataCache = [];
+        }
+    }
+
+    /**
      * Create DTO instance from an associative array.
      *
      * @param  array<string, mixed>  $data
@@ -149,6 +162,36 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     }
 
     /**
+     * Convert DTO to associative array, including hidden properties.
+     *
+     * @return array<string, mixed>
+     */
+    public function allValues(): array
+    {
+        $metadata = self::resolveMetadata();
+        $result = [];
+
+        foreach ($metadata['properties'] as $name => $prop) {
+            $value = $this->{$name};
+
+            // Convert nested DTOs
+            if ($value instanceof DataTransferObject) {
+                $value = $value->allValues();
+            } elseif ($value instanceof \BackedEnum) {
+                $value = $value->value;
+            } elseif ($value instanceof \UnitEnum) {
+                $value = $value->name;
+            } elseif ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DateTimeInterface::ATOM);
+            }
+
+            $result[$name] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
      * Convert DTO to associative array.
      *
      * @return array<string, mixed>
@@ -214,7 +257,8 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      */
     public function with(array $overrides): static
     {
-        $data = $this->toArray();
+        // Use all property values (including hidden) to avoid data loss
+        $data = $this->allValues();
         $data = array_merge($data, $overrides);
 
         return static::fromArray($data, validate: false);
