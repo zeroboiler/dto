@@ -212,8 +212,29 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             'float', 'double' => (float) $value,
             'string' => (string) $value,
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
-            'array' => is_array($value) ? $value : ((string) $value !== '' ? json_decode((string) $value, true) : []),
+            'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value),
             default => $value,
         };
+    }
+
+    /**
+     * Safely decode a JSON string to an array.
+     * Returns [] for empty strings or invalid JSON instead of silently returning null.
+     *
+     * @return array<string, mixed>
+     */
+    private static function decodeJsonArray(string $value): array
+    {
+        if ($value === '') {
+            return [];
+        }
+
+        try {
+            $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+
+            return is_array($decoded) ? $decoded : [];
+        } catch (\JsonException) {
+            return [];
+        }
     }
 }
