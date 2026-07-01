@@ -39,13 +39,18 @@ class OpenApiSchemaGenerator
             $name = $param->getName();
             $type = $param->getType();
 
-            // Check for DefaultValue attribute early to determine if field is required
-            $hasDefaultValueAttr = false;
-            $defaultValue = null;
-
             $propReflection = $reflection->hasProperty($name)
                 ? new \ReflectionProperty($dtoClass, $name)
                 : null;
+
+            // Skip hidden properties entirely
+            if (self::hasAttribute($propReflection, Hidden::class)) {
+                continue;
+            }
+
+            // Check for DefaultValue attribute early to determine if field is required
+            $hasDefaultValueAttr = false;
+            $defaultValue = null;
 
             if ($propReflection instanceof \ReflectionProperty) {
                 foreach ($propReflection->getAttributes() as $attr) {
@@ -75,15 +80,6 @@ class OpenApiSchemaGenerator
                 $propSchema['default'] = $defaultValue;
             }
 
-            // Check for Hidden attribute
-            if ($propReflection instanceof \ReflectionProperty) {
-                foreach ($propReflection->getAttributes() as $attr) {
-                    if ($attr->getName() === Hidden::class) {
-                        continue 2;
-                    }
-                }
-            }
-
             $properties[$name] = $propSchema;
         }
 
@@ -97,6 +93,24 @@ class OpenApiSchemaGenerator
         }
 
         return $schema;
+    }
+
+    /**
+     * Check if a reflection property has a given attribute.
+     */
+    private static function hasAttribute(?\ReflectionProperty $prop, string $attributeClass): bool
+    {
+        if (! $prop instanceof \ReflectionProperty) {
+            return false;
+        }
+
+        foreach ($prop->getAttributes() as $attr) {
+            if ($attr->getName() === $attributeClass) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function inferType(?\ReflectionType $type): string
