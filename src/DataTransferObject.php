@@ -60,6 +60,8 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
             $value = Arr::get($data, $sourceKey);
 
+            // Only apply default when the key is entirely absent from the data.
+            // Explicit null or empty string should be respected as intentional values (#678).
             if (! $hasKey && $prop['has_default']) {
                 $value = $prop['default'];
             }
