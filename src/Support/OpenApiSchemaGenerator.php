@@ -104,13 +104,7 @@ class OpenApiSchemaGenerator
             return false;
         }
 
-        foreach ($prop->getAttributes() as $attr) {
-            if ($attr->getName() === $attributeClass) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($prop->getAttributes(), fn (\ReflectionAttribute $attr): bool => $attr->getName() === $attributeClass);
     }
 
     private static function inferType(?\ReflectionType $type): string
