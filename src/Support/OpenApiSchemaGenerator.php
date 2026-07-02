@@ -120,6 +120,34 @@ class OpenApiSchemaGenerator
             };
         }
 
+        if ($type instanceof \ReflectionUnionType) {
+            // Collect all named types from the union (including null)
+            $types = [];
+            foreach ($type->getTypes() as $subType) {
+                if ($subType instanceof \ReflectionNamedType) {
+                    if ($subType->getName() === 'null') {
+                        continue;
+                    }
+                    $types[] = self::inferType($subType);
+                }
+            }
+
+            // Deduplicate
+            $types = array_values(array_unique($types));
+
+            // If only one non-null type remains, return it
+            if (count($types) === 1) {
+                return $types[0];
+            }
+
+            // Multiple distinct types — return 'object' as the safest generic
+            return 'object';
+        }
+
+        if ($type instanceof \ReflectionIntersectionType) {
+            return 'object';
+        }
+
         return 'string';
     }
 }
