@@ -66,7 +66,12 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                 $value = $prop['default'];
             }
 
-            if ($prop['cast'] !== null && $value !== null) {
+            // ValueObject auto-instantiation (#689)
+            // If the property is typed as a ValueObject and the raw value is not already an instance,
+            // construct the VO from the raw value. The VO constructor handles validation.
+            if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
+                $value = self::castValueToValueObject($value, $prop['value_object_class']);
+            } elseif ($prop['cast'] !== null && $value !== null) {
                 $value = self::castValue($value, $prop['cast']);
             }
 
@@ -192,6 +197,21 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             return $includeHidden ? $value->allValues() : $value->toArray();
         }
 
+        if ($value instanceof \ZeroBoiler\ValueObjects\Contracts\ValueObject) {
+            // Use columnType() to determine serialization strategy.
+            // Single-value VOs (string/integer columns) serialize to their primitive.
+            // Composite VOs (json columns) serialize to their array representation.
+            $columnType = method_exists($value, 'columnType') ? $value::columnType() : 'json';
+
+            if ($columnType === 'json') {
+                return $value->toArray();
+            }
+
+            $primitive = $value->toPrimitive();
+
+            return is_scalar($primitive) ? $primitive : $value->toArray();
+        }
+
         if ($value instanceof \BackedEnum) {
             return $value->value;
         }
@@ -217,6 +237,65 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value),
             default => $value,
         };
+    }
+
+    /**
+     * Cast a raw value to a ValueObject instance.
+     *
+     * Handles both single-value VOs (constructed from a scalar)
+     * and composite VOs (constructed from an array or JSON string).
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @param  class-string<\ZeroBoiler\ValueObjects\Contracts\ValueObject>  $voClass
+     *
+     * @throws \InvalidArgumentException If the value cannot be cast to the VO
+     * @throws \Illuminate\Validation\ValidationException If the VO validation fails
+     */
+    private static function castValueToValueObject(mixed $value, string $voClass): \ZeroBoiler\ValueObjects\Contracts\ValueObject
+    {
+        // Already a VO instance — return as-is (shouldn't happen due to caller check, but be safe)
+        if ($value instanceof $voClass) {
+            return $value;
+        }
+
+        // Try fromPrimitive first — it handles both scalar and JSON/array inputs
+        if (method_exists($voClass, 'fromPrimitive')) {
+            try {
+                return $voClass::fromPrimitive($value);
+            } catch (\InvalidArgumentException $e) {
+                // fromPrimitive failed, try direct construction below
+            }
+        }
+
+        // Composite VO from array — try named constructor
+        if (is_array($value)) {
+            try {
+                return new $voClass(...$value);
+            } catch (\Throwable $e) {
+                throw new \InvalidArgumentException(
+                    "Cannot cast array to {$voClass}: ".$e->getMessage(),
+                    0,
+                    $e
+                );
+            }
+        }
+
+        // Single-value VO from scalar — try direct construction
+        if (is_string($value) || is_int($value) || is_float($value)) {
+            try {
+                return new $voClass($value);
+            } catch (\Throwable $e) {
+                throw new \InvalidArgumentException(
+                    "Cannot cast ".get_debug_type($value)." to {$voClass}: ".$e->getMessage(),
+                    0,
+                    $e
+                );
+            }
+        }
+
+        throw new \InvalidArgumentException(
+            "Cannot cast ".get_debug_type($value)." to ValueObject {$voClass}"
+        );
     }
 
     /**

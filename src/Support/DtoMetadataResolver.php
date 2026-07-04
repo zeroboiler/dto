@@ -9,6 +9,7 @@ namespace ZeroBoiler\DTO\Support;
 
 use ReflectionClass;
 use ReflectionProperty;
+use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Cast as CastAttribute;
 use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
@@ -81,6 +82,7 @@ final class DtoMetadataResolver
                 'cast' => null,
                 'hidden' => false,
                 'nullable' => $type?->allowsNull() ?? true,
+                'value_object_class' => self::detectValueObjectClass($type),
             ];
 
             if ($propMeta['has_default']) {
@@ -182,6 +184,38 @@ final class DtoMetadataResolver
             $ruleKey = strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', $attrClass));
             $messages["{$name}.{$ruleKey}"] = $instance->message;
         }
+    }
+
+    /**
+     * Detect if the property type is a ValueObject class.
+     *
+     * Returns the FQCN of the VO class if detected, null otherwise.
+     *
+     * @return class-string<ValueObjectContract>|null
+     */
+    private static function detectValueObjectClass(?\ReflectionType $type): ?string
+    {
+        if (! $type instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        $typeName = $type->getName();
+
+        // Skip PHP scalar/builtin types
+        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+            return null;
+        }
+
+        // Check if the class exists and implements ValueObject contract
+        if (! class_exists($typeName) && ! interface_exists($typeName)) {
+            return null;
+        }
+
+        if (in_array(ValueObjectContract::class, class_implements($typeName) ?: [], true)) {
+            return $typeName;
+        }
+
+        return null;
     }
 
     /**

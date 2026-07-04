@@ -15,6 +15,7 @@ spl_autoload_register(function (string $class): void {
     $prefixes = [
         'ZeroBoiler\\DTO\\' => __DIR__.'/../src/',
         'ZeroBoiler\\DTO\\Tests\\' => __DIR__.'/',
+        'ZeroBoiler\\ValueObjects\\' => __DIR__.'/../../value-objects/src/',
     ];
 
     foreach ($prefixes as $prefix => $baseDir) {

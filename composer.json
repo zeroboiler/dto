@@ -11,7 +11,8 @@
         "illuminate/contracts": "^13.0",
         "illuminate/http": "^13.0",
         "illuminate/support": "^13.0",
-        "illuminate/validation": "^13.0"
+        "illuminate/validation": "^13.0",
+        "zeroboiler/value-objects": "^0.1"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",

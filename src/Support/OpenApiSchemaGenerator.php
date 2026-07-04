@@ -11,6 +11,7 @@ namespace ZeroBoiler\DTO\Support;
 use ReflectionClass;
 use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
  * Generate OpenAPI schema from a DTO class.
@@ -110,7 +111,15 @@ class OpenApiSchemaGenerator
     private static function inferType(?\ReflectionType $type): string
     {
         if ($type instanceof \ReflectionNamedType) {
-            return match ($type->getName()) {
+            $typeName = $type->getName();
+
+            // Check if it's a ValueObject — infer from its columnType()
+            $isVo = class_exists($typeName) && in_array(ValueObjectContract::class, class_implements($typeName) ?: [], true);
+            if ($isVo) {
+                return self::inferVoType($typeName);
+            }
+
+            return match ($typeName) {
                 'int' => 'integer',
                 'float' => 'number',
                 'bool' => 'boolean',
@@ -149,5 +158,26 @@ class OpenApiSchemaGenerator
         }
 
         return 'string';
+    }
+
+    /**
+     * Infer the OpenAPI type from a ValueObject's columnType() method.
+     *
+     * @param  class-string<ValueObjectContract>  $voClass
+     */
+    private static function inferVoType(string $voClass): string
+    {
+        if (! method_exists($voClass, 'columnType')) {
+            return 'object';
+        }
+
+        return match ($voClass::columnType()) {
+            'string' => 'string',
+            'integer' => 'integer',
+            'decimal', 'float' => 'number',
+            'boolean', 'bool' => 'boolean',
+            'json', 'array' => 'object',
+            default => 'object',
+        };
     }
 }
