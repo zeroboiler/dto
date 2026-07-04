@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 use ZeroBoiler\DTO\Tests\Fixtures\VoUserDTO;
-use ZeroBoiler\ValueObjects\Currency;
 use ZeroBoiler\ValueObjects\Email;
 use ZeroBoiler\ValueObjects\Money;
 use ZeroBoiler\ValueObjects\Url;
@@ -87,10 +87,10 @@ describe('DTO × ValueObjects: fromArray() auto-instantiation', function (): voi
     });
 
     it('throws on invalid VO value during construction', function (): void {
-        expect(fn () => VoUserDTO::fromArray([
+        expect(fn (): VoUserDTO => VoUserDTO::fromArray([
             'email' => 'not-an-email',
         ], validate: false))
-            ->toThrow(\Illuminate\Validation\ValidationException::class);
+            ->toThrow(ValidationException::class);
     });
 });
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ZeroBoiler, licensed under the proprietary license.
  */
@@ -9,7 +10,6 @@ namespace ZeroBoiler\DTO\Support;
 
 use ReflectionClass;
 use ReflectionProperty;
-use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Cast as CastAttribute;
 use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
@@ -27,6 +27,7 @@ use ZeroBoiler\DTO\Attributes\Pattern;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
+use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
  * Resolves validation rules and property metadata from DTO attributes.

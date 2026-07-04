@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use JsonSerializable;
 use ZeroBoiler\DTO\Support\DtoMetadataResolver;
+use ZeroBoiler\ValueObjects\Contracts\ValueObject;
 
 /**
  * Base Data Transfer Object — zero boilerplate hydration, validation and serialization.
@@ -197,7 +198,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             return $includeHidden ? $value->allValues() : $value->toArray();
         }
 
-        if ($value instanceof \ZeroBoiler\ValueObjects\Contracts\ValueObject) {
+        if ($value instanceof ValueObject) {
             // Use columnType() to determine serialization strategy.
             // Single-value VOs (string/integer columns) serialize to their primitive.
             // Composite VOs (json columns) serialize to their array representation.
@@ -246,12 +247,12 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      * and composite VOs (constructed from an array or JSON string).
      *
      * @param  mixed  $value  Raw value from input data
-     * @param  class-string<\ZeroBoiler\ValueObjects\Contracts\ValueObject>  $voClass
+     * @param  class-string<ValueObject>  $voClass
      *
      * @throws \InvalidArgumentException If the value cannot be cast to the VO
-     * @throws \Illuminate\Validation\ValidationException If the VO validation fails
+     * @throws ValidationException If the VO validation fails
      */
-    private static function castValueToValueObject(mixed $value, string $voClass): \ZeroBoiler\ValueObjects\Contracts\ValueObject
+    private static function castValueToValueObject(mixed $value, string $voClass): ValueObject
     {
         // Already a VO instance — return as-is (shouldn't happen due to caller check, but be safe)
         if ($value instanceof $voClass) {
@@ -262,7 +263,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         if (method_exists($voClass, 'fromPrimitive')) {
             try {
                 return $voClass::fromPrimitive($value);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 // fromPrimitive failed, try direct construction below
             }
         }
@@ -286,7 +287,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                 return new $voClass($value);
             } catch (\Throwable $e) {
                 throw new \InvalidArgumentException(
-                    "Cannot cast ".get_debug_type($value)." to {$voClass}: ".$e->getMessage(),
+                    'Cannot cast '.get_debug_type($value)." to {$voClass}: ".$e->getMessage(),
                     0,
                     $e
                 );
@@ -294,7 +295,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         }
 
         throw new \InvalidArgumentException(
-            "Cannot cast ".get_debug_type($value)." to ValueObject {$voClass}"
+            'Cannot cast '.get_debug_type($value)." to ValueObject {$voClass}"
         );
     }
 

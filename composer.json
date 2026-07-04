@@ -59,5 +59,10 @@
             "pestphp/pest-plugin": true,
             "phpstan/extension-installer": true
         }
-    }
+    },
+    "repositories": [{
+        "name": "zeroboiler-value-objects",
+        "type": "path",
+        "url": "../value-objects"
+    }]
 }
