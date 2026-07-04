@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use JsonSerializable;
@@ -236,6 +237,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             'string' => (string) $value,
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
             'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value),
+            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : new Carbon($value),
             default => $value,
         };
     }

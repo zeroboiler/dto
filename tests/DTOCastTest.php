@@ -6,8 +6,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Carbon;
 use ZeroBoiler\DTO\Casts\DTOCast;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\DateCastDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\DateTimeCastDTO;
 
 describe('DTOCast', function (): void {
     it('casts JSON to DTO instance', function (): void {
@@ -72,4 +75,27 @@ describe('DTOCast', function (): void {
         $decoded = json_decode($result, true);
         expect($decoded['email'])->toBe('arr@example.com');
     });
+});
+
+it('casts date strings to Carbon instances (IMP-3 R34)', function (): void {
+    $dto = DateCastDTO::fromArray(['event_date' => '2026-07-04'], validate: false);
+
+    expect($dto->event_date)->toBeInstanceOf(Carbon::class)
+        ->and($dto->event_date->toDateString())->toBe('2026-07-04');
+});
+
+it('casts datetime strings to Carbon instances (IMP-3 R34)', function (): void {
+    $dto = DateTimeCastDTO::fromArray(['created_at' => '2026-07-04T19:37:00Z'], validate: false);
+
+    expect($dto->created_at)->toBeInstanceOf(Carbon::class)
+        ->and($dto->created_at->year)->toBe(2026)
+        ->and($dto->created_at->month)->toBe(7)
+        ->and($dto->created_at->day)->toBe(4);
+});
+
+it('passes through existing DateTimeInterface instances for date cast', function (): void {
+    $date = new DateTime('2026-01-15');
+    $dto = DateCastDTO::fromArray(['event_date' => $date], validate: false);
+
+    expect($dto->event_date)->toBeInstanceOf(DateTimeInterface::class);
 });
