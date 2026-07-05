@@ -19,6 +19,12 @@ use ZeroBoiler\DTO\DataTransferObject;
  *       'payload' => CreateUserDTO::class,
  *   ];
  *
+ *   // With validation on set (ensures data integrity on save):
+ *   protected function casts(): array
+ *   {
+ *       return ['payload' => (new DTOCast(CreateUserDTO::class, validate: true))];
+ *   }
+ *
  * @template T of \ZeroBoiler\DTO\DataTransferObject
  *
  * @implements CastsAttributes<T, T|array<string, mixed>|null>
@@ -27,8 +33,12 @@ class DTOCast implements CastsAttributes
 {
     /**
      * @param  class-string<T>  $dtoClass
+     * @param  bool  $validate  Whether to validate arrays passed to set()
      */
-    public function __construct(private readonly string $dtoClass) {}
+    public function __construct(
+        private readonly string $dtoClass,
+        private readonly bool $validate = false,
+    ) {}
 
     /**
      * @param  Model  $model
@@ -65,7 +75,18 @@ class DTOCast implements CastsAttributes
             return json_encode($value->toArray());
         }
 
-        return is_array($value) ? json_encode($value) : $value;
+        if (is_array($value)) {
+            // Validate the array data if validation is enabled
+            if ($this->validate) {
+                /** @var class-string<T> $dtoClass */
+                $dtoClass = $this->dtoClass;
+                $dtoClass::fromArray($value, validate: true);
+            }
+
+            return json_encode($value);
+        }
+
+        return $value;
     }
 
     /**

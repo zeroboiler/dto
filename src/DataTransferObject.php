@@ -203,7 +203,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             // Use columnType() to determine serialization strategy.
             // Single-value VOs (string/integer columns) serialize to their primitive.
             // Composite VOs (json columns) serialize to their array representation.
-            $columnType = method_exists($value, 'columnType') ? $value::columnType() : 'json';
+            $columnType = $value::columnType();
 
             if ($columnType === 'json') {
                 return $value->toArray();

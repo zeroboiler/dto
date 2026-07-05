@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Support;
 
+use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionClass;
 use ReflectionProperty;
 use ZeroBoiler\DTO\Attributes\Boolean;
@@ -104,7 +106,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string>  $propRules
+     * @param  list<string|EnumRule>  $propRules
      * @param  array<string, string>  $messages
      */
     private static function resolveAttributes(
@@ -130,7 +132,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string>  $propRules
+     * @param  list<string|Enum>  $propRules
      */
     private static function applyValidationAttribute(object $instance, array &$propRules): void
     {
@@ -149,10 +151,7 @@ final class DtoMetadataResolver
             $instance instanceof DateAttribute => $propRules[] = $instance->format
                 ? 'date_format:'.$instance->format
                 : 'date',
-            $instance instanceof EnumAttribute => $propRules[] = 'in:'.implode(
-                ',',
-                array_map(fn (\BackedEnum $c): int|string => $c->value, $instance->enumClass::cases())
-            ),
+            $instance instanceof EnumAttribute => $propRules[] = new EnumRule($instance->enumClass),
             default => null,
         };
     }
