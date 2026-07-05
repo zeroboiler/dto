@@ -50,4 +50,25 @@ describe('OpenApiSchemaGenerator', function (): void {
 
         expect($schema['type'])->toBe('object');
     });
+
+    it('does not mark non-nullable optional fields as nullable (BUG-4 R37)', function (): void {
+        $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
+        $props = (array) $schema['properties'];
+
+        // `status` is string (non-nullable) with a default value — optional but NOT nullable
+        expect($props['status'])->not->toHaveKey('nullable');
+        expect($props['status']['type'])->toBe('string');
+
+        // `tags` is array (non-nullable) with a default — optional but NOT nullable
+        expect($props['tags'])->not->toHaveKey('nullable');
+    });
+
+    it('marks truly nullable fields as nullable', function (): void {
+        $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
+        $props = (array) $schema['properties'];
+
+        // `phone` is ?string — actually nullable
+        expect($props['phone'])->toHaveKey('nullable');
+        expect($props['phone']['nullable'])->toBeTrue();
+    });
 });

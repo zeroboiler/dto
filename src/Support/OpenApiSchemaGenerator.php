@@ -9,8 +9,21 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Support;
 
 use ReflectionClass;
+use ReflectionProperty;
+use ZeroBoiler\DTO\Attributes\Boolean;
+use ZeroBoiler\DTO\Attributes\Date;
 use ZeroBoiler\DTO\Attributes\DefaultValue;
+use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\Enum as EnumAttribute;
 use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\DTO\Attributes\In;
+use ZeroBoiler\DTO\Attributes\Integer;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Numeric;
+use ZeroBoiler\DTO\Attributes\Pattern;
+use ZeroBoiler\DTO\Attributes\Url;
+use ZeroBoiler\DTO\Attributes\Uuid;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
@@ -73,12 +86,21 @@ class OpenApiSchemaGenerator
 
             $propSchema = ['type' => self::inferType($type)];
 
-            if (! $isRequired) {
+            // Only mark as nullable if the type actually allows null.
+            // Optional fields (not in `required`) mean the field can be absent,
+            // but nullable means the field can be explicitly null — these are different concepts.
+            $typeAllowsNull = $type?->allowsNull() ?? true;
+            if ($typeAllowsNull) {
                 $propSchema['nullable'] = true;
             }
 
             if ($hasDefaultValueAttr) {
                 $propSchema['default'] = $defaultValue;
+            }
+
+            // Enrich schema with validation attribute constraints
+            if ($propReflection instanceof \ReflectionProperty) {
+                $propSchema = self::applyValidationAttributes($propReflection, $propSchema);
             }
 
             $properties[$name] = $propSchema;
@@ -94,6 +116,66 @@ class OpenApiSchemaGenerator
         }
 
         return $schema;
+    }
+
+    /**
+     * Enrich the OpenAPI property schema with constraints from validation attributes.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyValidationAttributes(\ReflectionProperty $prop, array $propSchema): array
+    {
+        foreach ($prop->getAttributes() as $attr) {
+            $instance = $attr->newInstance();
+
+            match (true) {
+                $instance instanceof Email => $propSchema['format'] = 'email',
+                $instance instanceof Url => $propSchema['format'] = 'uri',
+                $instance instanceof Uuid => $propSchema['format'] = 'uuid',
+                $instance instanceof Max => $propSchema['maxLength'] = $instance->value,
+                $instance instanceof Min => $propSchema['minLength'] = $instance->value,
+                $instance instanceof Pattern => $propSchema['pattern'] = ltrim($instance->regex, '/'),
+                $instance instanceof Integer => $propSchema['type'] = 'integer',
+                $instance instanceof Numeric => $propSchema['type'] = 'number',
+                $instance instanceof Boolean => $propSchema['type'] = 'boolean',
+                $instance instanceof Date => $propSchema['format'] = 'date',
+                $instance instanceof In => $propSchema['enum'] = $instance->values,
+                $instance instanceof EnumAttribute => $propSchema = self::applyEnumSchema($instance, $propSchema),
+                default => null,
+            };
+        }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply enum constraints to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyEnumSchema(EnumAttribute $enum, array $propSchema): array
+    {
+        $enumClass = $enum->enumClass;
+
+        if (! enum_exists($enumClass)) {
+            return $propSchema;
+        }
+
+        $values = array_map(
+            fn (\BackedEnum $case): mixed => $case->value,
+            $enumClass::cases()
+        );
+
+        $propSchema['enum'] = $values;
+
+        // Infer type from first enum value
+        if ($values !== []) {
+            $propSchema['type'] = is_int($values[0]) ? 'integer' : 'string';
+        }
+
+        return $propSchema;
     }
 
     /**
