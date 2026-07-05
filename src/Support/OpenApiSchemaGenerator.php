@@ -54,7 +54,7 @@ class OpenApiSchemaGenerator
             $type = $param->getType();
 
             $propReflection = $reflection->hasProperty($name)
-                ? new \ReflectionProperty($dtoClass, $name)
+                ? new ReflectionProperty($dtoClass, $name)
                 : null;
 
             // Skip hidden properties entirely
@@ -66,7 +66,7 @@ class OpenApiSchemaGenerator
             $hasDefaultValueAttr = false;
             $defaultValue = null;
 
-            if ($propReflection instanceof \ReflectionProperty) {
+            if ($propReflection instanceof ReflectionProperty) {
                 foreach ($propReflection->getAttributes() as $attr) {
                     if ($attr->getName() === DefaultValue::class) {
                         $instance = $attr->newInstance();
@@ -99,7 +99,7 @@ class OpenApiSchemaGenerator
             }
 
             // Enrich schema with validation attribute constraints
-            if ($propReflection instanceof \ReflectionProperty) {
+            if ($propReflection instanceof ReflectionProperty) {
                 $propSchema = self::applyValidationAttributes($propReflection, $propSchema);
             }
 
@@ -124,7 +124,7 @@ class OpenApiSchemaGenerator
      * @param  array<string, mixed>  $propSchema
      * @return array<string, mixed>
      */
-    private static function applyValidationAttributes(\ReflectionProperty $prop, array $propSchema): array
+    private static function applyValidationAttributes(ReflectionProperty $prop, array $propSchema): array
     {
         foreach ($prop->getAttributes() as $attr) {
             $instance = $attr->newInstance();
@@ -181,9 +181,9 @@ class OpenApiSchemaGenerator
     /**
      * Check if a reflection property has a given attribute.
      */
-    private static function hasAttribute(?\ReflectionProperty $prop, string $attributeClass): bool
+    private static function hasAttribute(?ReflectionProperty $prop, string $attributeClass): bool
     {
-        if (! $prop instanceof \ReflectionProperty) {
+        if (! $prop instanceof ReflectionProperty) {
             return false;
         }
 
