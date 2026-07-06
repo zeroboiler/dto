@@ -156,7 +156,7 @@ class OpenApiSchemaGenerator
      */
     private static function inferPropertySchema(?\ReflectionType $type, array &$components): array
     {
-        if (!$type instanceof \ReflectionType) {
+        if (! $type instanceof \ReflectionType) {
             return ['type' => 'string'];
         }
         // Union types — produce oneOf schema (#75)
