@@ -15,8 +15,8 @@ use ZeroBoiler\DTO\Tests\Fixtures\UnionTypeDTO;
 describe('OpenApiSchemaGenerator — Nested DTO Support (#76)', function (): void {
     it('throws when generate() encounters nested DTO references', function (): void {
         // generate() cannot produce valid $ref pointers without components (BUG-2 R38)
-        expect(fn () => OpenApiSchemaGenerator::generate(OrderDTO::class))
-            ->toThrow(\LogicException::class, 'nested DTO references');
+        expect(fn (): array => OpenApiSchemaGenerator::generate(OrderDTO::class))
+            ->toThrow(LogicException::class, 'nested DTO references');
     });
 
     it('generates $ref for nested DTO property via generateWithComponents()', function (): void {
