@@ -84,6 +84,158 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     }
 
     /**
+     * Create DTO instance from a partial associative array (PATCH semantics).
+     *
+     * Only fields present in $data are validated and hydrated.
+     * Missing fields fall back to their default values, or type-appropriate
+     * empty values when no default exists (string → '', int → 0, etc.).
+     *
+     * This is ideal for PATCH endpoints where only changed fields are submitted.
+     * For merging onto an existing DTO, use {@see with()} instead.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  bool  $validatePresent  Run validation on fields present in $data
+     *
+     * @throws ValidationException
+     */
+    public static function fromPartialArray(array $data, bool $validatePresent = true): static
+    {
+        if ($validatePresent && $data !== []) {
+            static::validatePartialArray($data);
+        }
+
+        $metadata = self::resolveMetadata();
+        $args = [];
+
+        foreach ($metadata['properties'] as $name => $prop) {
+            $sourceKey = $prop['map_from'] ?? $name;
+            $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
+
+            if ($hasKey) {
+                $value = Arr::get($data, $sourceKey);
+                // Apply the same casting/VO logic as fromArray
+                if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
+                    $value = self::castValueToValueObject($value, $prop['value_object_class']);
+                } elseif ($prop['cast'] !== null && $value !== null) {
+                    $value = self::castValue($value, $prop['cast']);
+                }
+                $args[$name] = $value;
+            } elseif ($prop['has_default']) {
+                // Missing field: use default if available, otherwise type-appropriate empty value
+                $args[$name] = $prop['default'];
+            } else {
+                $args[$name] = self::emptyValueForType($name, $prop['nullable'], $prop);
+            }
+        }
+
+        return new static(...$args);
+    }
+
+    /**
+     * Get a type-appropriate empty value for a missing field.
+     *
+     * Uses reflection on the constructor parameter to determine the type.
+     *
+     * @param  array<string, mixed>  $propMeta
+     */
+    private static function emptyValueForType(string $paramName, bool $nullable, array $propMeta): mixed
+    {
+        // If the property is nullable, null is the natural default
+        if ($nullable) {
+            return null;
+        }
+
+        // Try to infer from cast type
+        $cast = $propMeta['cast'] ?? null;
+        if ($cast !== null) {
+            return match ($cast) {
+                'int', 'integer' => 0,
+                'float', 'double' => 0.0,
+                'string' => '',
+                'bool', 'boolean' => false,
+                'array' => [],
+                default => null,
+            };
+        }
+
+        // Use reflection to get the type from the constructor parameter
+        $reflection = new \ReflectionClass(static::class);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor !== null) {
+            foreach ($constructor->getParameters() as $param) {
+                if ($param->getName() === $paramName) {
+                    $type = $param->getType();
+
+                    if ($type instanceof \ReflectionNamedType) {
+                        $typeName = $type->getName();
+
+                        return match ($typeName) {
+                            'int' => 0,
+                            'float' => 0.0,
+                            'string' => '',
+                            'bool' => false,
+                            'array' => [],
+                            default => null,
+                        };
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Validate only the fields present in the partial data.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     *
+     * @throws ValidationException
+     */
+    public static function validatePartialArray(array $data): array
+    {
+        $metadata = self::resolveMetadata();
+        $partialRules = [];
+
+        foreach ($metadata['rules'] as $field => $rules) {
+            $sourceKey = $metadata['properties'][$field]['map_from'] ?? $field;
+            $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
+
+            if (! $hasKey) {
+                continue;
+            }
+
+            // Convert 'required' to 'sometimes' for partial updates
+            $adjustedRules = array_map(
+                fn (mixed $rule): mixed => $rule === 'required' ? 'sometimes' : $rule,
+                $rules
+            );
+
+            $partialRules[$field] = $adjustedRules;
+        }
+
+        if ($partialRules === []) {
+            return $data;
+        }
+
+        $validator = Validator::make($data, $partialRules, $metadata['messages']);
+
+        return $validator->validate();
+    }
+
+    /**
+     * Create DTO from a partial request (PATCH/PUT with sparse data).
+     *
+     * @throws ValidationException
+     */
+    public static function fromPartialRequest(Request $request, bool $validate = true): static
+    {
+        return static::fromPartialArray($request->all(), $validate);
+    }
+
+    /**
      * @throws ValidationException
      */
     public static function fromRequest(Request $request, bool $validate = true): static
