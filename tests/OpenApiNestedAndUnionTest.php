@@ -13,26 +13,32 @@ use ZeroBoiler\DTO\Tests\Fixtures\OrderDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\UnionTypeDTO;
 
 describe('OpenApiSchemaGenerator — Nested DTO Support (#76)', function (): void {
-    it('generates $ref for nested DTO property', function (): void {
-        $schema = OpenApiSchemaGenerator::generate(OrderDTO::class);
-        $props = (array) $schema['properties'];
+    it('throws when generate() encounters nested DTO references', function (): void {
+        // generate() cannot produce valid $ref pointers without components (BUG-2 R38)
+        expect(fn () => OpenApiSchemaGenerator::generate(OrderDTO::class))
+            ->toThrow(\LogicException::class, 'nested DTO references');
+    });
+
+    it('generates $ref for nested DTO property via generateWithComponents()', function (): void {
+        $result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
+        $props = (array) $result['schema']['properties'];
 
         expect($props['shippingAddress'])->toHaveKey('$ref')
             ->and($props['shippingAddress']['$ref'])->toBe('#/components/schemas/AddressDTO');
     });
 
     it('does not mark nested DTO as nullable when non-nullable', function (): void {
-        $schema = OpenApiSchemaGenerator::generate(OrderDTO::class);
-        $props = (array) $schema['properties'];
+        $result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
+        $props = (array) $result['schema']['properties'];
 
         // shippingAddress is non-nullable AddressDTO
         expect($props['shippingAddress'])->not->toHaveKey('nullable');
     });
 
     it('includes nested DTO in required when non-nullable and no default', function (): void {
-        $schema = OpenApiSchemaGenerator::generate(OrderDTO::class);
+        $result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
 
-        expect($schema['required'])->toContain('shippingAddress');
+        expect($result['schema']['required'])->toContain('shippingAddress');
     });
 });
 
@@ -124,8 +130,8 @@ describe('OpenApiSchemaGenerator — Union Type Support (#75)', function (): voi
     });
 
     it('handles OrderDTO rawTotal union type (int|float|string)', function (): void {
-        $schema = OpenApiSchemaGenerator::generate(OrderDTO::class);
-        $props = (array) $schema['properties'];
+        $result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
+        $props = (array) $result['schema']['properties'];
 
         $rawTotal = $props['rawTotal'];
 

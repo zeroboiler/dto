@@ -41,8 +41,22 @@ class OpenApiSchemaGenerator
     public static function generate(string $dtoClass): array
     {
         $components = [];
+        $schema = self::generateInternal($dtoClass, $components);
 
-        return self::generateInternal($dtoClass, $components);
+        // If nested DTOs were detected, generate() produces schemas with
+        // dangling $ref pointers — the component definitions are discarded.
+        // Direct users to generateWithComponents() instead. (BUG-2 R38)
+        if ($components !== []) {
+            $componentNames = implode(', ', array_keys($components));
+
+            throw new \LogicException(
+                'DTO contains nested DTO references ('.$componentNames.'). '
+                .'Use OpenApiSchemaGenerator::generateWithComponents() instead, '
+                .'which returns both the schema and component definitions.'
+            );
+        }
+
+        return $schema;
     }
 
     /**

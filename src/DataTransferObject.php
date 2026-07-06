@@ -176,7 +176,10 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                             'string' => '',
                             'bool' => false,
                             'array' => [],
-                            default => null,
+                            default => throw new \InvalidArgumentException(
+                                "Cannot provide empty value for '{$paramName}' of type '{$typeName}' in partial update. "
+                                .'Provide this field explicitly or make it nullable.'
+                            ),
                         };
                     }
                 }
