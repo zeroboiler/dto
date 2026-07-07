@@ -247,18 +247,36 @@ final class DtoMetadataResolver
      */
     private static function detectValueObjectClass(?\ReflectionType $type): ?string
     {
-        if (! $type instanceof \ReflectionNamedType) {
-            return null;
+        if ($type instanceof \ReflectionNamedType) {
+            return self::checkValueObject($type->getName());
         }
 
-        $typeName = $type->getName();
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof \ReflectionNamedType) {
+                    $result = self::checkValueObject($innerType->getName());
+                    if ($result !== null) {
+                        return $result;
+                    }
+                }
+            }
+        }
 
+        return null;
+    }
+
+    /**
+     * Check if a class name implements ValueObject contract.
+     *
+     * @return class-string<ValueObjectContract>|null
+     */
+    private static function checkValueObject(string $typeName): ?string
+    {
         // Skip PHP scalar/builtin types
         if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
             return null;
         }
 
-        // Check if the class exists and implements ValueObject contract
         if (! class_exists($typeName) && ! interface_exists($typeName)) {
             return null;
         }
@@ -280,23 +298,39 @@ final class DtoMetadataResolver
      */
     private static function detectDtoClass(?\ReflectionType $type): ?string
     {
-        if (! $type instanceof \ReflectionNamedType) {
-            return null;
+        if ($type instanceof \ReflectionNamedType) {
+            return self::checkDtoClass($type->getName());
         }
 
-        $typeName = $type->getName();
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof \ReflectionNamedType) {
+                    $result = self::checkDtoClass($innerType->getName());
+                    if ($result !== null) {
+                        return $result;
+                    }
+                }
+            }
+        }
 
-        // Skip PHP scalar/builtin types
+        return null;
+    }
+
+    /**
+     * Check if a class name is a DTO subclass.
+     *
+     * @return class-string<\ZeroBoiler\DTO\DataTransferObject>|null
+     */
+    private static function checkDtoClass(string $typeName): ?string
+    {
         if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
             return null;
         }
 
-        // Check if the class exists
         if (! class_exists($typeName)) {
             return null;
         }
 
-        // Check if it's a subclass of DataTransferObject
         if (is_subclass_of($typeName, \ZeroBoiler\DTO\DataTransferObject::class)) {
             return $typeName;
         }
@@ -316,14 +350,35 @@ final class DtoMetadataResolver
         }
 
         if ($type instanceof \ReflectionNamedType) {
-            $typeName = $type->getName();
-            if ($typeName === 'int') {
-                $rules[] = 'integer';
-            } elseif ($typeName === 'float') {
-                $rules[] = 'numeric';
+            $rules = array_merge($rules, self::rulesForNamedType($type->getName()));
+        } elseif ($type instanceof \ReflectionUnionType) {
+            // For union types (e.g., int|float|string), collect rules from each member type
+            // but avoid redundant rules (e.g., int implies numeric, no need for both 'integer' and 'numeric')
+            $unionRules = [];
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof \ReflectionNamedType && ! $innerType->allowsNull()) {
+                    foreach (self::rulesForNamedType($innerType->getName()) as $rule) {
+                        $unionRules[$rule] = true;
+                    }
+                }
             }
+            $rules = array_merge($rules, array_keys($unionRules));
         }
 
         return $rules;
+    }
+
+    /**
+     * Get validation rules for a single named PHP type.
+     *
+     * @return list<string>
+     */
+    private static function rulesForNamedType(string $typeName): array
+    {
+        return match ($typeName) {
+            'int' => ['integer'],
+            'float' => ['numeric'],
+            default => [],
+        };
     }
 }

@@ -341,3 +341,26 @@ describe('ArrayRule attribute', function (): void {
         expect($rules['bounded'])->toContain('max:5');
     });
 });
+
+// -----------------------------------------------------------------------
+// Union type rule inference (#61)
+// -----------------------------------------------------------------------
+
+use ZeroBoiler\DTO\Tests\Fixtures\UnionTypeDTO;
+
+describe('Union type rule inference (#61)', function (): void {
+    it('infers rules for int|string union type', function (): void {
+        $rules = UnionTypeDTO::rules();
+
+        // int|string should produce 'integer' rule
+        expect($rules['identifier'])->toContain('integer');
+    });
+
+    it('infers rules for int|float|string union type', function (): void {
+        $rules = \ZeroBoiler\DTO\Tests\Fixtures\OrderDTO::rules();
+
+        // int|float|string should produce 'integer' and 'numeric'
+        expect($rules['rawTotal'])->toContain('integer');
+        expect($rules['rawTotal'])->toContain('numeric');
+    });
+});
