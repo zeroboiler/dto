@@ -12,11 +12,17 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionClass;
 use ReflectionProperty;
+use ZeroBoiler\DTO\Attributes\ArrayRule;
+use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Cast as CastAttribute;
+use ZeroBoiler\DTO\Attributes\Confirmed;
 use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
+use ZeroBoiler\DTO\Attributes\Declined;
 use ZeroBoiler\DTO\Attributes\DefaultValue as DefaultValueAttribute;
+use ZeroBoiler\DTO\Attributes\Different;
 use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\EndsWith;
 use ZeroBoiler\DTO\Attributes\Enum as EnumAttribute;
 use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\In;
@@ -24,9 +30,14 @@ use ZeroBoiler\DTO\Attributes\Integer;
 use ZeroBoiler\DTO\Attributes\MapFrom;
 use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\NestedArray;
 use ZeroBoiler\DTO\Attributes\Numeric;
 use ZeroBoiler\DTO\Attributes\Pattern;
+use ZeroBoiler\DTO\Attributes\Present;
+use ZeroBoiler\DTO\Attributes\Prohibited;
 use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\Attributes\Same;
+use ZeroBoiler\DTO\Attributes\StartsWith;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
@@ -86,6 +97,8 @@ final class DtoMetadataResolver
                 'hidden' => false,
                 'nullable' => $type?->allowsNull() ?? true,
                 'value_object_class' => self::detectValueObjectClass($type),
+                'dto_class' => self::detectDtoClass($type),
+                'nested_array_class' => null,
             ];
 
             if ($propMeta['has_default']) {
@@ -152,8 +165,43 @@ final class DtoMetadataResolver
                 ? 'date_format:'.$instance->format
                 : 'date',
             $instance instanceof EnumAttribute => $propRules[] = new EnumRule($instance->enumClass),
+            $instance instanceof Confirmed => $propRules[] = 'confirmed',
+            $instance instanceof Different => $propRules[] = 'different:'.$instance->field,
+            $instance instanceof Same => $propRules[] = 'same:'.$instance->field,
+            $instance instanceof Between => $propRules[] = 'between:'.$instance->min.','.$instance->max,
+            $instance instanceof ArrayRule => self::applyArrayRule($instance, $propRules),
+            $instance instanceof Prohibited => $propRules[] = 'prohibited',
+            $instance instanceof Present => $propRules[] = 'present',
+            $instance instanceof Declined => $propRules[] = 'declined',
+            $instance instanceof StartsWith => $propRules[] = 'starts_with:'.implode(',', (array) $instance->prefix),
+            $instance instanceof EndsWith => $propRules[] = 'ends_with:'.implode(',', (array) $instance->suffix),
             default => null,
         };
+    }
+
+    /**
+     * Apply array validation rule with optional min/max count.
+     *
+     * @param  list<string>  $propRules
+     */
+    private static function applyArrayRule(ArrayRule $instance, array &$propRules): void
+    {
+        $rule = 'array';
+
+        if ($instance->min !== null && $instance->max !== null) {
+            // Use Laravel's between rule for array count bounds
+            $propRules[] = 'array';
+            $propRules[] = 'min:'.$instance->min;
+            $propRules[] = 'max:'.$instance->max;
+        } elseif ($instance->min !== null) {
+            $propRules[] = 'array';
+            $propRules[] = 'min:'.$instance->min;
+        } elseif ($instance->max !== null) {
+            $propRules[] = 'array';
+            $propRules[] = 'max:'.$instance->max;
+        } else {
+            $propRules[] = 'array';
+        }
     }
 
     /**
@@ -171,6 +219,10 @@ final class DtoMetadataResolver
 
         if ($instance instanceof Hidden) {
             $propMeta['hidden'] = true;
+        }
+
+        if ($instance instanceof NestedArray) {
+            $propMeta['nested_array_class'] = $instance->dtoClass;
         }
     }
 
@@ -212,6 +264,40 @@ final class DtoMetadataResolver
         }
 
         if (in_array(ValueObjectContract::class, class_implements($typeName) ?: [], true)) {
+            return $typeName;
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect if the property type is a nested DTO class.
+     *
+     * Returns the FQCN of the DTO subclass if detected, null otherwise.
+     * A DTO is detected by checking if the class extends DataTransferObject.
+     *
+     * @return class-string<\ZeroBoiler\DTO\DataTransferObject>|null
+     */
+    private static function detectDtoClass(?\ReflectionType $type): ?string
+    {
+        if (! $type instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        $typeName = $type->getName();
+
+        // Skip PHP scalar/builtin types
+        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+            return null;
+        }
+
+        // Check if the class exists
+        if (! class_exists($typeName)) {
+            return null;
+        }
+
+        // Check if it's a subclass of DataTransferObject
+        if (is_subclass_of($typeName, \ZeroBoiler\DTO\DataTransferObject::class)) {
             return $typeName;
         }
 

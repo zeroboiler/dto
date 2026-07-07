@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
+
+declare(strict_types=1);
+
+namespace ZeroBoiler\DTO\Attributes;
+
+use Attribute;
+
+/**
+ * Mark an array property as containing nested DTO instances.
+ * During hydration, each element of the array will be converted to the DTO.
+ *
+ *   #[NestedArray(OrderItemDTO::class)]
+ *   public readonly array $items;
+ *
+ * The DTO class must have a constructor that accepts an array (via fromArray).
+ */
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class NestedArray
+{
+    /**
+     * @param  class-string<\ZeroBoiler\DTO\DataTransferObject>  $dtoClass
+     */
+    public function __construct(
+        public string $dtoClass,
+        public ?string $message = null,
+    ) {}
+}

@@ -77,6 +77,20 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                 $value = self::castValue($value, $prop['cast']);
             }
 
+            // Nested DTO hydration (#117)
+            // If the property is typed as a DTO subclass and the raw value is an array,
+            // recursively hydrate the nested DTO.
+            if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
+                $value = self::hydrateNestedDto($value, $prop['dto_class']);
+            }
+
+            // Array of nested DTOs (#117)
+            // If the property has #[NestedArray] and the raw value is an array,
+            // hydrate each element into the specified DTO class.
+            if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
+                $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
+            }
+
             $args[$name] = $value;
         }
 
@@ -113,12 +127,23 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
 
             if ($hasKey) {
                 $value = Arr::get($data, $sourceKey);
-                // Apply the same casting/VO logic as fromArray
+                // Apply the same casting/VO/nested DTO logic as fromArray
                 if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
                     $value = self::castValueToValueObject($value, $prop['value_object_class']);
                 } elseif ($prop['cast'] !== null && $value !== null) {
                     $value = self::castValue($value, $prop['cast']);
                 }
+
+                // Nested DTO hydration (#117)
+                if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
+                    $value = self::hydrateNestedDto($value, $prop['dto_class']);
+                }
+
+                // Array of nested DTOs (#117)
+                if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
+                    $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
+                }
+
                 $args[$name] = $value;
             } elseif ($prop['has_default']) {
                 // Missing field: use default if available, otherwise type-appropriate empty value
@@ -354,6 +379,22 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             return $includeHidden ? $value->allValues() : $value->toArray();
         }
 
+        // Handle arrays that may contain DTO instances
+        if (is_array($value)) {
+            return array_map(
+                fn (mixed $item): mixed => $item instanceof DataTransferObject
+                    ? ($includeHidden ? $item->allValues() : $item->toArray())
+                    : $this->normalizeScalar($item),
+                $value
+            );
+        }
+
+        return $this->normalizeScalar($value);
+    }
+
+    private function normalizeScalar(mixed $value): mixed
+    {
+
         if ($value instanceof ValueObject) {
             // Use columnType() to determine serialization strategy.
             // Single-value VOs (string/integer columns) serialize to their primitive.
@@ -475,5 +516,61 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         } catch (\JsonException) {
             return [];
         }
+    }
+
+    /**
+     * Hydrate a nested DTO from raw data.
+     *
+     * If the value is already a DTO instance, returns it as-is.
+     * If the value is an array, recursively calls fromArray() on the DTO class.
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @param  class-string<self>  $dtoClass  The nested DTO class to hydrate
+     *
+     * @throws \InvalidArgumentException If the value cannot be cast to the DTO
+     */
+    private static function hydrateNestedDto(mixed $value, string $dtoClass): DataTransferObject
+    {
+        if ($value instanceof $dtoClass) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            return $dtoClass::fromArray($value, validate: false);
+        }
+
+        throw new \InvalidArgumentException(
+            'Cannot hydrate '.get_debug_type($value)." into nested DTO {$dtoClass}. Expected array or {$dtoClass} instance."
+        );
+    }
+
+    /**
+     * Hydrate an array of nested DTOs.
+     *
+     * Each element of the input array is converted to the specified DTO class.
+     * Elements that are already DTO instances are passed through.
+     *
+     * @param  array<int, mixed>  $values  Raw array of data
+     * @param  class-string<self>  $dtoClass  The DTO class for each element
+     *
+     * @return array<int, DataTransferObject>  Array of hydrated DTO instances
+     */
+    private static function hydrateNestedArray(array $values, string $dtoClass): array
+    {
+        $result = [];
+
+        foreach ($values as $index => $value) {
+            if ($value instanceof $dtoClass) {
+                $result[] = $value;
+            } elseif (is_array($value)) {
+                $result[] = $dtoClass::fromArray($value, validate: false);
+            } else {
+                throw new \InvalidArgumentException(
+                    "Cannot hydrate element at index {$index} into {$dtoClass}. Expected array, got ".get_debug_type($value).'.'
+                );
+            }
+        }
+
+        return $result;
     }
 }

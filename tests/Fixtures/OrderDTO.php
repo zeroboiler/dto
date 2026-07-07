@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Tests\Fixtures;
 
+use ZeroBoiler\DTO\Attributes\NestedArray;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
@@ -19,7 +20,7 @@ class OrderDTO extends DataTransferObject
 
         public readonly AddressDTO $shippingAddress,
 
-        /** @var OrderItemDTO[] */
+        #[NestedArray(OrderItemDTO::class)]
         public readonly array $items = [],
 
         public readonly int|float|string $rawTotal = 0,
