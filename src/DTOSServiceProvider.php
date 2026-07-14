@@ -28,5 +28,30 @@ final class DTOSServiceProvider extends ServiceProvider
                 MakeDtoSchemaCommand::class,
             ]);
         }
+
+        $this->registerCacheFlush();
+    }
+
+    /**
+     * Flush the DTO metadata cache at the end of each request in
+     * long-lived processes (Octane, Swoole, RoadRunner).
+     *
+     * In standard PHP-FPM, the static cache dies with the process
+     * at the end of every request. Long-lived runners keep it around,
+     * which can cause stale metadata between deployments and unbounded
+     * memory growth as more DTO classes are resolved.
+     */
+    private function registerCacheFlush(): void
+    {
+        // Laravel Octane — flush after each request
+        $this->app['events']->listen('octane.terminate', function (): void {
+            DataTransferObject::flushMetadataCache();
+        });
+
+        // Generic fallback — listen for the Laravel framework flush event
+        // This works with Swoole/RoadRunner packages that dispatch this event
+        $this->app['events']->listen('laravel.flush', function (): void {
+            DataTransferObject::flushMetadataCache();
+        });
     }
 }
