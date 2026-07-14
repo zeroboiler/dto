@@ -63,7 +63,7 @@ describe('DTOCast', function (): void {
     });
 
     it('handles array input in set', function (): void {
-        $cast = new DTOCast(CreateUserDTO::class);
+        $cast = new DTOCast(CreateUserDTO::class, validate: false);
 
         $result = $cast->set(
             model: new class {},

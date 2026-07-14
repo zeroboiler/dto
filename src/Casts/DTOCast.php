@@ -10,6 +10,7 @@ namespace ZeroBoiler\DTO\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
 
 /**
@@ -33,11 +34,11 @@ class DTOCast implements CastsAttributes
 {
     /**
      * @param  class-string<T>  $dtoClass
-     * @param  bool  $validate  Whether to validate arrays passed to set()
+     * @param  bool  $validate  Whether to validate arrays passed to set() (default: true)
      */
     public function __construct(
         private readonly string $dtoClass,
-        private readonly bool $validate = false,
+        private readonly bool $validate = true,
     ) {}
 
     /**
@@ -64,6 +65,9 @@ class DTOCast implements CastsAttributes
     /**
      * @param  Model  $model
      * @param  T|array<string, mixed>|null  $value
+     *
+     * @throws \InvalidArgumentException When value is not a DTO, array, or null
+     * @throws ValidationException When validation is enabled and the data fails
      */
     public function set($model, string $key, $value, array $attributes)
     {
@@ -86,7 +90,14 @@ class DTOCast implements CastsAttributes
             return json_encode($value);
         }
 
-        return $value;
+        throw new \InvalidArgumentException(
+            sprintf(
+                'DTOCast for [%s] expects instance of %s, array, or null. Got [%s].',
+                $key,
+                $this->dtoClass,
+                get_debug_type($value),
+            )
+        );
     }
 
     /**

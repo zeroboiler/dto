@@ -40,6 +40,7 @@ use ZeroBoiler\DTO\Attributes\Same;
 use ZeroBoiler\DTO\Attributes\StartsWith;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
+use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
@@ -232,7 +233,8 @@ final class DtoMetadataResolver
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {
         if (property_exists($instance, 'message') && $instance->message !== null) {
-            $attrClass = new ReflectionClass($instance)->getShortName();
+            $reflection = new ReflectionClass($instance);
+            $attrClass = $reflection->getShortName();
             $ruleKey = strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', $attrClass));
             $messages["{$name}.{$ruleKey}"] = $instance->message;
         }
@@ -294,7 +296,7 @@ final class DtoMetadataResolver
      * Returns the FQCN of the DTO subclass if detected, null otherwise.
      * A DTO is detected by checking if the class extends DataTransferObject.
      *
-     * @return class-string<\ZeroBoiler\DTO\DataTransferObject>|null
+     * @return class-string<DataTransferObject>|null
      */
     private static function detectDtoClass(?\ReflectionType $type): ?string
     {
@@ -319,7 +321,7 @@ final class DtoMetadataResolver
     /**
      * Check if a class name is a DTO subclass.
      *
-     * @return class-string<\ZeroBoiler\DTO\DataTransferObject>|null
+     * @return class-string<DataTransferObject>|null
      */
     private static function checkDtoClass(string $typeName): ?string
     {
@@ -331,7 +333,7 @@ final class DtoMetadataResolver
             return null;
         }
 
-        if (is_subclass_of($typeName, \ZeroBoiler\DTO\DataTransferObject::class)) {
+        if (is_subclass_of($typeName, DataTransferObject::class)) {
             return $typeName;
         }
 

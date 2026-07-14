@@ -259,7 +259,9 @@ class OpenApiSchemaGenerator
     private static function componentName(string $className): string
     {
         // Convert PascalCase to PascalCase (keep as-is for OpenAPI component names)
-        return new ReflectionClass($className)->getShortName();
+        $reflection = new ReflectionClass($className);
+
+        return $reflection->getShortName();
     }
 
     /**
