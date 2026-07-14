@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use ZeroBoiler\DTO\Attributes\ArrayRule;
 use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Confirmed;
 use ZeroBoiler\DTO\Attributes\Declined;
@@ -307,13 +308,13 @@ describe('StartsWith/EndsWith with multiple values', function (): void {
 class ArrayRuleDTO extends DataTransferObject
 {
     public function __construct(
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule]
+        #[ArrayRule]
         public readonly array $tags,
 
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule(min: 1)]
+        #[ArrayRule(min: 1)]
         public readonly array $required,
 
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule(min: 1, max: 5)]
+        #[ArrayRule(min: 1, max: 5)]
         public readonly array $bounded,
     ) {}
 }
@@ -357,7 +358,7 @@ describe('Union type rule inference (#61)', function (): void {
     });
 
     it('infers rules for int|float|string union type', function (): void {
-        $rules = \ZeroBoiler\DTO\Tests\Fixtures\OrderDTO::rules();
+        $rules = OrderDTO::rules();
 
         // int|float|string should produce 'integer' and 'numeric'
         expect($rules['rawTotal'])->toContain('integer');
