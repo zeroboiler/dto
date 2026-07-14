@@ -77,6 +77,7 @@ final class DtoMetadataResolver
 
         $properties = [];
         $rules = [];
+        /** @var array<string, string> $messages */
         $messages = [];
 
         foreach ($constructor->getParameters() as $param) {
@@ -120,7 +121,8 @@ final class DtoMetadataResolver
 
     /**
      * @param  list<string|EnumRule>  $propRules
-     * @param  array<string, string>  $messages
+     * @param  array<string, mixed>  $propMeta
+     * @param  array<string, mixed>  $messages
      */
     private static function resolveAttributes(
         ReflectionProperty $propReflection,
@@ -227,7 +229,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  array<string, string>  $messages
+     * @param  array<string, mixed>  $messages
      */
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {
