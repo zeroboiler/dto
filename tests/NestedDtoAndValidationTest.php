@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
+use ZeroBoiler\DTO\Attributes\ArrayRule;
 use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Confirmed;
 use ZeroBoiler\DTO\Attributes\Declined;
 use ZeroBoiler\DTO\Attributes\Different;
 use ZeroBoiler\DTO\Attributes\EndsWith;
-use ZeroBoiler\DTO\Attributes\NestedArray;
 use ZeroBoiler\DTO\Attributes\Present;
 use ZeroBoiler\DTO\Attributes\Prohibited;
 use ZeroBoiler\DTO\Attributes\Same;
@@ -123,7 +123,7 @@ describe('Nested DTO hydration (#117)', function (): void {
             'orderNumber' => 'ORD-007',
             'shippingAddress' => 'not-an-array', // invalid
         ], validate: false);
-    })->throws(\InvalidArgumentException::class, 'Cannot hydrate string into nested DTO');
+    })->throws(InvalidArgumentException::class, 'Cannot hydrate string into nested DTO');
 
     it('throws on invalid element in nested array', function (): void {
         OrderDTO::fromArray([
@@ -134,7 +134,7 @@ describe('Nested DTO hydration (#117)', function (): void {
                 'not-an-array', // invalid
             ],
         ], validate: false);
-    })->throws(\InvalidArgumentException::class, 'Cannot hydrate element at index 1');
+    })->throws(InvalidArgumentException::class, 'Cannot hydrate element at index 1');
 
     it('supports nested DTOs in fromPartialArray', function (): void {
         $dto = OrderDTO::fromPartialArray([
@@ -307,13 +307,13 @@ describe('StartsWith/EndsWith with multiple values', function (): void {
 class ArrayRuleDTO extends DataTransferObject
 {
     public function __construct(
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule]
+        #[ArrayRule]
         public readonly array $tags,
 
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule(min: 1)]
+        #[ArrayRule(min: 1)]
         public readonly array $required,
 
-        #[\ZeroBoiler\DTO\Attributes\ArrayRule(min: 1, max: 5)]
+        #[ArrayRule(min: 1, max: 5)]
         public readonly array $bounded,
     ) {}
 }
@@ -357,7 +357,7 @@ describe('Union type rule inference (#61)', function (): void {
     });
 
     it('infers rules for int|float|string union type', function (): void {
-        $rules = \ZeroBoiler\DTO\Tests\Fixtures\OrderDTO::rules();
+        $rules = OrderDTO::rules();
 
         // int|float|string should produce 'integer' and 'numeric'
         expect($rules['rawTotal'])->toContain('integer');
