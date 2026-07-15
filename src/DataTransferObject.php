@@ -327,13 +327,20 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     }
 
     /**
+     * Create a new instance with modified values (immutable update).
+     *
+     * Validation is always enforced so that immutable updates cannot
+     * produce a DTO in an invalid state.
+     *
      * @param  array<string, mixed>  $overrides
+     *
+     * @throws ValidationException When merged data fails validation.
      */
-    public function with(array $overrides, bool $validate = true): static
+    public function with(array $overrides): static
     {
         $data = array_merge($this->allValues(), $overrides);
 
-        return static::fromArray($data, validate: $validate);
+        return static::fromArray($data, validate: true);
     }
 
     // -----------------------------------------------------------------------
@@ -552,8 +559,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * @param  array<int, mixed>  $values  Raw array of data
      * @param  class-string<self>  $dtoClass  The DTO class for each element
-     *
-     * @return array<int, DataTransferObject>  Array of hydrated DTO instances
+     * @return array<int, DataTransferObject> Array of hydrated DTO instances
      */
     private static function hydrateNestedArray(array $values, string $dtoClass): array
     {

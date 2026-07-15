@@ -89,13 +89,34 @@ describe('CreateUserDTO', function (): void {
             'email' => 'test@example.com',
             'name' => 'Doruk',
             'status' => 'active',
-        ], validate: false);
+        ]);
 
-        $updated = $dto->with(['status' => 'inactive'], validate: false);
+        $updated = $dto->with(['status' => 'inactive']);
 
         expect($dto->status)->toBe('active');
         expect($updated->status)->toBe('inactive');
         expect($updated->email)->toBe('test@example.com');
+    });
+
+    it('throws ValidationException when with() receives invalid data', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Doruk',
+        ]);
+
+        expect(fn (): CreateUserDTO => $dto->with(['email' => 'not-an-email']))
+            ->toThrow(ValidationException::class);
+    });
+
+    it('validates merged data in with() — existing valid data + invalid override fails', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Doruk',
+        ]);
+
+        // name has min:2 rule — single char must fail
+        expect(fn (): CreateUserDTO => $dto->with(['name' => 'X']))
+            ->toThrow(ValidationException::class);
     });
 
     it('checks equality', function (): void {
