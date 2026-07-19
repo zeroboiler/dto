@@ -27,24 +27,20 @@ describe('Array Cast Edge Cases (Issue #64)', function (): void {
         expect($dto->tags)->toBe([]);
     });
 
-    it('handles whitespace-only string as empty array', function (): void {
-        $dto = ArrayCastDTO::fromArray([
+    it('throws DTOException for whitespace-only string (invalid JSON)', function (): void {
+        expect(fn () => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '   ',
-        ], validate: false);
-
-        // Whitespace-only is not valid JSON, so returns empty array
-        expect($dto->tags)->toBe([]);
+        ], validate: false))
+            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
-    it('handles invalid JSON string as empty array', function (): void {
-        $dto = ArrayCastDTO::fromArray([
+    it('throws DTOException for invalid JSON string', function (): void {
+        expect(fn () => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => 'not-json{',
-        ], validate: false);
-
-        // Invalid JSON should silently return empty array, not throw
-        expect($dto->tags)->toBe([]);
+        ], validate: false))
+            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
     it('handles nested JSON structures', function (): void {
@@ -124,33 +120,28 @@ describe('Array Cast Edge Cases (Issue #64)', function (): void {
         expect($dto->metadata)->toBe([['id' => 1], ['id' => 2]]);
     });
 
-    it('handles non-array JSON (scalar JSON) as empty array', function (): void {
-        $dto = ArrayCastDTO::fromArray([
+    it('throws DTOException for non-array JSON (scalar JSON)', function (): void {
+        expect(fn () => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '"just-a-string"',
-        ], validate: false);
-
-        // json_decode returns a string, not an array — should return []
-        expect($dto->tags)->toBe([]);
+        ], validate: false))
+            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
-    it('handles JSON number as empty array', function (): void {
-        $dto = ArrayCastDTO::fromArray([
+    it('throws DTOException for JSON number (not an array)', function (): void {
+        expect(fn () => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '12345',
-        ], validate: false);
-
-        // json_decode returns an int, not an array — should return []
-        expect($dto->tags)->toBe([]);
+        ], validate: false))
+            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
-    it('handles JSON boolean as empty array', function (): void {
-        $dto = ArrayCastDTO::fromArray([
+    it('throws DTOException for JSON boolean (not an array)', function (): void {
+        expect(fn () => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => 'true',
-        ], validate: false);
-
-        expect($dto->tags)->toBe([]);
+        ], validate: false))
+            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
     it('handles deeply nested JSON (3+ levels)', function (): void {

@@ -17,4 +17,15 @@ final class DTOException extends Exception
 
         return new self("Cannot cast property [{$property}] value [{$typeStr}] to [{$type}].");
     }
+
+    /**
+     * Thrown when a JSON string cannot be decoded into an array.
+     *
+     * @param  string  $property  The property being cast
+     * @param  string  $jsonError  The json_last_error_msg() output
+     */
+    public static function invalidJson(string $property, string $jsonError): self
+    {
+        return new self("Cannot decode JSON for property [{$property}]: {$jsonError}");
+    }
 }

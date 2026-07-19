@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use JsonSerializable;
+use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Support\DtoMetadataResolver;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject;
 
@@ -74,7 +75,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
             if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
                 $value = self::castValueToValueObject($value, $prop['value_object_class']);
             } elseif ($prop['cast'] !== null && $value !== null) {
-                $value = self::castValue($value, $prop['cast']);
+                $value = self::castValue($value, $prop['cast'], $name);
             }
 
             // Nested DTO hydration (#117)
@@ -131,7 +132,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
                 if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
                     $value = self::castValueToValueObject($value, $prop['value_object_class']);
                 } elseif ($prop['cast'] !== null && $value !== null) {
-                    $value = self::castValue($value, $prop['cast']);
+                    $value = self::castValue($value, $prop['cast'], $name);
                 }
 
                 // Nested DTO hydration (#117)
@@ -436,14 +437,17 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         return $value;
     }
 
-    private static function castValue(mixed $value, string $type): mixed
+    /**
+     * @param  string  $propertyName  Name of the property being cast (for error messages)
+     */
+    private static function castValue(mixed $value, string $type, string $propertyName = ''): mixed
     {
         return match ($type) {
             'int', 'integer' => (int) $value,
             'float', 'double' => (float) $value,
             'string' => (string) $value,
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
-            'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value),
+            'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value, $propertyName),
             'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : new Carbon($value),
             default => $value,
         };
@@ -509,12 +513,19 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     }
 
     /**
-     * Safely decode a JSON string to an array.
-     * Returns [] for empty strings or invalid JSON instead of silently returning null.
+     * Decode a JSON string to an array.
+     *
+     * Returns [] for empty strings. Throws DTOException on invalid JSON
+     * to prevent silent data loss.
+     *
+     * @param  string  $value  Raw JSON string
+     * @param  string  $propertyName  Property name for error context
      *
      * @return array<string, mixed>
+     *
+     * @throws DTOException When the JSON is invalid or does not decode to an array
      */
-    private static function decodeJsonArray(string $value): array
+    private static function decodeJsonArray(string $value, string $propertyName = ''): array
     {
         if ($value === '') {
             return [];
@@ -522,11 +533,15 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
 
         try {
             $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-
-            return is_array($decoded) ? $decoded : [];
-        } catch (\JsonException) {
-            return [];
+        } catch (\JsonException $e) {
+            throw DTOException::invalidJson($propertyName, $e->getMessage());
         }
+
+        if (! is_array($decoded)) {
+            throw DTOException::invalidJson($propertyName, 'Expected a JSON array, got ' . get_debug_type($decoded));
+        }
+
+        return $decoded;
     }
 
     /**
