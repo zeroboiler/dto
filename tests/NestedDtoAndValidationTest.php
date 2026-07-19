@@ -167,7 +167,7 @@ describe('Nested DTO hydration (#117)', function (): void {
 
         $updated = $dto->with([
             'shippingAddress' => ['street' => 'New St', 'city' => 'New City'],
-        ], validate: false);
+        ]);
 
         expect($updated->shippingAddress)
             ->toBeInstanceOf(AddressDTO::class)

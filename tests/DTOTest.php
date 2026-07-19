@@ -91,7 +91,7 @@ describe('CreateUserDTO', function (): void {
             'status' => 'active',
         ], validate: false);
 
-        $updated = $dto->with(['status' => 'inactive'], validate: false);
+        $updated = $dto->with(['status' => 'inactive']);
 
         expect($dto->status)->toBe('active');
         expect($updated->status)->toBe('inactive');

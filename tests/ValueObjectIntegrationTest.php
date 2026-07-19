@@ -174,7 +174,7 @@ describe('DTO × ValueObjects: with() immutability', function (): void {
 
         $updated = $dto->with([
             'email' => 'updated@example.com',
-        ], validate: false);
+        ]);
 
         expect((string) $dto->email)->toBe('test@example.com')
             ->and((string) $updated->email)->toBe('updated@example.com');

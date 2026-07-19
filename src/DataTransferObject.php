@@ -327,13 +327,24 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     }
 
     /**
+     * Create an immutable copy with the given overrides.
+     *
+     * Always validates the merged data to prevent invalid state (#2).
+     * The `$validate` parameter is accepted for backward compatibility
+     * but cannot disable validation.
+     *
      * @param  array<string, mixed>  $overrides
      */
     public function with(array $overrides, bool $validate = true): static
     {
         $data = array_merge($this->allValues(), $overrides);
 
-        return static::fromArray($data, validate: $validate);
+        // Validation is always enforced in with() to prevent data-integrity
+        // issues (#2).  The $validate flag is intentionally ignored so that
+        // callers cannot bypass rules by passing false.
+        unset($validate); // explicitly suppress – parameter kept for BC only
+
+        return static::fromArray($data, validate: true);
     }
 
     // -----------------------------------------------------------------------
