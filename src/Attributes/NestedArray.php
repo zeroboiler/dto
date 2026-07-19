@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\DataTransferObject;
 
 /**
  * Mark an array property as containing nested DTO instances.
@@ -23,7 +24,7 @@ use Attribute;
 final class NestedArray
 {
     /**
-     * @param  class-string<\ZeroBoiler\DTO\DataTransferObject>  $dtoClass
+     * @param  class-string<DataTransferObject>  $dtoClass
      */
     public function __construct(
         public string $dtoClass,

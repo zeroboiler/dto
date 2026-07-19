@@ -10,10 +10,12 @@ namespace ZeroBoiler\DTO\Support;
 
 use ReflectionClass;
 use ReflectionProperty;
+use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Date;
 use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\EndsWith;
 use ZeroBoiler\DTO\Attributes\Enum as EnumAttribute;
 use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\In;
@@ -22,6 +24,8 @@ use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Numeric;
 use ZeroBoiler\DTO\Attributes\Pattern;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\Attributes\StartsWith;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
 use ZeroBoiler\DTO\DataTransferObject;
@@ -125,6 +129,12 @@ class OpenApiSchemaGenerator
             }
 
             $isRequired = ! $param->isDefaultValueAvailable() && ! $hasDefaultValueAttr && ! $type?->allowsNull();
+
+            // Explicit #[Required] attribute forces the field into required list
+            // even when the type allows null.
+            if (! $isRequired && self::hasAttribute($propReflection, Required::class)) {
+                $isRequired = true;
+            }
 
             if ($isRequired) {
                 $required[] = $name;
@@ -259,7 +269,9 @@ class OpenApiSchemaGenerator
     private static function componentName(string $className): string
     {
         // Convert PascalCase to PascalCase (keep as-is for OpenAPI component names)
-        return new ReflectionClass($className)->getShortName();
+        $reflection = new ReflectionClass($className);
+
+        return $reflection->getShortName();
     }
 
     /**
@@ -277,20 +289,159 @@ class OpenApiSchemaGenerator
                 $instance instanceof Email => $propSchema['format'] = 'email',
                 $instance instanceof Url => $propSchema['format'] = 'uri',
                 $instance instanceof Uuid => $propSchema['format'] = 'uuid',
-                $instance instanceof Max => $propSchema['maxLength'] = $instance->value,
-                $instance instanceof Min => $propSchema['minLength'] = $instance->value,
-                $instance instanceof Pattern => $propSchema['pattern'] = ltrim($instance->regex, '/'),
+                $instance instanceof Pattern => $propSchema['pattern'] = self::stripRegexDelimiters($instance->regex),
                 $instance instanceof Integer => $propSchema['type'] = 'integer',
                 $instance instanceof Numeric => $propSchema['type'] = 'number',
                 $instance instanceof Boolean => $propSchema['type'] = 'boolean',
                 $instance instanceof Date => $propSchema['format'] = 'date',
                 $instance instanceof In => $propSchema['enum'] = $instance->values,
                 $instance instanceof EnumAttribute => $propSchema = self::applyEnumSchema($instance, $propSchema),
+                $instance instanceof Max => $propSchema = self::applyMaxConstraint($instance->value, $propSchema),
+                $instance instanceof Min => $propSchema = self::applyMinConstraint($instance->value, $propSchema),
+                $instance instanceof Between => $propSchema = self::applyBetweenConstraint($instance, $propSchema),
+                $instance instanceof StartsWith => $propSchema = self::applyStartsWithPattern($instance, $propSchema),
+                $instance instanceof EndsWith => $propSchema = self::applyEndsWithPattern($instance, $propSchema),
                 default => null,
             };
         }
 
         return $propSchema;
+    }
+
+    /**
+     * Determine whether the current schema type represents a numeric value.
+     *
+     * @param  array<string, mixed>  $propSchema
+     */
+    private static function isNumericType(array $propSchema): bool
+    {
+        return ($propSchema['type'] ?? null) === 'integer'
+            || ($propSchema['type'] ?? null) === 'number';
+    }
+
+    /**
+     * Strip leading and trailing regex delimiters from a pattern string.
+     *
+     * Handles common delimiters: /, #, ~, and |.
+     */
+    private static function stripRegexDelimiters(string $regex): string
+    {
+        $delimiters = ['/', '#', '~', '|'];
+
+        foreach ($delimiters as $delim) {
+            if (str_starts_with($regex, $delim) && str_ends_with($regex, $delim)) {
+                return substr($regex, 1, -1);
+            }
+        }
+
+        // Fall back to stripping leading delimiters only (backward compat)
+        return ltrim($regex, '/#~|');
+    }
+
+    /**
+     * Apply a Min constraint as either minimum (numeric) or minLength (string).
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyMinConstraint(int $value, array $propSchema): array
+    {
+        if (self::isNumericType($propSchema)) {
+            $propSchema['minimum'] = $value;
+        } else {
+            $propSchema['minLength'] = $value;
+        }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a Max constraint as either maximum (numeric) or maxLength (string).
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyMaxConstraint(int $value, array $propSchema): array
+    {
+        if (self::isNumericType($propSchema)) {
+            $propSchema['maximum'] = $value;
+        } else {
+            $propSchema['maxLength'] = $value;
+        }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a Between constraint (both min and max) with type-aware mapping.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyBetweenConstraint(Between $between, array $propSchema): array
+    {
+        $propSchema = self::applyMinConstraint((int) $between->min, $propSchema);
+
+        return self::applyMaxConstraint((int) $between->max, $propSchema);
+    }
+
+    /**
+     * Merge a pattern fragment into an existing pattern (if any) using a logical AND.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function mergePattern(string $fragment, array $propSchema): array
+    {
+        $existing = $propSchema['pattern'] ?? null;
+
+        if ($existing !== null) {
+            // Combine patterns using lookahead to preserve both constraints
+            $propSchema['pattern'] = '(?='.ltrim($fragment, '^').')'.$existing;
+        } else {
+            $propSchema['pattern'] = $fragment;
+        }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply StartsWith constraint as a pattern prefix.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyStartsWithPattern(StartsWith $startsWith, array $propSchema): array
+    {
+        $prefixes = (array) $startsWith->prefix;
+        if (count($prefixes) === 1) {
+            $escaped = preg_quote($prefixes[0], '/');
+
+            return self::mergePattern('^'.$escaped, $propSchema);
+        }
+        // Multiple prefixes → alternation group
+        $escaped = array_map(fn (string $p): string => preg_quote($p, '/'), $prefixes);
+
+        return self::mergePattern('^('.implode('|', $escaped).')', $propSchema);
+    }
+
+    /**
+     * Apply EndsWith constraint as a pattern suffix.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyEndsWithPattern(EndsWith $endsWith, array $propSchema): array
+    {
+        $suffixes = (array) $endsWith->suffix;
+        if (count($suffixes) === 1) {
+            $escaped = preg_quote($suffixes[0], '/');
+
+            return self::mergePattern($escaped.'$', $propSchema);
+        }
+        $escaped = array_map(fn (string $s): string => preg_quote($s, '/'), $suffixes);
+
+        return self::mergePattern('('.implode('|', $escaped).')$', $propSchema);
     }
 
     /**
