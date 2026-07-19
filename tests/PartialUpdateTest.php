@@ -158,7 +158,7 @@ describe('with() vs fromPartialArray() integration', function (): void {
         // PATCH: only update name
         $patched = $original->with([
             'name' => 'Patched',
-        ], validate: false);
+        ]);
 
         expect($patched->email)->toBe('original@test.com') // unchanged
             ->and($patched->name)->toBe('Patched') // updated
