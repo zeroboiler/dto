@@ -29,7 +29,24 @@ final class DTOSServiceProvider extends ServiceProvider
             ]);
         }
 
+        $this->configureDevCacheInvalidation();
         $this->registerCacheFlush();
+    }
+
+    /**
+     * In local/testing environments, enable TTL-based metadata cache
+     * invalidation so that changes to DTO classes are picked up
+     * automatically without needing a manual cache flush (#3).
+     *
+     * Default TTL: 2 seconds — long enough to benefit from caching
+     * within a single request, short enough to detect code changes
+     * on the next page load.
+     */
+    private function configureDevCacheInvalidation(): void
+    {
+        if ($this->app->environment('local', 'testing')) {
+            DataTransferObject::setMetadataCacheTtl(2.0);
+        }
     }
 
     /**

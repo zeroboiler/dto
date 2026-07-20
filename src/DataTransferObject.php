@@ -32,12 +32,37 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     /** @var array<string, array<string, mixed>> Cache for reflection metadata per class */
     private static array $_metadataCache = [];
 
+    /** @var array<string, float> Cache creation timestamps per class */
+    private static array $_metadataCacheTimestamps = [];
+
+    /**
+     * TTL in seconds for metadata cache in local/testing environments.
+     *
+     * When the app runs in dev mode, cached metadata older than
+     * this TTL is automatically invalidated on next access.
+     * Set to 0 to disable TTL-based invalidation.
+     */
+    private static float $_metadataCacheTtl = 0.0;
+
+    /**
+     * Set the TTL for metadata cache entries.
+     *
+     * Called by the service provider when APP_ENV is local or testing.
+     * Pass 0 to disable TTL-based invalidation (production default).
+     */
+    public static function setMetadataCacheTtl(float $seconds): void
+    {
+        self::$_metadataCacheTtl = $seconds;
+    }
+
     public static function flushMetadataCache(?string $class = null): void
     {
         if ($class !== null) {
             unset(self::$_metadataCache[$class]);
+            unset(self::$_metadataCacheTimestamps[$class]);
         } else {
             self::$_metadataCache = [];
+            self::$_metadataCacheTimestamps = [];
         }
     }
 
@@ -363,7 +388,21 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     {
         $class = static::class;
 
-        return self::$_metadataCache[$class] ?? self::$_metadataCache[$class] = DtoMetadataResolver::resolve($class);
+        // TTL-based invalidation for dev/testing environments (#3)
+        if (self::$_metadataCacheTtl > 0.0 && isset(self::$_metadataCacheTimestamps[$class])) {
+            $age = microtime(true) - self::$_metadataCacheTimestamps[$class];
+            if ($age >= self::$_metadataCacheTtl) {
+                unset(self::$_metadataCache[$class]);
+                unset(self::$_metadataCacheTimestamps[$class]);
+            }
+        }
+
+        if (! isset(self::$_metadataCache[$class])) {
+            self::$_metadataCache[$class] = DtoMetadataResolver::resolve($class);
+            self::$_metadataCacheTimestamps[$class] = microtime(true);
+        }
+
+        return self::$_metadataCache[$class];
     }
 
     /**
