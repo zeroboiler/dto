@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate property as a date or date format.
@@ -20,10 +21,15 @@ use Attribute;
  *   public string $birthDate;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Date
+final class Date implements ValidationAttribute
 {
     public function __construct(
         public ?string $format = null,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'date';
+    }
 }

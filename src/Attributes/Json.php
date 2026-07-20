@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate that the value is a valid JSON string.
@@ -17,9 +18,14 @@ use Attribute;
  *   public string $metadata;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Json
+final class Json implements ValidationAttribute
 {
     public function __construct(
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'json';
+    }
 }

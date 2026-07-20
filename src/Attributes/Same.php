@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Require this field's value to match another field's value.
@@ -17,10 +18,15 @@ use Attribute;
  *   public string $passwordRepeat;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Same
+final class Same implements ValidationAttribute
 {
     public function __construct(
         public string $field,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'same';
+    }
 }

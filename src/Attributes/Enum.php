@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate property against a backed enum class.
@@ -19,7 +20,7 @@ use Attribute;
  * Requires zeroboiler/enums for full integration.
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Enum
+final class Enum implements ValidationAttribute
 {
     /**
      * @param  class-string<\BackedEnum>  $enumClass
@@ -28,4 +29,9 @@ final class Enum
         public string $enumClass,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'enum';
+    }
 }

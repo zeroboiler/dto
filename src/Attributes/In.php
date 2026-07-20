@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate property value is in a list of allowed values.
@@ -21,7 +22,7 @@ use Attribute;
  *   public string $status;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class In
+final class In implements ValidationAttribute
 {
     /**
      * @param  array<int, string|int>  $values
@@ -30,4 +31,9 @@ final class In
         public array $values,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'in';
+    }
 }

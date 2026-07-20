@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Require this field when ALL of the given fields are present.
@@ -17,7 +18,7 @@ use Attribute;
  *   public ?string $username;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class RequiredWithAll
+final class RequiredWithAll implements ValidationAttribute
 {
     /**
      * @param  array<int, string>  $fields  Field names; required if ALL are present.
@@ -26,4 +27,9 @@ final class RequiredWithAll
         public array $fields,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'required_with_all';
+    }
 }

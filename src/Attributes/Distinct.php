@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Require array elements to be distinct (no duplicates).
@@ -17,9 +18,14 @@ use Attribute;
  *   public array $tags;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Distinct
+final class Distinct implements ValidationAttribute
 {
     public function __construct(
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'distinct';
+    }
 }
