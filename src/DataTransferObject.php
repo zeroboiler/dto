@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use JsonSerializable;
+use ZeroBoiler\DTO\Contracts\FromRequestDTO;
+use ZeroBoiler\DTO\Contracts\ValidatableDTO;
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Support\DtoMetadataResolver;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject;
@@ -27,7 +29,7 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject;
  *
  * @phpstan-consistent-constructor
  */
-abstract class DataTransferObject implements Arrayable, JsonSerializable
+abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSerializable, ValidatableDTO
 {
     /** @var array<string, array<string, mixed>> Cache for reflection metadata per class */
     private static array $_metadataCache = [];
@@ -319,6 +321,23 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
     public static function rules(): array
     {
         return self::resolveMetadata()['rules'];
+    }
+
+    /**
+     * Return validation rules scoped to a specific action.
+     *
+     * By default, returns the same rules as {@see rules()} for all actions.
+     * Override in subclasses to provide action-specific rules (e.g.
+     * different rules for 'create' vs 'update').
+     *
+     * Common actions: 'create', 'update', 'patch', 'delete'.
+     *
+     * @param  string  $action  The action context
+     * @return array<string, array<int, mixed>>
+     */
+    public static function rulesFor(string $action): array
+    {
+        return static::rules();
     }
 
     /**
