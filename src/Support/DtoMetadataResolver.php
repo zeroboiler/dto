@@ -233,7 +233,7 @@ final class DtoMetadataResolver
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {
         if (property_exists($instance, 'message') && $instance->message !== null) {
-            $attrClass = (new ReflectionClass($instance))->getShortName();
+            $attrClass = new ReflectionClass($instance)->getShortName();
             $ruleKey = strtolower((string) preg_replace('/([a-z])([A-Z])/', '$1_$2', $attrClass));
             $messages["{$name}.{$ruleKey}"] = $instance->message;
         }

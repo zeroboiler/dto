@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\ArrayCastDTO;
 
 describe('Array Cast Edge Cases (Issue #64)', function (): void {
@@ -28,19 +29,19 @@ describe('Array Cast Edge Cases (Issue #64)', function (): void {
     });
 
     it('throws DTOException for whitespace-only string (invalid JSON)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '   ',
         ], validate: false))
-            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
+            ->toThrow(DTOException::class);
     });
 
     it('throws DTOException for invalid JSON string', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => 'not-json{',
         ], validate: false))
-            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
+            ->toThrow(DTOException::class);
     });
 
     it('handles nested JSON structures', function (): void {
@@ -121,27 +122,27 @@ describe('Array Cast Edge Cases (Issue #64)', function (): void {
     });
 
     it('throws DTOException for non-array JSON (scalar JSON)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '"just-a-string"',
         ], validate: false))
-            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
+            ->toThrow(DTOException::class);
     });
 
     it('throws DTOException for JSON number (not an array)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '12345',
         ], validate: false))
-            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
+            ->toThrow(DTOException::class);
     });
 
     it('throws DTOException for JSON boolean (not an array)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => 'true',
         ], validate: false))
-            ->toThrow(ZeroBoiler\DTO\Exceptions\DTOException::class);
+            ->toThrow(DTOException::class);
     });
 
     it('handles deeply nested JSON (3+ levels)', function (): void {

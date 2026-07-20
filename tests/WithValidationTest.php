@@ -1,23 +1,18 @@
 <?php
 
 /**
- * Tests for Issue #2: DTO::with() bypasses validation and type checking.
- *
- * Verifies that with() always validates data, preventing invalid values
- * from silently corrupting DTO state.
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
  */
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\DataTransferObject;
-use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\Email;
+use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\Attributes\Integer;
 use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Required;
-use Illuminate\Validation\ValidationException;
+use ZeroBoiler\DTO\DataTransferObject;
+use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 
 describe('Issue #2: with() validation bypass prevention', function (): void {
     it('rejects invalid email in with() overrides', function (): void {
@@ -26,7 +21,7 @@ describe('Issue #2: with() validation bypass prevention', function (): void {
             'name' => 'Doruk',
         ]);
 
-        expect(fn () => $dto->with(['email' => 'not-an-email']))
+        expect(fn (): CreateUserDTO => $dto->with(['email' => 'not-an-email']))
             ->toThrow(ValidationException::class);
     });
 
@@ -38,7 +33,7 @@ describe('Issue #2: with() validation bypass prevention', function (): void {
 
         // 'count' is typed as int with Integer attribute — passing a non-numeric string
         // should fail validation
-        expect(fn () => $dto->with(['count' => 'abc']))
+        expect(fn (): WithValidationDTO => $dto->with(['count' => 'abc']))
             ->toThrow(ValidationException::class);
     });
 
@@ -49,7 +44,7 @@ describe('Issue #2: with() validation bypass prevention', function (): void {
         ]);
 
         // name has Max(50) — a 51+ char string should fail
-        expect(fn () => $dto->with(['name' => str_repeat('x', 60)]))
+        expect(fn (): CreateUserDTO => $dto->with(['name' => str_repeat('x', 60)]))
             ->toThrow(ValidationException::class);
     });
 
@@ -60,7 +55,7 @@ describe('Issue #2: with() validation bypass prevention', function (): void {
         ]);
 
         // name has Min(2) – a single char should fail
-        expect(fn () => $dto->with(['name' => 'x']))
+        expect(fn (): CreateUserDTO => $dto->with(['name' => 'x']))
             ->toThrow(ValidationException::class);
     });
 
@@ -71,7 +66,7 @@ describe('Issue #2: with() validation bypass prevention', function (): void {
         ]);
 
         // Even with validate: false, with() must still validate (#2)
-        expect(fn () => $dto->with(['email' => 'invalid'], validate: false))
+        expect(fn (): CreateUserDTO => $dto->with(['email' => 'invalid'], validate: false))
             ->toThrow(ValidationException::class);
     });
 

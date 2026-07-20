@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Tests for invalid JSON handling in array cast (#1).
- *
- * Ensures that invalid JSON strings throw DTOException instead of
- * silently returning an empty array, which caused data loss.
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
  */
 
 declare(strict_types=1);
@@ -14,7 +11,7 @@ use ZeroBoiler\DTO\Tests\Fixtures\ArrayCastDTO;
 
 describe('invalid JSON in array cast (#1)', function (): void {
     it('throws DTOException for malformed JSON', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '{invalid json}',
         ], validate: false))
@@ -22,7 +19,7 @@ describe('invalid JSON in array cast (#1)', function (): void {
     });
 
     it('throws DTOException for truncated JSON', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '{"key":"value"',
         ], validate: false))
@@ -30,7 +27,7 @@ describe('invalid JSON in array cast (#1)', function (): void {
     });
 
     it('throws DTOException when JSON decodes to a non-array (string)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '"just a string"',
         ], validate: false))
@@ -38,7 +35,7 @@ describe('invalid JSON in array cast (#1)', function (): void {
     });
 
     it('throws DTOException when JSON decodes to a non-array (integer)', function (): void {
-        expect(fn () => ArrayCastDTO::fromArray([
+        expect(fn (): ArrayCastDTO => ArrayCastDTO::fromArray([
             'name' => 'Test',
             'tags' => '42',
         ], validate: false))
