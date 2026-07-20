@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate property as integer.
@@ -17,9 +18,14 @@ use Attribute;
  *   public int|string $age;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Integer
+final class Integer implements ValidationAttribute
 {
     public function __construct(
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'integer';
+    }
 }

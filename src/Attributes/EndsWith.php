@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate that a string ends with the given suffix(es).
@@ -17,7 +18,7 @@ use Attribute;
  *   public string $workEmail;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class EndsWith
+final class EndsWith implements ValidationAttribute
 {
     /**
      * @param  string|array<int, string>  $suffix
@@ -26,4 +27,9 @@ final class EndsWith
         public string|array $suffix,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'ends_with';
+    }
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
  * Validate that a value has an exact size (length for strings, count for arrays).
@@ -20,10 +21,15 @@ use Attribute;
  *   public array $items;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Size
+final class Size implements ValidationAttribute
 {
     public function __construct(
         public int $value,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'size';
+    }
 }
