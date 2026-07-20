@@ -520,7 +520,6 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * @param  string  $value  Raw JSON string
      * @param  string  $propertyName  Property name for error context
-     *
      * @return array<string, mixed>
      *
      * @throws DTOException When the JSON is invalid or does not decode to an array
@@ -538,7 +537,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
         }
 
         if (! is_array($decoded)) {
-            throw DTOException::invalidJson($propertyName, 'Expected a JSON array, got ' . get_debug_type($decoded));
+            throw DTOException::invalidJson($propertyName, 'Expected a JSON array, got '.get_debug_type($decoded));
         }
 
         return $decoded;
@@ -578,8 +577,7 @@ abstract class DataTransferObject implements Arrayable, JsonSerializable
      *
      * @param  array<int, mixed>  $values  Raw array of data
      * @param  class-string<self>  $dtoClass  The DTO class for each element
-     *
-     * @return array<int, DataTransferObject>  Array of hydrated DTO instances
+     * @return array<int, DataTransferObject> Array of hydrated DTO instances
      */
     private static function hydrateNestedArray(array $values, string $dtoClass): array
     {

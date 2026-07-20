@@ -10,6 +10,7 @@ namespace ZeroBoiler\DTO\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
 
 /**
@@ -19,10 +20,12 @@ use ZeroBoiler\DTO\DataTransferObject;
  *       'payload' => CreateUserDTO::class,
  *   ];
  *
- *   // With validation on set (ensures data integrity on save):
+ * Validation is enabled by default on set() to prevent storing invalid data.
+ * To opt out (e.g. for performance-critical paths with pre-validated data):
+ *
  *   protected function casts(): array
  *   {
- *       return ['payload' => (new DTOCast(CreateUserDTO::class, validate: true))];
+ *       return ['payload' => new DTOCast(CreateUserDTO::class, validate: false)];
  *   }
  *
  * @template T of \ZeroBoiler\DTO\DataTransferObject
@@ -33,11 +36,11 @@ class DTOCast implements CastsAttributes
 {
     /**
      * @param  class-string<T>  $dtoClass
-     * @param  bool  $validate  Whether to validate arrays passed to set()
+     * @param  bool  $validate  Whether to validate arrays passed to set() (default: true)
      */
     public function __construct(
         private readonly string $dtoClass,
-        private readonly bool $validate = false,
+        private readonly bool $validate = true,
     ) {}
 
     /**
@@ -64,6 +67,9 @@ class DTOCast implements CastsAttributes
     /**
      * @param  Model  $model
      * @param  T|array<string, mixed>|null  $value
+     *
+     * @throws \InvalidArgumentException When value is not a DTO, array, or null
+     * @throws ValidationException When validation is enabled and data is invalid
      */
     public function set($model, string $key, $value, array $attributes)
     {
@@ -76,17 +82,30 @@ class DTOCast implements CastsAttributes
         }
 
         if (is_array($value)) {
-            // Validate the array data if validation is enabled
+            /** @var class-string<T> $dtoClass */
+            $dtoClass = $this->dtoClass;
+
+            // Validate the array data if validation is enabled.
+            // The DTO is hydrated (and validated) first to ensure data integrity,
+            // then we serialize the hydrated DTO to guarantee the stored JSON
+            // matches the DTO's toArray() output (#8).
             if ($this->validate) {
-                /** @var class-string<T> $dtoClass */
-                $dtoClass = $this->dtoClass;
-                $dtoClass::fromArray($value, validate: true);
+                $dto = $dtoClass::fromArray($value, validate: true);
+
+                return json_encode($dto->toArray());
             }
 
-            return json_encode($value);
+            // Even without validation, hydrate through the DTO to ensure
+            // consistent serialization (applies defaults, casts, etc.)
+            $dto = $dtoClass::fromArray($value, validate: false);
+
+            return json_encode($dto->toArray());
         }
 
-        return $value;
+        // Reject unexpected types to prevent silent data corruption (#8)
+        throw new \InvalidArgumentException(
+            'DTOCast::set() expects a DTO instance, array, or null; got '.get_debug_type($value)
+        );
     }
 
     /**
