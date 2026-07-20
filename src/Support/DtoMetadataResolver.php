@@ -12,6 +12,7 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionClass;
 use ReflectionProperty;
+use ZeroBoiler\DTO\Attributes\Accepted;
 use ZeroBoiler\DTO\Attributes\ArrayRule;
 use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Boolean;
@@ -21,22 +22,32 @@ use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
 use ZeroBoiler\DTO\Attributes\Declined;
 use ZeroBoiler\DTO\Attributes\DefaultValue as DefaultValueAttribute;
 use ZeroBoiler\DTO\Attributes\Different;
+use ZeroBoiler\DTO\Attributes\Distinct;
 use ZeroBoiler\DTO\Attributes\Email;
 use ZeroBoiler\DTO\Attributes\EndsWith;
 use ZeroBoiler\DTO\Attributes\Enum as EnumAttribute;
 use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\In;
 use ZeroBoiler\DTO\Attributes\Integer;
+use ZeroBoiler\DTO\Attributes\Json as JsonAttribute;
 use ZeroBoiler\DTO\Attributes\MapFrom;
 use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\NestedArray;
+use ZeroBoiler\DTO\Attributes\Nullable;
 use ZeroBoiler\DTO\Attributes\Numeric;
 use ZeroBoiler\DTO\Attributes\Pattern;
 use ZeroBoiler\DTO\Attributes\Present;
 use ZeroBoiler\DTO\Attributes\Prohibited;
 use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\Attributes\RequiredIf;
+use ZeroBoiler\DTO\Attributes\RequiredUnless;
+use ZeroBoiler\DTO\Attributes\RequiredWith;
+use ZeroBoiler\DTO\Attributes\RequiredWithAll;
+use ZeroBoiler\DTO\Attributes\RequiredWithout;
 use ZeroBoiler\DTO\Attributes\Same;
+use ZeroBoiler\DTO\Attributes\Size;
+use ZeroBoiler\DTO\Attributes\Sometimes;
 use ZeroBoiler\DTO\Attributes\StartsWith;
 use ZeroBoiler\DTO\Attributes\Url;
 use ZeroBoiler\DTO\Attributes\Uuid;
@@ -80,6 +91,8 @@ final class DtoMetadataResolver
         $rules = [];
         /** @var array<string, string> $messages */
         $messages = [];
+        /** @var array<string, array<int, mixed>> $extraRules */
+        $extraRules = [];
 
         foreach ($constructor->getParameters() as $param) {
             $name = $param->getName();
@@ -109,12 +122,17 @@ final class DtoMetadataResolver
 
             $propRules = self::inferBaseRules($type, $propMeta['nullable'], $propMeta['has_default']);
 
-            self::resolveAttributes($propReflection, $propMeta, $propRules, $messages, $name);
+            self::resolveAttributes($propReflection, $propMeta, $propRules, $messages, $extraRules, $name);
 
             $properties[$name] = $propMeta;
             if ($propRules !== []) {
                 $rules[$name] = array_unique($propRules);
             }
+        }
+
+        // Merge wildcard rules (e.g., tags.* => ['distinct'])
+        foreach ($extraRules as $field => $fieldRules) {
+            $rules[$field] = $fieldRules;
         }
 
         return ['properties' => $properties, 'rules' => $rules, 'messages' => $messages];
@@ -124,12 +142,14 @@ final class DtoMetadataResolver
      * @param  list<string|EnumRule>  $propRules
      * @param  array<string, mixed>  $propMeta
      * @param  array<string, mixed>  $messages
+     * @param  array<string, array<int, mixed>>  $extraRules
      */
     private static function resolveAttributes(
         ReflectionProperty $propReflection,
         array &$propMeta,
         array &$propRules,
         array &$messages,
+        array &$extraRules,
         string $name,
     ): void {
         foreach ($propReflection->getAttributes() as $attr) {
@@ -137,6 +157,11 @@ final class DtoMetadataResolver
 
             self::applyValidationAttribute($instance, $propRules);
             self::applyMetaAttribute($instance, $propMeta);
+
+            // Distinct needs a wildcard rule on the array elements
+            if ($instance instanceof Distinct) {
+                $extraRules["{$name}.*"] = ['distinct'];
+            }
 
             if ($instance instanceof DefaultValueAttribute) {
                 $propMeta['default'] = $instance->value;
@@ -178,6 +203,17 @@ final class DtoMetadataResolver
             $instance instanceof Declined => $propRules[] = 'declined',
             $instance instanceof StartsWith => $propRules[] = 'starts_with:'.implode(',', (array) $instance->prefix),
             $instance instanceof EndsWith => $propRules[] = 'ends_with:'.implode(',', (array) $instance->suffix),
+            $instance instanceof Nullable => $propRules[] = 'nullable',
+            $instance instanceof Sometimes => $propRules[] = 'sometimes',
+            $instance instanceof Distinct => $propRules[] = 'distinct',
+            $instance instanceof Accepted => $propRules[] = 'accepted',
+            $instance instanceof Size => $propRules[] = 'size:'.$instance->value,
+            $instance instanceof JsonAttribute => $propRules[] = 'json',
+            $instance instanceof RequiredIf => $propRules[] = 'required_if:'.$instance->field.','.implode(',', array_map(fn (mixed $v): string => (string) $v, (array) $instance->value)),
+            $instance instanceof RequiredUnless => $propRules[] = 'required_unless:'.$instance->field.','.implode(',', array_map(fn (mixed $v): string => (string) $v, (array) $instance->value)),
+            $instance instanceof RequiredWith => $propRules[] = 'required_with:'.implode(',', $instance->fields),
+            $instance instanceof RequiredWithAll => $propRules[] = 'required_with_all:'.implode(',', $instance->fields),
+            $instance instanceof RequiredWithout => $propRules[] = 'required_without:'.implode(',', $instance->fields),
             default => null,
         };
     }
