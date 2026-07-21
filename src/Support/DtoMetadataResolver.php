@@ -17,6 +17,7 @@ use ZeroBoiler\DTO\Attributes\ArrayRule;
 use ZeroBoiler\DTO\Attributes\Between;
 use ZeroBoiler\DTO\Attributes\Boolean;
 use ZeroBoiler\DTO\Attributes\Cast as CastAttribute;
+use ZeroBoiler\DTO\Attributes\Collection;
 use ZeroBoiler\DTO\Attributes\Confirmed;
 use ZeroBoiler\DTO\Attributes\Date as DateAttribute;
 use ZeroBoiler\DTO\Attributes\Declined;
@@ -115,6 +116,7 @@ final class DtoMetadataResolver
                 'value_object_class' => self::detectValueObjectClass($type),
                 'dto_class' => self::detectDtoClass($type),
                 'nested_array_class' => null,
+                'collection_class' => null,
             ];
 
             if ($propMeta['has_default']) {
@@ -261,6 +263,10 @@ final class DtoMetadataResolver
 
         if ($instance instanceof NestedArray) {
             $propMeta['nested_array_class'] = $instance->dtoClass;
+        }
+
+        if ($instance instanceof Collection) {
+            $propMeta['collection_class'] = $instance->dtoClass;
         }
     }
 
