@@ -119,6 +119,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
             }
 
+            // Collection hydration (#28)
+            // If the property has #[Collection] and the raw value is an array,
+            // hydrate each element into the specified DTO class and wrap in a DtoCollection.
+            if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
+                $value = self::hydrateCollection($value, $prop['collection_class']);
+            }
+
             $args[$name] = $value;
         }
 
@@ -170,6 +177,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 // Array of nested DTOs (#117)
                 if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
                     $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
+                }
+
+                // Collection hydration (#28)
+                if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
+                    $value = self::hydrateCollection($value, $prop['collection_class']);
                 }
 
                 $args[$name] = $value;
@@ -445,16 +457,29 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
     private function normalizeValue(mixed $value, bool $includeHidden): mixed
     {
+        if ($value instanceof DtoCollection) {
+            return $value->toArray();
+        }
+
         if ($value instanceof DataTransferObject) {
             return $includeHidden ? $value->allValues() : $value->toArray();
         }
 
-        // Handle arrays that may contain DTO instances
+        // Handle arrays that may contain DTO instances or nested arrays
         if (is_array($value)) {
             return array_map(
-                fn (mixed $item): mixed => $item instanceof DataTransferObject
-                    ? ($includeHidden ? $item->allValues() : $item->toArray())
-                    : $this->normalizeScalar($item),
+                function (mixed $item) use ($includeHidden): mixed {
+                    if ($item instanceof DataTransferObject) {
+                        return $includeHidden ? $item->allValues() : $item->toArray();
+                    }
+
+                    // Recursively normalize nested arrays (#27)
+                    if (is_array($item)) {
+                        return $this->normalizeValue($item, $includeHidden);
+                    }
+
+                    return $this->normalizeScalar($item);
+                },
                 $value
             );
         }
@@ -625,6 +650,24 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         throw new \InvalidArgumentException(
             'Cannot hydrate '.get_debug_type($value)." into nested DTO {$dtoClass}. Expected array or {$dtoClass} instance."
         );
+    }
+
+    /**
+     * Hydrate a collection of nested DTOs.
+     *
+     * Each element of the input array is converted to the specified DTO class
+     * and the result is wrapped in a {@see DtoCollection}.
+     *
+     * @param  array<int, mixed>  $values  Raw array of data
+     * @param  class-string<self>  $dtoClass  The DTO class for each element
+     *
+     * @phpstan-return DtoCollection<self>
+     */
+    private static function hydrateCollection(array $values, string $dtoClass): DtoCollection
+    {
+        $items = self::hydrateNestedArray($values, $dtoClass);
+
+        return new DtoCollection($items);
     }
 
     /**
