@@ -14,7 +14,6 @@ use ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand;
 
 final class DTOSServiceProvider extends ServiceProvider
 {
-    #[\Override]
     public function register(): void
     {
         $this->app->singleton('zeroboiler.dto', fn (): DTOManager => new DTOManager);
