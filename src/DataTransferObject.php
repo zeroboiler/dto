@@ -396,7 +396,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     {
         $data = array_merge($this->allValues(), $overrides);
 
-        return static::fromArray($data, validate: $validate);
+        // Validation always runs in with() to prevent invalid state (#2).
+        // The $validate parameter is kept for backward compatibility but has no effect.
+        return static::fromArray($data, validate: true);
     }
 
     // -----------------------------------------------------------------------

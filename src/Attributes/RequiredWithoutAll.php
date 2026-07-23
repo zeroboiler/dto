@@ -20,10 +20,17 @@ use Attribute;
 final class RequiredWithoutAll
 {
     /**
+     * @var array<int, string>
+     */
+    public array $fields;
+
+    /**
      * @param  string|array<int, string>  $fields
      */
     public function __construct(
-        public string|array $fields,
+        string|array $fields,
         public ?string $message = null,
-    ) {}
+    ) {
+        $this->fields = is_array($fields) ? $fields : [$fields];
+    }
 }

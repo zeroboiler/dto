@@ -21,12 +21,19 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class RequiredWith implements ValidationAttribute
 {
     /**
-     * @param  array<int, string>  $fields  Field names; required if ANY is present.
+     * @var array<int, string>
+     */
+    public array $fields;
+
+    /**
+     * @param  string|array<int, string>  $fields  Field name(s); required if ANY is present.
      */
     public function __construct(
-        public array $fields,
+        string|array $fields,
         public ?string $message = null,
-    ) {}
+    ) {
+        $this->fields = is_array($fields) ? $fields : [$fields];
+    }
 
     public function ruleKey(): string
     {

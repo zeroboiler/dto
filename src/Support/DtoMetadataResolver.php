@@ -46,6 +46,7 @@ use ZeroBoiler\DTO\Attributes\RequiredUnless;
 use ZeroBoiler\DTO\Attributes\RequiredWith;
 use ZeroBoiler\DTO\Attributes\RequiredWithAll;
 use ZeroBoiler\DTO\Attributes\RequiredWithout;
+use ZeroBoiler\DTO\Attributes\RequiredWithoutAll;
 use ZeroBoiler\DTO\Attributes\Same;
 use ZeroBoiler\DTO\Attributes\Size;
 use ZeroBoiler\DTO\Attributes\Sometimes;
@@ -218,6 +219,7 @@ final class DtoMetadataResolver
             $instance instanceof RequiredWith => $propRules[] = 'required_with:'.implode(',', $instance->fields),
             $instance instanceof RequiredWithAll => $propRules[] = 'required_with_all:'.implode(',', $instance->fields),
             $instance instanceof RequiredWithout => $propRules[] = 'required_without:'.implode(',', $instance->fields),
+            $instance instanceof RequiredWithoutAll => $propRules[] = 'required_without_all:'.implode(',', $instance->fields),
             default => null,
         };
     }
