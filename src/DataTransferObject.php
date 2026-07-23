@@ -105,6 +105,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 $value = self::castValue($value, $prop['cast'], $name);
             }
 
+            // BackedEnum auto-cast (#with-roundtrip)
+            // If the property is typed as a BackedEnum and the raw value is not already an instance,
+            // reconstruct from the backed value. This ensures with() roundtrips work correctly.
+            if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
+                $value = self::castValueToEnum($value, $prop['enum_class']);
+            }
+
             // Nested DTO hydration (#117)
             // If the property is typed as a DTO subclass and the raw value is an array,
             // recursively hydrate the nested DTO.
@@ -167,6 +174,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                     $value = self::castValueToValueObject($value, $prop['value_object_class']);
                 } elseif ($prop['cast'] !== null && $value !== null) {
                     $value = self::castValue($value, $prop['cast'], $name);
+                }
+
+                // BackedEnum auto-cast (#with-roundtrip)
+                if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
+                    $value = self::castValueToEnum($value, $prop['enum_class']);
                 }
 
                 // Nested DTO hydration (#117)
@@ -515,6 +527,45 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         return $value;
+    }
+
+    /**
+     * Cast a raw value to a BackedEnum instance.
+     *
+     * Handles both backed values (string/int) and enum names.
+     * This ensures that with() roundtrips work correctly: toArray()
+     * serializes enums to their backed value, and this method
+     * reconstructs them when hydrating via fromArray().
+     *
+     * @param  mixed  $value  Raw value (backed value or enum name)
+     * @param  class-string<\BackedEnum>  $enumClass
+     *
+     * @throws \InvalidArgumentException If the value cannot be cast to the enum
+     */
+    private static function castValueToEnum(mixed $value, string $enumClass): \BackedEnum
+    {
+        if ($value instanceof $enumClass) {
+            return $value;
+        }
+
+        // Try from() with the raw value (works for string/int backed enums)
+        try {
+            return $enumClass::from($value);
+        } catch (\ValueError) {
+            // from() failed, try tryFrom() for a graceful null check,
+            // then fall back to name-based lookup
+        }
+
+        // Try matching by name (for cases where the enum name is passed)
+        foreach ($enumClass::cases() as $case) {
+            if ($case->name === (string) $value) {
+                return $case;
+            }
+        }
+
+        throw new \InvalidArgumentException(
+            'Cannot cast '.get_debug_type($value)." value '{$value}' to enum {$enumClass}"
+        );
     }
 
     /**

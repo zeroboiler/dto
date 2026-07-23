@@ -116,6 +116,7 @@ final class DtoMetadataResolver
                 'nullable' => $type?->allowsNull() ?? true,
                 'value_object_class' => self::detectValueObjectClass($type),
                 'dto_class' => self::detectDtoClass($type),
+                'enum_class' => self::detectEnumClass($type),
                 'nested_array_class' => null,
                 'collection_class' => null,
             ];
@@ -436,6 +437,52 @@ final class DtoMetadataResolver
         }
 
         return null;
+    }
+
+    /**
+     * Detect if the property type is a BackedEnum.
+     *
+     * Returns the FQCN of the enum class if detected, null otherwise.
+     *
+     * @return class-string<\BackedEnum>|null
+     */
+    private static function detectEnumClass(?\ReflectionType $type): ?string
+    {
+        if ($type instanceof \ReflectionNamedType) {
+            return self::checkEnumClass($type->getName());
+        }
+
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof \ReflectionNamedType) {
+                    $result = self::checkEnumClass($innerType->getName());
+                    if ($result !== null) {
+                        return $result;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if a class name is a BackedEnum.
+     *
+     * @return class-string<\BackedEnum>|null
+     */
+    private static function checkEnumClass(string $typeName): ?string
+    {
+        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+            return null;
+        }
+
+        if (! enum_exists($typeName)) {
+            return null;
+        }
+
+        /** @var class-string<\BackedEnum> $typeName */
+        return $typeName;
     }
 
     /**
