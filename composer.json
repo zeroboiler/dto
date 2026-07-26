@@ -3,7 +3,7 @@
     "description": "Zero-boilerplate type-safe DTO system with attribute-based validation, serialization and request mapping for Laravel",
     "type": "library",
     "license": "proprietary",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
