@@ -18,8 +18,10 @@ use ReflectionClass;
  */
 final class MakeDtoTestCommand extends Command
 {
+    #[\Override]
     protected $signature = 'zeroboiler:dto-test {class : The DTO class FQN} {--dir= : Output directory}';
 
+    #[\Override]
     protected $description = 'Generate Pest tests for a ZeroBoiler DTO class';
 
     public function handle(): int
@@ -47,8 +49,8 @@ final class MakeDtoTestCommand extends Command
             return self::SUCCESS;
         }
 
-        $fakeData = self::generateFakeData($dtoClass);
-        $fakeDataStr = self::formatDataAsPhp($fakeData);
+        $fakeData = $this->generateFakeData($dtoClass);
+        $fakeDataStr = $this->formatDataAsPhp($fakeData);
 
         $rules = $dtoClass::rules();
         $ruleStrings = [];
@@ -120,7 +122,7 @@ PHP;
      * @param  class-string  $dtoClass
      * @return array<string, mixed>
      */
-    private static function generateFakeData(string $dtoClass): array
+    private function generateFakeData(string $dtoClass): array
     {
         $reflection = new ReflectionClass($dtoClass);
         $constructor = $reflection->getConstructor();
@@ -140,7 +142,7 @@ PHP;
                 continue;
             }
 
-            $data[$name] = self::fakeValueForType($type, $name);
+            $data[$name] = $this->fakeValueForType($type, $name);
         }
 
         return $data;
@@ -152,7 +154,7 @@ PHP;
      * Uses the property name to generate more realistic values
      * (e.g. "email" fields get fake email addresses).
      */
-    private static function fakeValueForType(\ReflectionType $type, string $name): mixed
+    private function fakeValueForType(\ReflectionType $type, string $name): mixed
     {
         $lowerName = strtolower($name);
 
@@ -199,7 +201,7 @@ PHP;
      *
      * @param  array<string, mixed>  $data
      */
-    private static function formatDataAsPhp(array $data): string
+    private function formatDataAsPhp(array $data): string
     {
         if ($data === []) {
             return '[]';
