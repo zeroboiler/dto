@@ -212,7 +212,6 @@ final class DtoMetadataResolver
             $instance instanceof Nullable => $propRules[] = 'nullable',
             $instance instanceof Sometimes => $propRules[] = 'sometimes',
             $instance instanceof Distinct => $propRules[] = 'distinct',
-            $instance instanceof Accepted => $propRules[] = 'accepted',
             $instance instanceof Size => $propRules[] = 'size:'.$instance->value,
             $instance instanceof JsonAttribute => $propRules[] = 'json',
             $instance instanceof RequiredIf => $propRules[] = 'required_if:'.$instance->field.','.implode(',', array_map(fn (mixed $v): string => (string) $v, (array) $instance->value)),
@@ -249,60 +248,6 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredIf(RequiredIf $instance, array &$propRules): void
-    {
-        $value = is_scalar($instance->value) || $instance->value === null ? (string) $instance->value : '';
-        $propRules[] = "required_if:{$instance->field},{$value}";
-    }
-
-    /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredUnless(RequiredUnless $instance, array &$propRules): void
-    {
-        $value = is_scalar($instance->value) || $instance->value === null ? (string) $instance->value : '';
-        $propRules[] = "required_unless:{$instance->field},{$value}";
-    }
-
-    /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredWith(RequiredWith $instance, array &$propRules): void
-    {
-        $fields = implode(',', (array) $instance->fields);
-        $propRules[] = "required_with:{$fields}";
-    }
-
-    /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredWithAll(RequiredWithAll $instance, array &$propRules): void
-    {
-        $fields = implode(',', (array) $instance->fields);
-        $propRules[] = "required_with_all:{$fields}";
-    }
-
-    /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredWithout(RequiredWithout $instance, array &$propRules): void
-    {
-        $fields = implode(',', (array) $instance->fields);
-        $propRules[] = "required_without:{$fields}";
-    }
-
-    /**
-     * @param  list<string>  $propRules
-     */
-    private static function applyRequiredWithoutAll(RequiredWithoutAll $instance, array &$propRules): void
-    {
-        $fields = implode(',', (array) $instance->fields);
-        $propRules[] = "required_without_all:{$fields}";
-    }
-
-    /**
      * @param  array<string, mixed>  $propMeta
      */
     private static function applyMetaAttribute(object $instance, array &$propMeta): void
@@ -329,56 +274,10 @@ final class DtoMetadataResolver
     }
 
     /**
-     * Map of attribute class => Laravel validation rule key.
-     *
-     * This avoids fragile reflection-based name parsing (#9) and ensures
-     * message keys always match Laravel's expected rule names.
-     *
-     * @var array<string, string>
-     */
-    private static array $ruleKeyMap = [
-        Required::class => 'required',
-        Email::class => 'email',
-        Max::class => 'max',
-        Min::class => 'min',
-        Url::class => 'url',
-        Pattern::class => 'regex',
-        In::class => 'in',
-        Integer::class => 'integer',
-        Numeric::class => 'numeric',
-        Boolean::class => 'boolean',
-        Uuid::class => 'uuid',
-        DateAttribute::class => 'date',
-        EnumAttribute::class => 'enum',
-        Confirmed::class => 'confirmed',
-        Different::class => 'different',
-        Same::class => 'same',
-        Between::class => 'between',
-        ArrayRule::class => 'array',
-        Prohibited::class => 'prohibited',
-        Present::class => 'present',
-        Declined::class => 'declined',
-        Accepted::class => 'accepted',
-        StartsWith::class => 'starts_with',
-        EndsWith::class => 'ends_with',
-        Nullable::class => 'nullable',
-        Sometimes::class => 'sometimes',
-        Distinct::class => 'distinct',
-        SizeAttribute::class => 'size',
-        JsonAttribute::class => 'json',
-        RequiredIf::class => 'required_if',
-        RequiredUnless::class => 'required_unless',
-        RequiredWith::class => 'required_with',
-        RequiredWithAll::class => 'required_with_all',
-        RequiredWithout::class => 'required_without',
-        RequiredWithoutAll::class => 'required_without_all',
-    ];
-
-    /**
      * Collect custom validation message from attribute instance.
      *
-     * Uses an explicit rule-key map instead of reflection-based name
-     * parsing to ensure keys always match Laravel's rule names (#9).
+     * Uses each attribute's ruleKey() method for message key generation,
+     * ensuring keys always match Laravel's rule names (#9).
      *
      * @param  array<string, mixed>  $messages
      */
