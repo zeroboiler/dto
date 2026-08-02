@@ -53,34 +53,34 @@ describe('Issue #11: Validation execution — valid data', function (): void {
 
 describe('Issue #11: Validation execution — invalid data rejected', function (): void {
     it('rejects invalid email format', function (): void {
-        expect(fn () => CreateUserDTO::fromArray([
+        expect(fn (): CreateUserDTO => CreateUserDTO::fromArray([
             'email' => 'not-an-email',
             'name' => 'Doruk',
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects missing required field', function (): void {
-        expect(fn () => CreateUserDTO::fromArray([
+        expect(fn (): CreateUserDTO => CreateUserDTO::fromArray([
             'name' => 'Doruk',
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects name below min length', function (): void {
-        expect(fn () => CreateUserDTO::fromArray([
+        expect(fn (): CreateUserDTO => CreateUserDTO::fromArray([
             'email' => 'valid@example.com',
             'name' => 'x',
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects name exceeding max length', function (): void {
-        expect(fn () => CreateUserDTO::fromArray([
+        expect(fn (): CreateUserDTO => CreateUserDTO::fromArray([
             'email' => 'valid@example.com',
             'name' => str_repeat('x', 60),
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects non-numeric price for ProductDTO', function (): void {
-        expect(fn () => ProductDTO::fromArray([
+        expect(fn (): ProductDTO => ProductDTO::fromArray([
             'name' => 'Widget',
             'price' => 'not-a-number',
             'stock' => 5,
@@ -88,7 +88,7 @@ describe('Issue #11: Validation execution — invalid data rejected', function (
     });
 
     it('rejects negative stock below min constraint', function (): void {
-        expect(fn () => ProductDTO::fromArray([
+        expect(fn (): ProductDTO => ProductDTO::fromArray([
             'name' => 'Widget',
             'price' => '10.00',
             'stock' => -1,
@@ -96,20 +96,20 @@ describe('Issue #11: Validation execution — invalid data rejected', function (
     });
 
     it('rejects when required name is entirely missing', function (): void {
-        expect(fn () => ProductDTO::fromArray([
+        expect(fn (): ProductDTO => ProductDTO::fromArray([
             'price' => '10.00',
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects non-integer age', function (): void {
-        expect(fn () => ValidationTestDTO::fromArray([
+        expect(fn (): ValidationTestDTO => ValidationTestDTO::fromArray([
             'name' => 'John',
             'age' => 'not-a-number',
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects missing required age field', function (): void {
-        expect(fn () => ValidationTestDTO::fromArray([
+        expect(fn (): ValidationTestDTO => ValidationTestDTO::fromArray([
             'name' => 'John',
         ]))->toThrow(ValidationException::class);
     });
@@ -164,14 +164,14 @@ describe('Issue #11: Validation boundary tests', function (): void {
     });
 
     it('rejects age below between range', function (): void {
-        expect(fn () => ValidationTestDTO::fromArray([
+        expect(fn (): ValidationTestDTO => ValidationTestDTO::fromArray([
             'name' => 'John',
             'age' => -1,
         ]))->toThrow(ValidationException::class);
     });
 
     it('rejects age above between range', function (): void {
-        expect(fn () => ValidationTestDTO::fromArray([
+        expect(fn (): ValidationTestDTO => ValidationTestDTO::fromArray([
             'name' => 'John',
             'age' => 121,
         ]))->toThrow(ValidationException::class);

@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file is part of ZeroBoiler, licensed under the proprietary license.
+ */
 
 declare(strict_types=1);
 
@@ -8,7 +11,7 @@ use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('DtoCollection — construction & basic access', function (): void {
     it('creates an empty collection with no arguments', function (): void {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection;
 
         expect($collection->count())->toBe(0)
             ->and($collection->isEmpty())->toBeTrue()
@@ -47,7 +50,7 @@ describe('DtoCollection — construction & basic access', function (): void {
 
 describe('DtoCollection — first() & last()', function (): void {
     it('first() returns null for empty collection', function (): void {
-        expect((new DtoCollection())->first())->toBeNull();
+        expect(new DtoCollection()->first())->toBeNull();
     });
 
     it('first() returns the first DTO', function (): void {
@@ -60,7 +63,7 @@ describe('DtoCollection — first() & last()', function (): void {
     });
 
     it('last() returns null for empty collection', function (): void {
-        expect((new DtoCollection())->last())->toBeNull();
+        expect(new DtoCollection()->last())->toBeNull();
     });
 
     it('last() returns the last DTO', function (): void {
@@ -170,7 +173,7 @@ describe('DtoCollection — map()', function (): void {
     });
 
     it('map() on empty collection returns empty array', function (): void {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection;
 
         $result = $collection->map(fn (ProductDTO $p): string => $p->name);
 
@@ -214,7 +217,7 @@ describe('DtoCollection — toArray() & allValues()', function (): void {
     });
 
     it('toArray() on empty collection returns empty array', function (): void {
-        expect((new DtoCollection())->toArray())->toBe([]);
+        expect(new DtoCollection()->toArray())->toBe([]);
     });
 });
 
@@ -248,7 +251,7 @@ describe('DtoCollection — ArrayAccess', function (): void {
         $dto1 = new ProductDTO(name: 'A', price: '1.00');
         $dto2 = new ProductDTO(name: 'B', price: '2.00');
 
-        $collection = new DtoCollection();
+        $collection = new DtoCollection;
         $collection[] = $dto1;
         $collection[] = $dto2;
 
@@ -296,7 +299,7 @@ describe('DtoCollection — IteratorAggregate', function (): void {
 
     it('empty collection yields no items', function (): void {
         $count = 0;
-        foreach (new DtoCollection() as $item) {
+        foreach (new DtoCollection as $item) {
             $count++;
         }
 
@@ -332,7 +335,7 @@ describe('DtoCollection — JsonSerializable', function (): void {
     });
 
     it('json_encode of empty collection produces empty array', function (): void {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection;
 
         expect(json_encode($collection))->toBe('[]');
     });

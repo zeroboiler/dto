@@ -81,7 +81,7 @@ describe('Issue #18: FromRequestDTO contract', function (): void {
             'name' => 'Test',
         ]);
 
-        expect(fn () => CreateUserDTO::fromRequest($request))
+        expect(fn (): CreateUserDTO => CreateUserDTO::fromRequest($request))
             ->toThrow(ValidationException::class);
     });
 });

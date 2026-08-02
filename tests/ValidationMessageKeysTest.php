@@ -95,36 +95,36 @@ describe('Issue #9: Explicit validation message key generation', function (): vo
     it('ruleKey() returns correct Laravel rule name for each attribute', function (): void {
         expect((new Accepted)->ruleKey())->toBe('accepted');
         expect((new ArrayRule)->ruleKey())->toBe('array');
-        expect((new Between(1, 10))->ruleKey())->toBe('between');
+        expect(new Between(1, 10)->ruleKey())->toBe('between');
         expect((new Boolean)->ruleKey())->toBe('boolean');
         expect((new Confirmed)->ruleKey())->toBe('confirmed');
         expect((new Date)->ruleKey())->toBe('date');
         expect((new Declined)->ruleKey())->toBe('declined');
-        expect((new Different('other'))->ruleKey())->toBe('different');
+        expect(new Different('other')->ruleKey())->toBe('different');
         expect((new Distinct)->ruleKey())->toBe('distinct');
         expect((new Email)->ruleKey())->toBe('email');
-        expect((new EndsWith('x'))->ruleKey())->toBe('ends_with');
-        expect((new Enum(BackedEnum::class))->ruleKey())->toBe('enum');
-        expect((new In(['a']))->ruleKey())->toBe('in');
+        expect(new EndsWith('x')->ruleKey())->toBe('ends_with');
+        expect(new Enum(BackedEnum::class)->ruleKey())->toBe('enum');
+        expect(new In(['a'])->ruleKey())->toBe('in');
         expect((new Integer)->ruleKey())->toBe('integer');
         expect((new Json)->ruleKey())->toBe('json');
-        expect((new Max(10))->ruleKey())->toBe('max');
-        expect((new Min(1))->ruleKey())->toBe('min');
+        expect(new Max(10)->ruleKey())->toBe('max');
+        expect(new Min(1)->ruleKey())->toBe('min');
         expect((new Nullable)->ruleKey())->toBe('nullable');
         expect((new Numeric)->ruleKey())->toBe('numeric');
-        expect((new Pattern('/.*/'))->ruleKey())->toBe('regex');
+        expect(new Pattern('/.*/')->ruleKey())->toBe('regex');
         expect((new Present)->ruleKey())->toBe('present');
         expect((new Prohibited)->ruleKey())->toBe('prohibited');
         expect((new Required)->ruleKey())->toBe('required');
-        expect((new RequiredIf('f', 'v'))->ruleKey())->toBe('required_if');
-        expect((new RequiredUnless('f', 'v'))->ruleKey())->toBe('required_unless');
-        expect((new RequiredWith(['f']))->ruleKey())->toBe('required_with');
-        expect((new RequiredWithAll(['f']))->ruleKey())->toBe('required_with_all');
-        expect((new RequiredWithout(['f']))->ruleKey())->toBe('required_without');
-        expect((new Same('other'))->ruleKey())->toBe('same');
-        expect((new Size(3))->ruleKey())->toBe('size');
+        expect(new RequiredIf('f', 'v')->ruleKey())->toBe('required_if');
+        expect(new RequiredUnless('f', 'v')->ruleKey())->toBe('required_unless');
+        expect(new RequiredWith(['f'])->ruleKey())->toBe('required_with');
+        expect(new RequiredWithAll(['f'])->ruleKey())->toBe('required_with_all');
+        expect(new RequiredWithout(['f'])->ruleKey())->toBe('required_without');
+        expect(new Same('other')->ruleKey())->toBe('same');
+        expect(new Size(3)->ruleKey())->toBe('size');
         expect((new Sometimes)->ruleKey())->toBe('sometimes');
-        expect((new StartsWith('x'))->ruleKey())->toBe('starts_with');
+        expect(new StartsWith('x')->ruleKey())->toBe('starts_with');
         expect((new Url)->ruleKey())->toBe('url');
         expect((new Uuid)->ruleKey())->toBe('uuid');
     });
@@ -132,13 +132,13 @@ describe('Issue #9: Explicit validation message key generation', function (): vo
     it('Pattern attribute maps to "regex" rule key, not "pattern"', function (): void {
         // This is the key fix — previously class name parsing would produce 'pattern'
         // but Laravel's validation rule is 'regex'
-        expect((new Pattern('/^test/'))->ruleKey())->toBe('regex');
+        expect(new Pattern('/^test/')->ruleKey())->toBe('regex');
     });
 
     it('StartsWith attribute maps to "starts_with" rule key', function (): void {
         // Previously class name parsing produced 'starts_with' by coincidence
         // Now it's explicit and guaranteed
-        expect((new StartsWith('https://'))->ruleKey())->toBe('starts_with');
+        expect(new StartsWith('https://')->ruleKey())->toBe('starts_with');
     });
 
     it('custom messages use explicit rule keys in generated messages array', function (): void {

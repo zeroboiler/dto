@@ -63,7 +63,7 @@ describe('Issue #10: New validation attributes', function (): void {
         });
 
         it('rejects when terms not accepted', function (): void {
-            expect(fn () => AcceptedTestDTO::fromArray([
+            expect(fn (): AcceptedTestDTO => AcceptedTestDTO::fromArray([
                 'name' => 'John',
                 'terms' => false,
             ]))->toThrow(ValidationException::class);
@@ -81,7 +81,7 @@ describe('Issue #10: New validation attributes', function (): void {
         });
 
         it('rejects when string does not match size', function (): void {
-            expect(fn () => SizeTestDTO::fromArray([
+            expect(fn (): SizeTestDTO => SizeTestDTO::fromArray([
                 'name' => 'John',
                 'code' => 'ABCD',
             ]))->toThrow(ValidationException::class);
@@ -99,7 +99,7 @@ describe('Issue #10: New validation attributes', function (): void {
         });
 
         it('rejects invalid JSON string', function (): void {
-            expect(fn () => JsonTestDTO::fromArray([
+            expect(fn (): JsonTestDTO => JsonTestDTO::fromArray([
                 'name' => 'John',
                 'metadata' => 'not-json{',
             ]))->toThrow(ValidationException::class);
@@ -117,7 +117,7 @@ describe('Issue #10: New validation attributes', function (): void {
         });
 
         it('rejects with duplicate array elements', function (): void {
-            expect(fn () => DistinctTestDTO::fromArray([
+            expect(fn (): DistinctTestDTO => DistinctTestDTO::fromArray([
                 'name' => 'John',
                 'tags' => ['php', 'php', 'laravel'],
             ]))->toThrow(ValidationException::class);
@@ -126,7 +126,7 @@ describe('Issue #10: New validation attributes', function (): void {
 
     describe('RequiredIf', function (): void {
         it('requires field when condition met', function (): void {
-            expect(fn () => RequiredIfTestDTO::fromArray([
+            expect(fn (): RequiredIfTestDTO => RequiredIfTestDTO::fromArray([
                 'name' => 'John',
                 'type' => 'individual',
             ]))->toThrow(ValidationException::class);
@@ -144,7 +144,7 @@ describe('Issue #10: New validation attributes', function (): void {
 
     describe('RequiredWith', function (): void {
         it('requires field when dependent field is present', function (): void {
-            expect(fn () => RequiredWithTestDTO::fromArray([
+            expect(fn (): RequiredWithTestDTO => RequiredWithTestDTO::fromArray([
                 'name' => 'John',
                 'email' => 'test@test.com',
             ]))->toThrow(ValidationException::class);
