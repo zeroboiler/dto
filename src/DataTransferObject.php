@@ -396,6 +396,34 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Return an array containing only the specified fields.
+     *
+     * Uses toArray() (excludes hidden fields). Non-existent keys are
+     * silently ignored to match Laravel's Arr::only() behavior.
+     *
+     * @param  array<int, string>|string  $keys
+     * @return array<string, mixed>
+     */
+    public function only(array|string $keys): array
+    {
+        return Arr::only($this->toArray(), is_array($keys) ? $keys : func_get_args());
+    }
+
+    /**
+     * Return an array with the specified fields excluded.
+     *
+     * Uses toArray() (excludes hidden fields). Non-existent keys are
+     * silently ignored to match Laravel's Arr::except() behavior.
+     *
+     * @param  array<int, string>|string  $keys
+     * @return array<string, mixed>
+     */
+    public function except(array|string $keys): array
+    {
+        return Arr::except($this->toArray(), is_array($keys) ? $keys : func_get_args());
+    }
+
+    /**
      * Create an immutable copy with the given overrides.
      *
      * Always validates the merged data to prevent invalid state (#2).

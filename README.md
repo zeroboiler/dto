@@ -14,7 +14,9 @@ Zero-boilerplate type-safe DTO system for Laravel.
 - **Default values** — `#[Default('active')]` when source key is missing
 - **Serialization** — `toArray()`, `toJson()`, `jsonSerialize()`
 - **Immutable updates** — `$dto->with(['status' => 'inactive'])`
+- **Selective output** — `$dto->only('email', 'name')`, `$dto->except('password')`
 - **Equality** — `$dto1->equals($dto2)`
+- **Collection helpers** — `pluck()`, `pluckKey()` for extracting fields from DTO collections
 - **Eloquent casting** — store DTOs as JSON in database columns
 - **OpenAPI schema** — auto-generate API docs from DTO definitions
 - **Nested DTO schemas** — `$ref` to component schemas for nested DTOs
@@ -90,6 +92,32 @@ $dto->toJson();
 ```php
 $updated = $dto->with(['status' => 'inactive']);
 // Original $dto is unchanged
+```
+
+### Selective Output
+
+```php
+// Return only specific fields
+$dto->only('email', 'name');
+// ['email' => 'test@example.com', 'name' => 'Doruk']
+
+// Exclude sensitive fields
+$dto->except('password');
+// All fields except 'password'
+```
+
+### Collection Helpers
+
+```php
+$collection = new DtoCollection([$dto1, $dto2, $dto3]);
+
+// Extract a single field from all DTOs
+$emails = $collection->pluck('email');
+// ['a@example.com', 'b@example.com', 'c@example.com']
+
+// Build a key/value map
+$map = $collection->pluckKey('email', 'name');
+// ['a@example.com' => 'Alice', 'b@example.com' => 'Bob', ...]
 ```
 
 ### Partial Updates (PATCH)

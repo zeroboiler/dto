@@ -196,6 +196,42 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
+     * Pluck a single property value from each DTO in the collection.
+     *
+     * Useful for extracting a list of IDs, emails, or any single field
+     * from a collection of DTOs without manual mapping.
+     *
+     * @return array<int, mixed>
+     */
+    public function pluck(string $key): array
+    {
+        return array_map(
+            static fn (DataTransferObject $dto): mixed => $dto->{$key},
+            $this->items
+        );
+    }
+
+    /**
+     * Get a single column as key/value pairs from the collection.
+     *
+     * Uses one property as keys and another as values. If no value
+     * key is given, the entire DTO array is used as the value.
+     *
+     * @return array<int|string, mixed>
+     */
+    public function pluckKey(string $keyField, ?string $valueField = null): array
+    {
+        $result = [];
+
+        foreach ($this->items as $item) {
+            $keyValue = $item->{$keyField};
+            $result[$keyValue] = $valueField !== null ? $item->{$valueField} : $item->toArray();
+        }
+
+        return $result;
+    }
+
+    /**
      * Check if the collection is empty.
      */
     public function isEmpty(): bool
