@@ -96,44 +96,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 $value = $prop['default'];
             }
 
-            // ValueObject auto-instantiation (#689)
-            // If the property is typed as a ValueObject and the raw value is not already an instance,
-            // construct the VO from the raw value. The VO constructor handles validation.
-            if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
-                $value = self::castValueToValueObject($value, $prop['value_object_class']);
-            } elseif ($prop['cast'] !== null && $value !== null) {
-                $value = self::castValue($value, $prop['cast'], $name);
-            }
-
-            // BackedEnum auto-cast (#with-roundtrip)
-            // If the property is typed as a BackedEnum and the raw value is not already an instance,
-            // reconstruct from the backed value. This ensures with() roundtrips work correctly.
-            if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
-                $value = self::castValueToEnum($value, $prop['enum_class']);
-            }
-
-            // Nested DTO hydration (#117)
-            // If the property is typed as a DTO subclass and the raw value is an array,
-            // recursively hydrate the nested DTO.
-            if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
-                $value = self::hydrateNestedDto($value, $prop['dto_class']);
-            }
-
-            // Array of nested DTOs (#117)
-            // If the property has #[NestedArray] and the raw value is an array,
-            // hydrate each element into the specified DTO class.
-            if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
-                $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
-            }
-
-            // Collection hydration (#28)
-            // If the property has #[Collection] and the raw value is an array,
-            // hydrate each element into the specified DTO class and wrap in a DtoCollection.
-            if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
-                $value = self::hydrateCollection($value, $prop['collection_class']);
-            }
-
-            $args[$name] = $value;
+            $args[$name] = self::castAndHydrateValue($value, $prop, $name);
         }
 
         return new static(...$args);
@@ -169,34 +132,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
             if ($hasKey) {
                 $value = Arr::get($data, $sourceKey);
-                // Apply the same casting/VO/nested DTO logic as fromArray
-                if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
-                    $value = self::castValueToValueObject($value, $prop['value_object_class']);
-                } elseif ($prop['cast'] !== null && $value !== null) {
-                    $value = self::castValue($value, $prop['cast'], $name);
-                }
-
-                // BackedEnum auto-cast (#with-roundtrip)
-                if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
-                    $value = self::castValueToEnum($value, $prop['enum_class']);
-                }
-
-                // Nested DTO hydration (#117)
-                if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
-                    $value = self::hydrateNestedDto($value, $prop['dto_class']);
-                }
-
-                // Array of nested DTOs (#117)
-                if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
-                    $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
-                }
-
-                // Collection hydration (#28)
-                if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
-                    $value = self::hydrateCollection($value, $prop['collection_class']);
-                }
-
-                $args[$name] = $value;
+                $args[$name] = self::castAndHydrateValue($value, $prop, $name);
             } elseif ($prop['has_default']) {
                 // Missing field: use default if available, otherwise type-appropriate empty value
                 $args[$name] = $prop['default'];
@@ -444,6 +380,49 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     // -----------------------------------------------------------------------
     // Private helpers
     // -----------------------------------------------------------------------
+
+    /**
+     * Apply casting, ValueObject instantiation, enum casting, and nested DTO
+     * hydration to a raw property value.
+     *
+     * Centralizes the transformation pipeline shared by fromArray() and
+     * fromPartialArray() to eliminate duplicate casting logic.
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @param  array<string, mixed>  $prop  Property metadata from resolveMetadata()
+     * @param  string  $name  Property name (for error context)
+     */
+    private static function castAndHydrateValue(mixed $value, array $prop, string $name): mixed
+    {
+        // ValueObject auto-instantiation (#689)
+        if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
+            $value = self::castValueToValueObject($value, $prop['value_object_class']);
+        } elseif ($prop['cast'] !== null && $value !== null) {
+            $value = self::castValue($value, $prop['cast'], $name);
+        }
+
+        // BackedEnum auto-cast (#with-roundtrip)
+        if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
+            $value = self::castValueToEnum($value, $prop['enum_class']);
+        }
+
+        // Nested DTO hydration (#117)
+        if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
+            $value = self::hydrateNestedDto($value, $prop['dto_class']);
+        }
+
+        // Array of nested DTOs (#117)
+        if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
+            $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
+        }
+
+        // Collection hydration (#28)
+        if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
+            return self::hydrateCollection($value, $prop['collection_class']);
+        }
+
+        return $value;
+    }
 
     /**
      * @return array{
