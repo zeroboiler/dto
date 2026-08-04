@@ -2,6 +2,19 @@
 
 Zero-boilerplate type-safe DTO system for Laravel.
 
+## Installation
+
+```bash
+composer require zeroboiler/dto
+```
+
+The package auto-registers via Laravel's package discovery. No manual configuration needed.
+
+**Requirements:**
+- PHP 8.5+
+- Laravel 13+
+- `zeroboiler/value-objects` (installed automatically as a dependency)
+
 ## Features
 
 - **Attribute-based validation** — `#[Required]`, `#[Email]`, `#[Max]`, `#[Min]`, `#[Pattern]`, `#[Enum]`, `#[Uuid]`, `#[Url]`, `#[Date]`, `#[Integer]`, `#[Numeric]`, `#[Boolean]`, `#[In]`
