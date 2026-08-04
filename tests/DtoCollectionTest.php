@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ZeroBoiler, licensed under the proprietary license.
  */
@@ -269,7 +270,7 @@ describe('DtoCollection — ArrayAccess', function (): void {
         expect($collection[0])->toBe($replacement);
     });
 
-    it('offsetUnset removes item at index', function (): void {
+    it('offsetUnset removes item at index and re-indexes', function (): void {
         $dto1 = new ProductDTO(name: 'A', price: '1.00');
         $dto2 = new ProductDTO(name: 'B', price: '2.00');
 
@@ -277,8 +278,10 @@ describe('DtoCollection — ArrayAccess', function (): void {
 
         unset($collection[0]);
 
-        expect(isset($collection[0]))->toBeFalse()
-            ->and($collection->count())->toBe(1);
+        // After re-index, dto2 shifts to index 0
+        expect(isset($collection[1]))->toBeFalse()
+            ->and($collection->count())->toBe(1)
+            ->and($collection[0])->toBe($dto2);
     });
 });
 

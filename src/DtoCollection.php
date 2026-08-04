@@ -113,6 +113,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     public function offsetUnset(mixed $offset): void
     {
         unset($this->items[$offset]);
+        // Re-index to prevent gaps that break last(), map(), and count() consistency
+        $this->items = array_values($this->items);
     }
 
     public function jsonSerialize(): mixed
@@ -159,6 +161,9 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     /**
      * Get the last item or null if empty.
      *
+     * Uses end() instead of count()-1 to be resilient against
+     * any future index gaps.
+     *
      * @return T|null
      */
     public function last(): ?DataTransferObject
@@ -167,7 +172,13 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
             return null;
         }
 
-        return $this->items[count($this->items) - 1];
+        // end() moves the internal pointer; use a copy to avoid side effects
+        $copy = $this->items;
+
+        /** @var T|false $last */
+        $last = end($copy);
+
+        return $last === false ? null : $last;
     }
 
     /**
