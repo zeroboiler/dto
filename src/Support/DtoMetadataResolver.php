@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Support;
 
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionClass;
 use ReflectionProperty;
@@ -178,7 +177,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string|Enum>  $propRules
+     * @param  list<string|EnumRule>  $propRules
      */
     private static function applyValidationAttribute(object $instance, array &$propRules): void
     {
@@ -377,6 +376,10 @@ final class DtoMetadataResolver
         }
 
         if (! enum_exists($typeName)) {
+            return null;
+        }
+
+        if (! is_a($typeName, \BackedEnum::class, true)) {
             return null;
         }
 
