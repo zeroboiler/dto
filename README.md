@@ -233,6 +233,8 @@ component schemas. Union types produce `oneOf` schemas.
 | `#[RequiredWithAll('f1', 'f2')]` | Required when all specified fields are present |
 | `#[RequiredWithout('field')]` | Required when another field is not present |
 | `#[RequiredWithoutAll('f1', 'f2')]` | Required when all specified fields are absent |
+| `#[ArrayRule]` | Must be an array (optionally with `min`/`max` count) |
+| `#[ArrayRule(min: 1, max: 10)]` | Array with 1–10 elements |
 
 ### Metadata Attributes
 
