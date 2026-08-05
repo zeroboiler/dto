@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Request;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
@@ -97,13 +98,13 @@ describe('equals() — DTO equality', function (): void {
 
         // This would throw a TypeError — different types cannot be compared
         // But the method signature is self, so PHP enforces this at compile time
-        expect(fn () => $dto->equals($dto))->toBeCallable();
+        expect(fn (): bool => $dto->equals($dto))->toBeCallable();
     });
 });
 
 describe('fromRequest() — request hydration', function (): void {
     it('creates DTO from request data', function (): void {
-        $request = \Illuminate\Http\Request::create('/users', 'POST', [
+        $request = Request::create('/users', 'POST', [
             'email' => 'test@example.com',
             'name' => 'Test User',
         ]);

@@ -156,7 +156,7 @@ describe('validatePartialArray() — standalone partial validation', function ()
     });
 
     it('validates present fields against their rules', function (): void {
-        expect(fn () => CreateUserDTO::validatePartialArray([
+        expect(fn (): array => CreateUserDTO::validatePartialArray([
             'email' => 'not-an-email',
         ]))->toThrow(ValidationException::class);
     });
@@ -168,7 +168,7 @@ describe('validatePartialArray() — standalone partial validation', function ()
     });
 
     it('rejects field that fails min constraint', function (): void {
-        expect(fn () => CreateUserDTO::validatePartialArray([
+        expect(fn (): array => CreateUserDTO::validatePartialArray([
             'name' => 'x',
         ]))->toThrow(ValidationException::class);
     });

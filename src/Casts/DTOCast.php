@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Casts;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
@@ -43,7 +44,7 @@ class DTOCast implements CastsAttributes
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param Model $model
      * @param  array<string, mixed>  $attributes
      * @return T|null
      */
@@ -58,6 +59,7 @@ class DTOCast implements CastsAttributes
             return null;
         }
 
+        /** @var array<string, mixed> $data */
         /** @var class-string<T> $dtoClass */
         $dtoClass = $this->dtoClass;
 
@@ -65,13 +67,13 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param Model $model
      * @param  T|array<string, mixed>|null  $value
      * @param  array<string, mixed>  $attributes
      *
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
      * @throws ValidationException When validation is enabled and data is invalid
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>|string|null
      */
     public function set(object $model, string $key, $value, array $attributes)
     {
@@ -80,7 +82,7 @@ class DTOCast implements CastsAttributes
         }
 
         if ($value instanceof DataTransferObject) {
-            return json_encode($value->toArray());
+            return json_encode($value->toArray()) ?: '';
         }
 
         if (is_array($value)) {
@@ -91,7 +93,7 @@ class DTOCast implements CastsAttributes
             // (applies defaults, casts, etc.) and optionally validate (#8).
             $dto = $dtoClass::fromArray($value, validate: $this->validate);
 
-            return json_encode($dto->toArray());
+            return json_encode($dto->toArray()) ?: '';
         }
 
         // Reject unexpected types to prevent silent data corruption (#8)
@@ -101,7 +103,7 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param Model $model
      * @param  T|null  $value
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>|null

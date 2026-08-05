@@ -120,6 +120,7 @@ final class OpenApiSchemaGenerator
                 foreach ($propReflection->getAttributes() as $attr) {
                     if ($attr->getName() === DefaultValue::class) {
                         $instance = $attr->newInstance();
+                        assert($instance instanceof DefaultValue);
                         $hasDefaultValueAttr = true;
                         $defaultValue = $instance->value;
 
@@ -242,7 +243,7 @@ final class OpenApiSchemaGenerator
         // Deduplicate by comparing serialized form
         $unique = [];
         foreach ($schemas as $schema) {
-            $key = json_encode($schema);
+            $key = json_encode($schema) ?: '';
             if (! array_key_exists($key, $unique)) {
                 $unique[$key] = $schema;
             }
@@ -395,7 +396,7 @@ final class OpenApiSchemaGenerator
     {
         $existing = $propSchema['pattern'] ?? null;
 
-        if ($existing !== null) {
+        if ($existing !== null && is_string($existing)) {
             // Combine patterns using lookahead to preserve both constraints
             $propSchema['pattern'] = '(?='.ltrim($fragment, '^').')'.$existing;
         } else {
@@ -491,8 +492,9 @@ final class OpenApiSchemaGenerator
             $typeName = $type->getName();
 
             // Check if it's a ValueObject — infer from its columnType()
-            $isVo = class_exists($typeName) && in_array(ValueObjectContract::class, class_implements($typeName) ?: [], true);
+            $isVo = class_exists($typeName) && is_a($typeName, ValueObjectContract::class, true);
             if ($isVo) {
+                /** @var class-string<ValueObjectContract> $typeName */
                 return self::inferVoType($typeName);
             }
 

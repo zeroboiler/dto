@@ -68,19 +68,7 @@ final class DtoMetadataResolver
      *
      * @param  class-string  $class
      * @return array{
-     *     properties: array<string, array{
-     *         map_from: ?string,
-     *         default: mixed,
-     *         cast: ?string,
-     *         hidden: bool,
-     *         has_default: bool,
-     *         nullable: bool,
-     *         value_object_class: ?class-string<\ZeroBoiler\ValueObjects\Contracts\ValueObject>,
-     *         dto_class: ?class-string<DataTransferObject>,
-     *         enum_class: ?class-string<\BackedEnum>,
-     *         nested_array_class: ?class-string<DataTransferObject>,
-     *         collection_class: ?class-string<DataTransferObject>
-     *     }>,
+     *     properties: array<non-empty-string, array<string, mixed>>,
      *     rules: array<string, array<int, mixed>>,
      *     messages: array<string, string>
      * }
@@ -150,7 +138,7 @@ final class DtoMetadataResolver
     /**
      * @param  list<string|EnumRule>  $propRules
      * @param  array<string, mixed>  $propMeta
-     * @param  array<string, mixed>  $messages
+     * @param  array<string, string>  $messages
      * @param  array<string, array<int, mixed>>  $extraRules
      */
     private static function resolveAttributes(
@@ -218,8 +206,8 @@ final class DtoMetadataResolver
             $instance instanceof Distinct => $propRules[] = 'distinct',
             $instance instanceof Size => $propRules[] = 'size:'.$instance->value,
             $instance instanceof JsonAttribute => $propRules[] = 'json',
-            $instance instanceof RequiredIf => $propRules[] = 'required_if:'.$instance->field.','.implode(',', array_map(fn (mixed $v): string => (string) $v, (array) $instance->value)),
-            $instance instanceof RequiredUnless => $propRules[] = 'required_unless:'.$instance->field.','.implode(',', array_map(fn (mixed $v): string => (string) $v, (array) $instance->value)),
+            $instance instanceof RequiredIf => self::applyRequiredIfRule($instance, $propRules),
+            $instance instanceof RequiredUnless => self::applyRequiredUnlessRule($instance, $propRules),
             $instance instanceof RequiredWith => $propRules[] = 'required_with:'.implode(',', $instance->fields),
             $instance instanceof RequiredWithAll => $propRules[] = 'required_with_all:'.implode(',', $instance->fields),
             $instance instanceof RequiredWithout => $propRules[] = 'required_without:'.implode(',', $instance->fields),
@@ -229,9 +217,33 @@ final class DtoMetadataResolver
     }
 
     /**
+     * @param  list<string|EnumRule>  $propRules
+     */
+    private static function applyRequiredIfRule(RequiredIf $instance, array &$propRules): void
+    {
+        $values = (array) $instance->value;
+        $propRules[] = 'required_if:'.$instance->field.','.implode(',', array_map(
+            fn (mixed $v): string => is_string($v) ? $v : (is_scalar($v) ? (string) $v : ''),
+            $values,
+        ));
+    }
+
+    /**
+     * @param  list<string|EnumRule>  $propRules
+     */
+    private static function applyRequiredUnlessRule(RequiredUnless $instance, array &$propRules): void
+    {
+        $values = (array) $instance->value;
+        $propRules[] = 'required_unless:'.$instance->field.','.implode(',', array_map(
+            fn (mixed $v): string => is_string($v) ? $v : (is_scalar($v) ? (string) $v : ''),
+            $values,
+        ));
+    }
+
+    /**
      * Apply array validation rule with optional min/max count.
      *
-     * @param  list<string>  $propRules
+     * @param  list<string|EnumRule>  $propRules
      */
     private static function applyArrayRule(ArrayRule $instance, array &$propRules): void
     {
@@ -283,12 +295,12 @@ final class DtoMetadataResolver
      * Uses each attribute's ruleKey() method for message key generation,
      * ensuring keys always match Laravel's rule names (#9).
      *
-     * @param  array<string, mixed>  $messages
+     * @param  array<string, string>  $messages
      */
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {
         if ($instance instanceof ValidationAttribute && property_exists($instance, 'message') && $instance->message !== null) {
-            $messages["{$name}.{$instance->ruleKey()}"] = $instance->message;
+            $messages["{$name}.{$instance->ruleKey()}"] = (string) $instance->message;
         }
     }
 
@@ -336,6 +348,7 @@ final class DtoMetadataResolver
         }
 
         if (in_array(ValueObjectContract::class, class_implements($typeName) ?: [], true)) {
+            /** @var class-string<ValueObjectContract> $typeName */
             return $typeName;
         }
 

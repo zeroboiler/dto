@@ -86,8 +86,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         $args = [];
 
         foreach ($metadata['properties'] as $name => $prop) {
-            $sourceKey = $prop['map_from'] ?? $name;
-            $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
+            $sourceKey = is_string($prop['map_from'] ?? null) ? $prop['map_from'] : $name;
+            $hasKey = array_key_exists($sourceKey, $data) || Arr::has($data, $sourceKey);
             $value = Arr::get($data, $sourceKey);
 
             // Only apply default when the key is entirely absent from the data.
@@ -127,8 +127,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         $args = [];
 
         foreach ($metadata['properties'] as $name => $prop) {
-            $sourceKey = $prop['map_from'] ?? $name;
-            $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
+            $sourceKey = is_string($prop['map_from'] ?? null) ? $prop['map_from'] : $name;
+            $hasKey = array_key_exists($sourceKey, $data) || Arr::has($data, $sourceKey);
 
             if ($hasKey) {
                 $value = Arr::get($data, $sourceKey);
@@ -137,7 +137,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 // Missing field: use default if available, otherwise type-appropriate empty value
                 $args[$name] = $prop['default'];
             } else {
-                $args[$name] = self::emptyValueForType($name, $prop['nullable'], $prop);
+                $args[$name] = self::emptyValueForType($name, (bool) $prop['nullable'], $prop);
             }
         }
 
@@ -216,8 +216,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         $partialRules = [];
 
         foreach ($metadata['rules'] as $field => $rules) {
-            $sourceKey = $metadata['properties'][$field]['map_from'] ?? $field;
-            $hasKey = array_key_exists((string) $sourceKey, $data) || Arr::has($data, $sourceKey);
+            $sourceKey = is_string($metadata['properties'][$field]['map_from'] ?? null) ? $metadata['properties'][$field]['map_from'] : $field;
+            $hasKey = array_key_exists($sourceKey, $data) || Arr::has($data, $sourceKey);
 
             if (! $hasKey) {
                 continue;
@@ -318,7 +318,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
     public function toJson(int $options = 0): string
     {
-        return json_encode($this->jsonSerialize(), $options);
+        return json_encode($this->jsonSerialize(), $options) ?: '';
     }
 
     public function jsonSerialize(): mixed
@@ -393,31 +393,50 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      */
     private static function castAndHydrateValue(mixed $value, array $prop, string $name): mixed
     {
+        /** @var class-string<ValueObject>|null $voClass */
+        $voClass = $prop['value_object_class'] ?? null;
+
         // ValueObject auto-instantiation (#689)
-        if ($value !== null && $prop['value_object_class'] !== null && ! $value instanceof $prop['value_object_class']) {
-            $value = self::castValueToValueObject($value, $prop['value_object_class']);
-        } elseif ($prop['cast'] !== null && $value !== null) {
-            $value = self::castValue($value, $prop['cast'], $name);
+        if ($value !== null && $voClass !== null && ! $value instanceof $voClass) {
+            $value = self::castValueToValueObject($value, $voClass);
+        } elseif (($prop['cast'] ?? null) !== null && $value !== null) {
+            $castType = is_string($prop['cast']) ? $prop['cast'] : '';
+            $value = self::castValue($value, $castType, $name);
         }
+
+        /** @var class-string<\BackedEnum>|null $enumClass */
+        $enumClass = $prop['enum_class'] ?? null;
 
         // BackedEnum auto-cast (#with-roundtrip)
-        if ($value !== null && $prop['enum_class'] !== null && ! $value instanceof $prop['enum_class']) {
-            $value = self::castValueToEnum($value, $prop['enum_class']);
+        if ($value !== null && $enumClass !== null && ! $value instanceof $enumClass) {
+            $value = self::castValueToEnum($value, $enumClass);
         }
+
+        /** @var class-string<self>|null $dtoClass */
+        $dtoClass = $prop['dto_class'] ?? null;
 
         // Nested DTO hydration (#117)
-        if ($value !== null && $prop['dto_class'] !== null && ! $value instanceof $prop['dto_class']) {
-            $value = self::hydrateNestedDto($value, $prop['dto_class']);
+        if ($value !== null && $dtoClass !== null && ! $value instanceof $dtoClass) {
+            $value = self::hydrateNestedDto($value, $dtoClass);
         }
+
+        /** @var class-string<self>|null $nestedArrayClass */
+        $nestedArrayClass = $prop['nested_array_class'] ?? null;
 
         // Array of nested DTOs (#117)
-        if ($value !== null && $prop['nested_array_class'] !== null && is_array($value)) {
-            $value = self::hydrateNestedArray($value, $prop['nested_array_class']);
+        if ($value !== null && $nestedArrayClass !== null && is_array($value)) {
+            $arrayValue = $value;
+            /** @var array<int, mixed> $arrayValue */
+            $value = self::hydrateNestedArray($arrayValue, $nestedArrayClass);
         }
 
+        /** @var class-string<self>|null $collectionClass */
+        $collectionClass = $prop['collection_class'] ?? null;
+
         // Collection hydration (#28)
-        if ($value !== null && $prop['collection_class'] !== null && is_array($value)) {
-            return self::hydrateCollection($value, $prop['collection_class']);
+        if ($value !== null && $collectionClass !== null && is_array($value)) {
+            /** @var array<int, mixed> $value */
+            return self::hydrateCollection($value, $collectionClass);
         }
 
         return $value;
@@ -429,6 +448,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *     rules: array<string, array<int, mixed>>,
      *     messages: array<string, string>
      * }
+     *
+     * @phpstan-return array{properties: array<string, array<string, mixed>>, rules: array<string, array<int, mixed>>, messages: array<string, string>}
      */
     private static function resolveMetadata(): array
     {
@@ -448,7 +469,10 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             self::$_metadataCacheTimestamps[$class] = microtime(true);
         }
 
-        return self::$_metadataCache[$class];
+        /** @var array{properties: array<string, array<string, mixed>>, rules: array<string, array<int, mixed>>, messages: array<string, string>} $metadata */
+        $metadata = self::$_metadataCache[$class];
+
+        return $metadata;
     }
 
     /**
@@ -554,22 +578,27 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         // Try from() with the raw value (works for string/int backed enums)
-        try {
-            return $enumClass::from($value);
-        } catch (\ValueError) {
-            // from() failed, try tryFrom() for a graceful null check,
-            // then fall back to name-based lookup
+        if (is_int($value) || is_string($value)) {
+            try {
+                return $enumClass::from($value);
+            } catch (\ValueError) {
+                // from() failed, try tryFrom() for a graceful null check,
+                // then fall back to name-based lookup
+            }
         }
 
         // Try matching by name (for cases where the enum name is passed)
-        foreach ($enumClass::cases() as $case) {
-            if ($case->name === (string) $value) {
-                return $case;
+        $stringValue = is_string($value) ? $value : (is_scalar($value) ? (string) $value : null);
+        if ($stringValue !== null) {
+            foreach ($enumClass::cases() as $case) {
+                if ($case->name === $stringValue) {
+                    return $case;
+                }
             }
         }
 
         throw new \InvalidArgumentException(
-            'Cannot cast '.get_debug_type($value)." value '{$value}' to enum {$enumClass}"
+            'Cannot cast '.get_debug_type($value).' to enum '.$enumClass
         );
     }
 
@@ -579,12 +608,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     private static function castValue(mixed $value, string $type, string $propertyName = ''): mixed
     {
         return match ($type) {
-            'int', 'integer' => (int) $value,
-            'float', 'double' => (float) $value,
-            'string' => (string) $value,
+            'int', 'integer' => is_numeric($value) ? (int) $value : 0,
+            'float', 'double' => is_numeric($value) ? (float) $value : 0.0,
+            'string' => is_scalar($value) ? (string) $value : (is_object($value) && method_exists($value, '__toString') ? (string) $value : ''),
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
-            'array' => is_array($value) ? $value : self::decodeJsonArray((string) $value, $propertyName),
-            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : new Carbon($value),
+            'array' => is_array($value) ? $value : self::decodeJsonArray(is_string($value) ? $value : '', $propertyName),
+            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : (is_string($value) || is_int($value) || is_float($value) || $value === null ? new Carbon($value) : new Carbon()),
             default => $value,
         };
     }
@@ -676,6 +705,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             throw DTOException::invalidJson($propertyName, 'Expected a JSON array, got '.get_debug_type($decoded));
         }
 
+        /** @var array<string, mixed> $decoded */
         return $decoded;
     }
 
@@ -697,6 +727,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         if (is_array($value)) {
+            /** @var array<string, mixed> $value */
             return $dtoClass::fromArray($value, validate: false);
         }
 
@@ -741,6 +772,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             if ($value instanceof $dtoClass) {
                 $result[] = $value;
             } elseif (is_array($value)) {
+                /** @var array<string, mixed> $value */
                 $result[] = $dtoClass::fromArray($value, validate: false);
             } else {
                 throw new \InvalidArgumentException(

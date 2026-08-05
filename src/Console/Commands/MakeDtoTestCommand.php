@@ -18,8 +18,10 @@ use ReflectionClass;
  */
 final class MakeDtoTestCommand extends Command
 {
+    #[\Override]
     protected $signature = 'zeroboiler:dto-test {class : The DTO class FQN} {--dir= : Output directory}';
 
+    #[\Override]
     protected $description = 'Generate Pest tests for a ZeroBoiler DTO class';
 
     public function handle(): int

@@ -42,6 +42,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
                 );
             }
 
+            /** @var T $item */
             $this->items[] = $item;
         }
     }

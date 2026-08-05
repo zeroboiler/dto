@@ -21,14 +21,14 @@ describe('DtoCollection — type guards', function (): void {
         $dto = new ProductDTO(name: 'A', price: '1.00');
         $collection = new DtoCollection([$dto]);
 
-        expect(fn () => $collection[] = 'not a dto')->toThrow(InvalidArgumentException::class);
+        expect(fn (): string => $collection[] = 'not a dto')->toThrow(InvalidArgumentException::class);
     });
 
     it('rejects non-DTO items via offsetSet with explicit key', function (): void {
         $dto = new ProductDTO(name: 'A', price: '1.00');
         $collection = new DtoCollection([$dto]);
 
-        expect(fn () => $collection[1] = 42)->toThrow(InvalidArgumentException::class);
+        expect(fn (): int => $collection[1] = 42)->toThrow(InvalidArgumentException::class);
     });
 
     it('accepts valid DTO items in constructor', function (): void {
