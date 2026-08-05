@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 use ZeroBoiler\DTO\DataTransferObject;
 
 /**
@@ -21,7 +22,7 @@ use ZeroBoiler\DTO\DataTransferObject;
  * The DTO class must have a constructor that accepts an array (via fromArray).
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class NestedArray
+final class NestedArray implements ValidationAttribute
 {
     /**
      * @param  class-string<DataTransferObject>  $dtoClass
@@ -30,4 +31,9 @@ final class NestedArray
         public string $dtoClass,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'array';
+    }
 }

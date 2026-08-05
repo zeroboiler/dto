@@ -13,6 +13,9 @@ use Attribute;
 /**
  * Cast a property from one type to another during hydration.
  *
+ * Supported cast types: 'integer', 'int', 'float', 'double', 'string',
+ * 'boolean', 'bool', 'array', 'date', 'datetime'.
+ *
  *   #[Cast('integer')]
  *   public int $count;
  *
@@ -22,8 +25,11 @@ use Attribute;
  *   #[Cast('boolean')]
  *   public bool $active;
  *
- *   #[Cast(Carbon::class)]
- *   public Carbon $createdAt;
+ *   #[Cast('date')]
+ *   public \Carbon\Carbon $createdAt;
+ *
+ *   #[Cast('array')]
+ *   public array $metadata;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Cast

@@ -123,7 +123,7 @@ final class DtoMetadataResolver
 
             $properties[$name] = $propMeta;
             if ($propRules !== []) {
-                $rules[$name] = array_unique($propRules);
+                $rules[$name] = self::deduplicateRules($propRules);
             }
         }
 
@@ -497,5 +497,43 @@ final class DtoMetadataResolver
             'float' => ['numeric'],
             default => [],
         };
+    }
+
+    /**
+     * Deduplicate validation rules, handling both string rules and EnumRule objects.
+     *
+     * Unlike array_unique(), which compares objects by identity (always unique),
+     * this method compares EnumRule instances by their target enum class and
+     * string rules by value — ensuring true deduplication.
+     *
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $rules
+     * @return list<string|\Illuminate\Validation\Rules\Enum>
+     */
+    private static function deduplicateRules(array $rules): array
+    {
+        /** @var array<string|\Illuminate\Validation\Rules\Enum> $seen */
+        $seen = [];
+        /** @var list<string|\Illuminate\Validation\Rules\Enum> $deduped */
+        $deduped = [];
+
+        foreach ($rules as $rule) {
+            $key = is_string($rule) ? $rule : self::enumRuleKey($rule);
+            if (! array_key_exists($key, $seen)) {
+                $seen[$key] = $rule;
+                $deduped[] = $rule;
+            }
+        }
+
+        return $deduped;
+    }
+
+    /**
+     * Generate a unique key for an EnumRule instance for deduplication.
+     *
+     * @param  \Illuminate\Validation\Rules\Enum  $rule
+     */
+    private static function enumRuleKey(object $rule): string
+    {
+        return 'enum:' . get_class($rule) . ':' . spl_object_id($rule);
     }
 }

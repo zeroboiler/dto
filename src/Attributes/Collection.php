@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Attributes;
 
 use Attribute;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 use ZeroBoiler\DTO\DataTransferObject;
 
 /**
@@ -21,10 +22,10 @@ use ZeroBoiler\DTO\DataTransferObject;
  *   public readonly array $users;
  *
  * Unlike {@see NestedArray}, Collection also wraps the result in a
- * {@see \ZeroBoiler\DTO\Collection} instance providing type-safe access.
+ * {@see \ZeroBoiler\DTO\DtoCollection} instance providing type-safe access.
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Collection
+final class Collection implements ValidationAttribute
 {
     /**
      * @param  class-string<DataTransferObject>  $dtoClass
@@ -33,4 +34,9 @@ final class Collection
         public string $dtoClass,
         public ?string $message = null,
     ) {}
+
+    public function ruleKey(): string
+    {
+        return 'array';
+    }
 }
