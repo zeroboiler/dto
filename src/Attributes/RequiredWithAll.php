@@ -20,10 +20,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredWithAll implements ValidationAttribute
 {
-    /**
-     * @var array<int, string>
-     */
-    public array $fields;
+    /** @var array<int, string> */
+    public readonly array $fields;
 
     /**
      * @param  string|array<int, string>  $fields  Field name(s); required if ALL are present.
