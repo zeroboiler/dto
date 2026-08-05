@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use Illuminate\Http\Request;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('allValues() — includes hidden fields', function (): void {
     it('includes hidden fields that toArray() excludes', function (): void {

@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('only() — selective field output', function (): void {
     it('returns only the specified fields', function (): void {

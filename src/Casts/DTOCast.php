@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Casts;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
 
@@ -44,7 +44,7 @@ class DTOCast implements CastsAttributes
     ) {}
 
     /**
-     * @param Model $model
+     * @param  Model  $model
      * @param  array<string, mixed>  $attributes
      * @return T|null
      */
@@ -67,13 +67,13 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param Model $model
+     * @param  Model  $model
      * @param  T|array<string, mixed>|null  $value
      * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>|string|null
      *
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
      * @throws ValidationException When validation is enabled and data is invalid
-     * @return array<string, mixed>|string|null
      */
     public function set(object $model, string $key, $value, array $attributes)
     {
@@ -103,7 +103,7 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param Model $model
+     * @param  Model  $model
      * @param  T|null  $value
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>|null
