@@ -505,7 +505,6 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
     private function normalizeScalar(mixed $value): mixed
     {
-
         if ($value instanceof ValueObject) {
             // Use columnType() to determine serialization strategy.
             // Single-value VOs (string/integer columns) serialize to their primitive.
