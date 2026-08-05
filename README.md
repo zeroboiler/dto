@@ -138,9 +138,16 @@ $emails = $collection->pluck('email');
 $map = $collection->pluckKey('email', 'name');
 // ['a@example.com' => 'Alice', 'b@example.com' => 'Bob', ...]
 
-// Filter and chain
-$active = $collection->filter(fn (UserDTO $u): bool => $u->status === 'active')
-    ->map(fn (UserDTO $u): string => $u->name);
+// Map over items (returns plain array)
+$names = $collection->map(fn (UserDTO $u): string => $u->name);
+// ['Alice', 'Bob', 'Charlie']
+
+// Filter items (returns new DtoCollection)
+$active = $collection->filter(fn (UserDTO $u): bool => $u->status === 'active');
+
+// Get raw DTO instances (without serialization)
+$items = $collection->items();
+// [$dto1, $dto2, $dto3]
 
 // Basic access
 $collection->count();       // 3
