@@ -363,10 +363,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Create an immutable copy with the given overrides.
      *
      * Always validates the merged data to prevent invalid state (#2).
-     * The `$validate` parameter is accepted for backward compatibility
-     * but cannot disable validation.
      *
      * @param  array<string, mixed>  $overrides
+     * @param  bool  $validate  Deprecated: has no effect. Validation always runs to prevent invalid state.
      */
     public function with(array $overrides, bool $validate = true): static
     {
