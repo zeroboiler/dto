@@ -21,6 +21,7 @@ final class DTOSServiceProvider extends ServiceProvider
         $this->app->singleton('zeroboiler.dto', fn (): DTOManager => new DTOManager);
     }
 
+    #[\Override]
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
