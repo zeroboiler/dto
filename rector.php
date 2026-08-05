@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php85\Rector\Property\AddOverrideAttributeToOverriddenPropertiesRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
@@ -18,6 +19,8 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->skip([
         __DIR__.'/tests/Fixtures',
+        // #[Override] cannot target properties (only methods) — PHP constraint
+        AddOverrideAttributeToOverriddenPropertiesRector::class,
     ]);
 
     // PHP upgrades
