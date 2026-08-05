@@ -243,6 +243,43 @@ $order->items->count();     // 2
 $order->items->pluck('name'); // ['Widget A', 'Widget B']
 ```
 
+### Value Object Integration
+
+Properties typed with a `ValueObject` class (from `zeroboiler/value-objects`) are
+automatically instantiated during hydration and serialized to primitives on output.
+
+```php
+use ZeroBoiler\ValueObjects\Email;
+use ZeroBoiler\ValueObjects\Money;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class VoUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly Email $email,
+
+        public readonly ?Url $website = null,
+
+        public readonly ?Money $balance = null,
+    ) {}
+}
+
+// Auto-instantiated from scalar/array/JSON
+$dto = VoUserDTO::fromArray([
+    'email' => 'test@example.com',
+    'website' => 'https://zeroboiler.dev',
+    'balance' => ['amount' => 2500, 'currency' => 'USD'],
+], validate: false);
+
+$dto->email;       // Email value object
+$dto->balance;     // Money value object
+
+// Serialized back to primitives
+$dto->toArray();
+// ['email' => 'test@example.com', 'website' => 'https://zeroboiler.dev', 'balance' => ['amount' => 2500, 'currency' => 'USD']]
+```
+
 ### Eloquent Cast
 
 ```php
