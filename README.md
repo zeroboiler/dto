@@ -194,6 +194,8 @@ component schemas. Union types produce `oneOf` schemas.
 
 ## Attributes Reference
 
+### Validation Attributes
+
 | Attribute | Description |
 |-----------|-------------|
 | `#[Required]` | Field is required |
@@ -202,6 +204,8 @@ component schemas. Union types produce `oneOf` schemas.
 | `#[Uuid]` | Must be valid UUID |
 | `#[Min(n)]` | Minimum length/value |
 | `#[Max(n)]` | Maximum length/value |
+| `#[Size(n)]` | Must be exactly size n |
+| `#[Between(min, max)]` | Value must be between min and max |
 | `#[Pattern('/regex/')]` | Must match regex |
 | `#[In(['a', 'b'])]` | Must be one of values |
 | `#[Enum(EnumClass::class)]` | Must be valid enum value |
@@ -209,10 +213,44 @@ component schemas. Union types produce `oneOf` schemas.
 | `#[Numeric]` | Must be numeric |
 | `#[Boolean]` | Must be boolean |
 | `#[Date]` | Must be valid date |
-| `#[Cast('type')]` | Cast value during hydration |
+| `#[Date('Y-m-d')]` | Must match date format |
+| `#[Json]` | Must be valid JSON string |
+| `#[StartsWith('prefix')]` | Must start with given prefix(es) |
+| `#[EndsWith('suffix')]` | Must end with given suffix(es) |
+| `#[Accepted]` | Must be accepted (yes, on, 1, true) |
+| `#[Declined]` | Must be declined (no, off, 0, false) |
+| `#[Confirmed]` | Must have a matching `{field}_confirmation` |
+| `#[Distinct]` | Array elements must be unique |
+| `#[Prohibited]` | Field must not be present |
+| `#[Present]` | Field must be present (even if empty) |
+| `#[Sometimes]` | Only validate if field is present |
+| `#[Nullable]` | Allows null value |
+| `#[Same('field')]` | Must match another field's value |
+| `#[Different('field')]` | Must differ from another field's value |
+| `#[RequiredIf('field', value)]` | Required when another field has a value |
+| `#[RequiredUnless('field', value)]` | Required unless another field has a value |
+| `#[RequiredWith('field')]` | Required when another field is present |
+| `#[RequiredWithAll('f1', 'f2')]` | Required when all specified fields are present |
+| `#[RequiredWithout('field')]` | Required when another field is not present |
+| `#[RequiredWithoutAll('f1', 'f2')]` | Required when all specified fields are absent |
+
+### Metadata Attributes
+
+| Attribute | Description |
+|-----------|-------------|
+| `#[Cast('type')]` | Cast value during hydration (`'integer'`, `'string'`, `'boolean'`, `'array'`, `'date'`, `'datetime'`) |
 | `#[MapFrom('source_key')]` | Map from different source key |
-| `#[Hidden]` | Exclude from output |
-| `#[Default(value)]` | Default value when missing |
+| `#[Hidden]` | Exclude from `toArray()` / `toJson()` output |
+| `#[Default(value)]` | Default value when key is missing |
+| `#[NestedArray(DTOClass::class)]` | Hydrate array elements as nested DTO instances |
+| `#[Collection(DTOClass::class)]` | Hydrate as `DtoCollection` of DTO instances |
+
+All validation attributes accept an optional `message` parameter for custom error messages:
+
+```php
+#[Email(message: 'Please provide a valid email address')]
+#[Min(8, message: 'Password must be at least 8 characters')]
+```
 
 ## License
 
