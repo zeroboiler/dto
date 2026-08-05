@@ -6,15 +6,7 @@
 
 declare(strict_types=1);
 
-/**
- * Shared Rector configuration for all ZeroBoiler packages.
- *
- * Copy this file to each package root as `rector.php` and adjust paths.
- */
-
 use Rector\Config\RectorConfig;
-use Rector\Doctrine\Set\DoctrineSetList;
-use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
@@ -37,24 +29,6 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::INSTANCEOF,
         SetList::TYPE_DECLARATION,
         SetList::PRIVATIZATION,
-    ]);
-
-    // Laravel
-    // TODO: Install rector/rector-laravel package to enable Laravel rules
-    // $rectorConfig->sets([
-    //     \Rector\Laravel\Set\LaravelSetList::LARAVEL_130,
-    //     \Rector\Laravel\Set\LaravelLevelSetList::UP_TO_LARAVEL_130,
-    // ]);
-
-    // PHPUnit → Pest
-    $rectorConfig->sets([
-        PHPUnitSetList::PHPUNIT_110,
-        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-    ]);
-
-    // Doctrine (if used)
-    $rectorConfig->sets([
-        DoctrineSetList::DOCTRINE_CODE_QUALITY,
     ]);
 
     // Auto-import
