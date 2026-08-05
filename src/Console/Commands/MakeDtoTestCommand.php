@@ -186,7 +186,7 @@ PHP;
             return match ($type->getName()) {
                 'string' => 'test-'.$name,
                 'int' => random_int(1, 100),
-                'float' => round(mt_rand(1, 10000) / 100, 2),
+                'float' => round(random_int(100, 10000) / 100, 2),
                 'bool' => true,
                 'array' => [],
                 default => null,

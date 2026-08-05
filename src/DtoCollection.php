@@ -235,6 +235,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         $result = [];
 
         foreach ($this->items as $item) {
+            /** @var int|string $keyValue */
             $keyValue = $item->{$keyField};
             $result[$keyValue] = $valueField !== null ? $item->{$valueField} : $item->toArray();
         }
