@@ -185,6 +185,64 @@ CreateUserDTO::rulesFor('update');
 // Returns rules() by default; override in subclass for action-specific logic
 ```
 
+### Nested DTOs
+
+```php
+use ZeroBoiler\DTO\Attributes\NestedArray;
+
+class OrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $orderNumber,
+
+        #[NestedArray(AddressDTO::class)]
+        public readonly array $items = [],
+    ) {}
+}
+
+// items array automatically hydrated as DTO instances
+$order = OrderDTO::fromArray([
+    'orderNumber' => 'ORD-001',
+    'items' => [
+        ['street' => '123 Main St', 'city' => 'Istanbul'],
+        ['street' => '456 Oak Ave', 'city' => 'Ankara'],
+    ],
+]);
+
+$order->items; // array of AddressDTO instances
+```
+
+### DTO Collections
+
+```php
+use ZeroBoiler\DTO\Attributes\Collection;
+use ZeroBoiler\DTO\DtoCollection;
+
+class OrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $orderNumber,
+
+        #[Collection(ItemDTO::class)]
+        public readonly DtoCollection $items,
+    ) {}
+}
+
+// items array automatically wrapped in a DtoCollection of DTO instances
+$order = OrderDTO::fromArray([
+    'orderNumber' => 'ORD-001',
+    'items' => [
+        ['name' => 'Widget A', 'price' => 9.99],
+        ['name' => 'Widget B', 'price' => 14.99],
+    ],
+]);
+
+$order->items->count();     // 2
+$order->items->pluck('name'); // ['Widget A', 'Widget B']
+```
+
 ### Eloquent Cast
 
 ```php
