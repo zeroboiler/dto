@@ -87,19 +87,9 @@ class DTOCast implements CastsAttributes
             /** @var class-string<T> $dtoClass */
             $dtoClass = $this->dtoClass;
 
-            // Validate the array data if validation is enabled.
-            // The DTO is hydrated (and validated) first to ensure data integrity,
-            // then we serialize the hydrated DTO to guarantee the stored JSON
-            // matches the DTO's toArray() output (#8).
-            if ($this->validate) {
-                $dto = $dtoClass::fromArray($value, validate: true);
-
-                return json_encode($dto->toArray());
-            }
-
-            // Even without validation, hydrate through the DTO to ensure
-            // consistent serialization (applies defaults, casts, etc.)
-            $dto = $dtoClass::fromArray($value, validate: false);
+            // Hydrate through the DTO to ensure consistent serialization
+            // (applies defaults, casts, etc.) and optionally validate (#8).
+            $dto = $dtoClass::fromArray($value, validate: $this->validate);
 
             return json_encode($dto->toArray());
         }
