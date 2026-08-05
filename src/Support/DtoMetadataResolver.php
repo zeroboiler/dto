@@ -529,10 +529,8 @@ final class DtoMetadataResolver
 
     /**
      * Generate a unique key for an EnumRule instance for deduplication.
-     *
-     * @param  \Illuminate\Validation\Rules\Enum  $rule
      */
-    private static function enumRuleKey(object $rule): string
+    private static function enumRuleKey(\Illuminate\Validation\Rules\Enum $rule): string
     {
         return 'enum:' . get_class($rule) . ':' . spl_object_id($rule);
     }

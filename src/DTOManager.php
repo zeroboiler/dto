@@ -12,6 +12,13 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
 /**
  * Runtime DTO helper — accessible via `DTO` facade or injected.
+ *
+ * Provides methods for validation, DTO creation, and OpenAPI schema
+ * generation without direct static method usage.
+ *
+ *   DTO::validate(CreateUserDTO::class, $data);
+ *   DTO::make(CreateUserDTO::class, $data);
+ *   DTO::schema(CreateUserDTO::class);
  */
 final class DTOManager
 {

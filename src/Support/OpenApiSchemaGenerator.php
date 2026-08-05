@@ -466,9 +466,11 @@ final class OpenApiSchemaGenerator
 
         $propSchema['enum'] = $values;
 
-        // Infer type from first enum value
+        // Infer type from first enum value (strict type check)
         if ($values !== []) {
-            $propSchema['type'] = is_int($values[0]) ? 'integer' : 'string';
+            $first = $values[0];
+
+            $propSchema['type'] = is_int($first) ? 'integer' : 'string';
         }
 
         return $propSchema;

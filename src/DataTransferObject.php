@@ -603,9 +603,15 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
-     * @param  string  $propertyName  Name of the property being cast (for error messages)
+     * Cast a raw value to a PHP scalar or object type.
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @param  string  $type  Target cast type (e.g. 'int', 'string', 'date')
+     * @param  string  $propertyName  Property name for error messages
+     *
+     * @throws \InvalidArgumentException When the value cannot be cast to date/datetime
      */
-    private static function castValue(mixed $value, string $type, string $propertyName = ''): mixed
+    private static function castValue(mixed $value, string $type, string $propertyName): mixed
     {
         return match ($type) {
             'int', 'integer' => is_numeric($value) ? (int) $value : 0,
