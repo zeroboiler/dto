@@ -18,15 +18,14 @@ use ReflectionClass;
  */
 final class MakeDtoTestCommand extends Command
 {
-    #[\Override]
     protected $signature = 'zeroboiler:dto-test {class : The DTO class FQN} {--dir= : Output directory}';
 
-    #[\Override]
     protected $description = 'Generate Pest tests for a ZeroBoiler DTO class';
 
     public function handle(): int
     {
-        $dtoClass = (string) $this->argument('class');
+        /** @var string $dtoClass */
+        $dtoClass = $this->argument('class');
 
         if (! class_exists($dtoClass)) {
             $this->error("DTO class '{$dtoClass}' not found.");
@@ -36,7 +35,9 @@ final class MakeDtoTestCommand extends Command
 
         $shortName = class_basename($dtoClass);
         $defaultDir = base_path('tests/Unit/DTO');
-        $dir = (string) ($this->option('dir') ?? $defaultDir);
+        /** @var string|null $optDir */
+        $optDir = $this->option('dir');
+        $dir = $optDir ?? $defaultDir;
         $path = rtrim($dir, '/')."/{$shortName}Test.php";
 
         if (! is_dir($dir)) {
@@ -139,6 +140,10 @@ PHP;
 
             // Skip optional parameters that have a default — they don't need fake data
             if ($param->isDefaultValueAvailable()) {
+                continue;
+            }
+
+            if ($type === null) {
                 continue;
             }
 

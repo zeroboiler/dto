@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand;
@@ -20,7 +21,6 @@ final class DTOSServiceProvider extends ServiceProvider
         $this->app->singleton('zeroboiler.dto', fn (): DTOManager => new DTOManager);
     }
 
-    #[\Override]
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
@@ -61,14 +61,17 @@ final class DTOSServiceProvider extends ServiceProvider
      */
     private function registerCacheFlush(): void
     {
+        /** @var Dispatcher $events */
+        $events = $this->app->make('events');
+
         // Laravel Octane — flush after each request
-        $this->app['events']->listen('octane.terminate', function (): void {
+        $events->listen('octane.terminate', function (): void {
             DataTransferObject::flushMetadataCache();
         });
 
         // Generic fallback — listen for the Laravel framework flush event
         // This works with Swoole/RoadRunner packages that dispatch this event
-        $this->app['events']->listen('laravel.flush', function (): void {
+        $events->listen('laravel.flush', function (): void {
             DataTransferObject::flushMetadataCache();
         });
     }

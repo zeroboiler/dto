@@ -19,15 +19,14 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  */
 final class MakeDtoSchemaCommand extends Command
 {
-    #[\Override]
     protected $signature = 'zeroboiler:dto-schema {class : The DTO class FQN} {--json : Output as raw JSON}';
 
-    #[\Override]
     protected $description = 'Generate OpenAPI schema from a ZeroBoiler DTO class';
 
     public function handle(): int
     {
-        $dtoClass = (string) $this->argument('class');
+        /** @var string $dtoClass */
+        $dtoClass = $this->argument('class');
 
         if (! class_exists($dtoClass)) {
             $this->error("DTO class '{$dtoClass}' not found.");
@@ -44,11 +43,11 @@ final class MakeDtoSchemaCommand extends Command
         }
 
         if ($this->option('json')) {
-            $this->line(json_encode($schema, JSON_PRETTY_PRINT));
+            $this->line(json_encode($schema, JSON_PRETTY_PRINT) ?: '');
         } else {
             $this->info('Schema for: '.class_basename($dtoClass));
             $this->newLine();
-            $this->line(json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $this->line(json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '');
         }
 
         return self::SUCCESS;
