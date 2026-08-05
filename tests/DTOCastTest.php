@@ -99,3 +99,39 @@ it('passes through existing DateTimeInterface instances for date cast', function
 
     expect($dto->event_date)->toBeInstanceOf(DateTimeInterface::class);
 });
+
+describe('DTOCast::serialize()', function (): void {
+    it('serializes DTO to array', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'ser@example.com',
+            'name' => 'Serialize Test',
+        ], validate: false);
+
+        $cast = new DTOCast(CreateUserDTO::class);
+
+        $result = $cast->serialize(
+            model: new class {},
+            key: 'payload',
+            value: $dto,
+            attributes: [],
+        );
+
+        expect($result)->toBeArray()
+            ->and($result['email'])->toBe('ser@example.com')
+            ->and($result['name'])->toBe('Serialize Test')
+            ->and($result)->not->toHaveKey('password'); // hidden
+    });
+
+    it('returns null for null value', function (): void {
+        $cast = new DTOCast(CreateUserDTO::class);
+
+        $result = $cast->serialize(
+            model: new class {},
+            key: 'payload',
+            value: null,
+            attributes: [],
+        );
+
+        expect($result)->toBeNull();
+    });
+});
