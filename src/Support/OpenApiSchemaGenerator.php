@@ -34,7 +34,7 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 /**
  * Generate OpenAPI schema from a DTO class.
  */
-class OpenApiSchemaGenerator
+final class OpenApiSchemaGenerator
 {
     /**
      * Generate an OpenAPI schema array for a DTO class.
