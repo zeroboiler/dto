@@ -36,6 +36,12 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     public function __construct(array $items = [])
     {
         foreach ($items as $item) {
+            if (! $item instanceof DataTransferObject) {
+                throw new \InvalidArgumentException(
+                    'DtoCollection only accepts DataTransferObject instances; got '.get_debug_type($item)
+                );
+            }
+
             $this->items[] = $item;
         }
     }
@@ -103,6 +109,12 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
+        if (! $value instanceof DataTransferObject) {
+            throw new \InvalidArgumentException(
+                'DtoCollection only accepts DataTransferObject instances; got '.get_debug_type($value)
+            );
+        }
+
         if ($offset === null) {
             $this->items[] = $value;
         } else {
