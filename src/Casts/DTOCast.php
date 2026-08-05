@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
 
@@ -44,10 +43,11 @@ class DTOCast implements CastsAttributes
     ) {}
 
     /**
-     * @param  Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array<string, mixed>  $attributes
      * @return T|null
      */
-    public function get($model, string $key, $value, array $attributes)
+    public function get(object $model, string $key, $value, array $attributes)
     {
         if ($value === null) {
             return null;
@@ -65,13 +65,15 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  T|array<string, mixed>|null  $value
+     * @param  array<string, mixed>  $attributes
      *
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
      * @throws ValidationException When validation is enabled and data is invalid
+     * @return array<string, mixed>|null
      */
-    public function set($model, string $key, $value, array $attributes)
+    public function set(object $model, string $key, $value, array $attributes)
     {
         if ($value === null) {
             return null;
@@ -109,12 +111,12 @@ class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  T|null  $value
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>|null
      */
-    public function serialize($model, string $key, $value, array $attributes)
+    public function serialize(object $model, string $key, $value, array $attributes)
     {
         return $value?->toArray();
     }
