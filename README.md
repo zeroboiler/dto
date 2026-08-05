@@ -420,6 +420,24 @@ All validation attributes accept an optional `message` parameter for custom erro
 #[Min(8, message: 'Password must be at least 8 characters')]
 ```
 
+## Testing
+
+```bash
+# Run the full test suite
+composer test
+
+# Run PHPStan analysis (level 9, no baseline)
+composer analyse
+
+# Run code style checker
+composer lint
+
+# Run all quality checks at once
+composer ci
+```
+
+All checks must pass before merging. The package targets PHPStan level 9 with a clean baseline (zero suppressed errors).
+
 ## License
 
 Proprietary — © ZeroBoiler
