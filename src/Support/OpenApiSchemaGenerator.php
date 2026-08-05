@@ -49,7 +49,7 @@ final class OpenApiSchemaGenerator
 
         // If nested DTOs were detected, generate() produces schemas with
         // dangling $ref pointers — the component definitions are discarded.
-        // Direct users to generateWithComponents() instead. (BUG-2 R38)
+        // Direct users to generateWithComponents() instead.
         if ($components !== []) {
             $componentNames = implode(', ', array_keys($components));
 
