@@ -330,6 +330,34 @@ $result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
 Nested DTOs are automatically detected and generate `$ref` pointers to
 component schemas. Union types produce `oneOf` schemas.
 
+## Configuration
+
+The DTO package requires no configuration for basic usage. The service provider
+auto-registers via Laravel's package discovery.
+
+### Dev/Test Cache Invalidation
+
+In `local` and `testing` environments, metadata caches automatically expire after
+2 seconds, so changes to DTO classes are picked up without manual intervention.
+
+### Long-Lived Processes
+
+For Octane, Swoole, or RoadRunner, the package automatically listens for
+`octane.terminate` and `laravel.flush` events to clear the static metadata cache
+between requests. This prevents stale metadata and unbounded memory growth.
+
+You can also manually flush the cache:
+
+```php
+use ZeroBoiler\DTO\DataTransferObject;
+
+// Flush cache for a specific DTO class
+DataTransferObject::flushMetadataCache(MyDTO::class);
+
+// Flush all cached metadata
+DataTransferObject::flushMetadataCache();
+```
+
 ## Attributes Reference
 
 ### Validation Attributes
