@@ -189,10 +189,26 @@ describe('only() + except() consistency', function (): void {
             'status' => 'active',
         ], validate: false);
 
+        $only = $dto->only(['email', 'name', 'tags', 'phone']);
+        $except = $dto->except(['status']);
+
+        // only(all visible fields minus 'status') should equal except(['status'])
+        expect($only)->toBe($except);
+    });
+
+    it('only returns only specified fields while except returns all others', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+            'status' => 'active',
+        ], validate: false);
+
         $only = $dto->only(['email', 'name']);
         $except = $dto->except(['status']);
 
-        // Both should yield the same result (all visible fields minus 'status')
-        expect($only)->toBe($except);
+        // only() is a subset — it should have fewer keys than except()
+        expect($only)->toHaveCount(2);
+        expect($except)->toHaveCount(4); // email, name, tags, phone
+        expect(array_keys($only))->toBe(['email', 'name']);
     });
 });

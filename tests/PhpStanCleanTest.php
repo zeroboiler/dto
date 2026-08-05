@@ -35,7 +35,7 @@ describe('PHPStan Configuration (Issue #6)', function (): void {
         expect($source)->toContain('@param  array<string, mixed>  $propMeta');
 
         // $messages should have typed iterable annotation
-        expect($source)->toContain('array<string, mixed>  $messages');
+        expect($source)->toContain('array<string, string>  $messages');
 
         // Local variable annotation for messages array
         expect($source)->toContain('/** @var array<string, string> $messages */');
