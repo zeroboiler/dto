@@ -1,6 +1,7 @@
 # ZeroBoiler DTO
 
-Zero-boilerplate type-safe DTO system for Laravel.
+Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
+auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 
 ## Installation
 
@@ -14,6 +15,114 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - PHP 8.5+
 - Laravel 13+
 - `zeroboiler/value-objects` (installed automatically as a dependency)
+
+## Type System
+
+### Readonly Promoted Properties
+
+ZeroBoiler DTOs use PHP 8.1+ **readonly promoted properties** in the constructor.
+This ensures immutability — once a DTO is created, its properties cannot be changed:
+
+```php
+class CreateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,        // Must be set, validated as email, immutable
+
+        #[Default('active')]
+        public readonly string $status = 'active', // Optional with default, immutable
+
+        #[Hidden]
+        public readonly ?string $password = null,   // Nullable, excluded from output, immutable
+    ) {}
+}
+```
+
+All properties **must** be `public readonly`. The `readonly` keyword guarantees
+immutability at the language level — not just by convention.
+
+### Property Types
+
+| Type | PHP Type | Validation | Serialization |
+|------|----------|------------|---------------|
+| **Scalar** | `string`, `int`, `float`, `bool` | Auto-inferred (`integer`, `numeric`, etc.) | As-is |
+| **Nullable** | `?string`, `?int` | `sometimes` rule auto-added | `null` when empty |
+| **Array** | `array` | None by default | JSON array |
+| **BackedEnum** | `UserStatus` (backed enum) | Laravel `Enum` rule | Backed value |
+| **ValueObject** | `Email`, `Money` (from zeroboiler/value-objects) | None | `toPrimitive()` or `toArray()` |
+| **Nested DTO** | `AddressDTO` | Recursive hydration | `toArray()` recursively |
+| **DateTime** | `\Carbon\Carbon` | Cast required: `#[Cast('date')]` | ISO 8601 (ATOM format) |
+
+### Hydration Pipeline
+
+When `fromArray()` or `fromRequest()` is called, each property value goes through
+this transformation pipeline:
+
+```
+Raw Input Value
+    │
+    ├─ 1. Map source key (#[MapFrom('user_name')])
+    ├─ 2. Apply default if key missing (#[Default('active')])
+    ├─ 3. Cast type (#[Cast('integer')])
+    ├─ 4. Instantiate ValueObject (detected from type)
+    ├─ 5. Instantiate BackedEnum (detected from type)
+    ├─ 6. Hydrate nested DTO (detected from type)
+    ├─ 7. Hydrate nested array of DTOs (#[NestedArray/Collection])
+    │
+    ▼
+Final DTO Instance (immutable)
+```
+
+Validation runs **before** hydration to reject invalid data early.
+
+### Architecture
+
+```
+┌───────────────────────────────────────────────┐
+│           Your DTO                             │
+│  class CreateUserDTO extends DataTransferObject│
+│  {                                              │
+│      public function __construct(              │
+│          #[Required, Email]                     │
+│          public readonly string $email,          │
+│          ...                                    │
+│      ) {}                                      │
+│  }                                              │
+└──────────┬────────────────────────────────────┘
+           │ resolves via
+           ▼
+┌───────────────────────────────────────────────┐
+│  DtoMetadataResolver                           │
+│  ├─ Reads constructor parameters (Reflection)  │
+│  ├─ Reads property attributes                  │
+│  ├─ Infers base rules from types               │
+│  ├─ Builds validation rules + messages          │
+│  ├─ Detects ValueObject/Enum/DTO types         │
+│  └─ Caches result per class (TTL-based)       │
+└──────────┬────────────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────────────────────┐
+│  DataTransferObject (abstract base)           │
+│  ├─ fromArray() / fromRequest()               │  Hydration + validation
+│  ├─ fromPartialArray() / fromPartialRequest() │  PATCH semantics
+│  ├─ with() → new static (immutable update)    │
+│  ├─ toArray() / toJson() / jsonSerialize()     │  Serialization
+│  ├─ only() / except() / allValues()           │  Selective output
+│  ├─ equals()                                   │  Value equality
+│  └─ rules() / rulesFor() / validateArray()    │  Standalone validation
+└──────────┬────────────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────────────────────┐
+│  DtoCollection (typed array wrapper)          │
+│  ├─ pluck() / pluckKey() / map() / filter()  │
+│  ├─ count() / isEmpty() / first() / last()    │
+│  ├─ push() / items() / toArray()              │
+│  └─ ArrayAccess + IteratorAggregate             │
+└───────────────────────────────────────────────┘
+```
 
 ## Features
 
