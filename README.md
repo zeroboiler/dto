@@ -123,6 +123,8 @@ $dto->except('password');
 
 ```php
 $collection = new DtoCollection([$dto1, $dto2, $dto3]);
+// Or via static factory
+$collection = DtoCollection::make([$dto1, $dto2]);
 
 // Extract a single field from all DTOs
 $emails = $collection->pluck('email');
@@ -131,6 +133,18 @@ $emails = $collection->pluck('email');
 // Build a key/value map
 $map = $collection->pluckKey('email', 'name');
 // ['a@example.com' => 'Alice', 'b@example.com' => 'Bob', ...]
+
+// Filter and chain
+$active = $collection->filter(fn (UserDTO $u): bool => $u->status === 'active')
+    ->map(fn (UserDTO $u): string => $u->name);
+
+// Basic access
+$collection->count();       // 3
+$collection->isEmpty();     // false
+$collection->isNotEmpty();  // true
+$collection->first();       // $dto1
+$collection->last();        // $dto3
+$collection->push($dto4);   // fluent, appends to end
 ```
 
 ### Partial Updates (PATCH)
