@@ -35,7 +35,13 @@ final class MakeDtoSchemaCommand extends Command
             return self::FAILURE;
         }
 
-        $schema = OpenApiSchemaGenerator::generate($dtoClass);
+        try {
+            $schema = OpenApiSchemaGenerator::generate($dtoClass);
+        } catch (\LogicException $e) {
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         if ($this->option('json')) {
             $this->line(json_encode($schema, JSON_PRETTY_PRINT));
