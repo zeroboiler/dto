@@ -169,6 +169,10 @@ $valid = CreateUserDTO::validatePartialArray($data);
 ```php
 CreateUserDTO::rules();
 // ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
+
+// Action-scoped rules (override per action in subclass)
+CreateUserDTO::rulesFor('update');
+// Returns rules() by default; override in subclass for action-specific logic
 ```
 
 ### Eloquent Cast

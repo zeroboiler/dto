@@ -402,7 +402,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         // BackedEnum auto-cast (#with-roundtrip)
-        if ($value !== null && ($prop['enum_class'] ?? null) !== null && ! $value instanceof $prop['enum_class']) {
+        if ($value !== null && $prop['enum_class'] !== null && ! $value instanceof $prop['enum_class']) {
             $value = self::castValueToEnum($value, $prop['enum_class']);
         }
 

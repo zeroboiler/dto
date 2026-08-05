@@ -74,7 +74,12 @@ final class DtoMetadataResolver
      *         cast: ?string,
      *         hidden: bool,
      *         has_default: bool,
-     *         nullable: bool
+     *         nullable: bool,
+     *         value_object_class: ?class-string<\ZeroBoiler\ValueObjects\Contracts\ValueObject>,
+     *         dto_class: ?class-string<DataTransferObject>,
+     *         enum_class: ?class-string<\BackedEnum>,
+     *         nested_array_class: ?class-string<DataTransferObject>,
+     *         collection_class: ?class-string<DataTransferObject>
      *     }>,
      *     rules: array<string, array<int, mixed>>,
      *     messages: array<string, string>
