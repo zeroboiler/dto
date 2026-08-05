@@ -97,6 +97,10 @@ $dto->toArray();
 // ['email' => 'test@example.com', 'name' => 'Doruk', 'status' => 'active', ...]
 // password is excluded (#[Hidden])
 
+$dto->allValues();
+// Same as toArray() but includes hidden fields
+// ['email' => 'test@example.com', 'name' => 'Doruk', ..., 'password' => 'secret123']
+
 $dto->toJson();
 ```
 
@@ -170,6 +174,12 @@ $valid = CreateUserDTO::validatePartialArray($data);
 CreateUserDTO::rules();
 // ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
 
+// Standalone validation (without creating a DTO instance)
+$validated = CreateUserDTO::validateArray($data);
+
+// Validate only present fields (PATCH semantics)
+$validated = CreateUserDTO::validatePartialArray($data);
+
 // Action-scoped rules (override per action in subclass)
 CreateUserDTO::rulesFor('update');
 // Returns rules() by default; override in subclass for action-specific logic
@@ -188,6 +198,21 @@ protected $casts = [
 ```bash
 php artisan zeroboiler:dto-test "App\DTO\CreateUserDTO"
 php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --json
+```
+
+### DTO Facade / Manager
+
+```php
+use ZeroBoiler\DTO\Facades\DTO;
+
+// Create a DTO from data
+$dto = DTO::make(CreateUserDTO::class, ['email' => 'test@example.com', 'name' => 'Doruk']);
+
+// Validate data against a DTO class
+$validated = DTO::validate(CreateUserDTO::class, $data);
+
+// Generate OpenAPI schema
+$schema = DTO::schema(CreateUserDTO::class);
 ```
 
 ### OpenAPI Schema Generation
