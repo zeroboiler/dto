@@ -563,6 +563,7 @@ final class DtoMetadataResolver
     {
         $ref = new \ReflectionProperty($rule, 'rule');
         $ref->setAccessible(true);
+        /** @var string|class-string<\BackedEnum> $enumClass */
         $enumClass = $ref->getValue($rule);
 
         return 'enum:'.(is_string($enumClass) ? $enumClass : spl_object_id($rule));

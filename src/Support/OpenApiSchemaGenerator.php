@@ -467,8 +467,13 @@ final class OpenApiSchemaGenerator
             return $propSchema;
         }
 
+        if (! is_a($enumClass, \BackedEnum::class, true)) {
+            return $propSchema;
+        }
+
+        /** @var class-string<\BackedEnum> $enumClass */
         $values = array_map(
-            fn (\BackedEnum $case): mixed => $case->value,
+            static fn (\BackedEnum $case): mixed => $case->value,
             $enumClass::cases()
         );
 
