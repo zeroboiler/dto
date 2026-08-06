@@ -47,8 +47,14 @@ final class OpenApiSchemaGenerator
     /**
      * Generate an OpenAPI schema array for a DTO class.
      *
+     * Use this for DTOs without nested DTO references. For DTOs with
+     * nested DTOs, use {@see generateWithComponents()} instead.
+     *
      * @param  class-string  $dtoClass
      * @return array<string, mixed>
+     *
+     * @throws \LogicException If the DTO contains nested DTO references
+     * @throws \ReflectionException If the class does not exist
      */
     public static function generate(string $dtoClass): array
     {
@@ -79,6 +85,8 @@ final class OpenApiSchemaGenerator
      *
      * @param  class-string  $dtoClass
      * @return array{schema: array<string, mixed>, components: array{schemas: array<string, array<string, mixed>>}}
+     *
+     * @throws \ReflectionException If the class does not exist
      */
     public static function generateWithComponents(string $dtoClass): array
     {

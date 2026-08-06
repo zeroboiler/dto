@@ -94,9 +94,15 @@ final class DtoMetadataResolver
     /**
      * Resolve all metadata for a DTO class.
      *
+     * Reads constructor parameters via reflection, detects attribute types
+     * (ValueObject, BackedEnum, nested DTO), infers base validation rules
+     * from PHP types, and collects validation attribute rules.
+     *
      * @param  class-string  $class
      * @return DtoResolvedMetadata
      * @phpstan-return DtoResolvedMetadata
+     *
+     * @throws \ReflectionException If the class does not exist
      */
     public static function resolve(string $class): array
     {

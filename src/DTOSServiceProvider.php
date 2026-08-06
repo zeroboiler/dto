@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand;
@@ -76,7 +75,7 @@ final class DTOSServiceProvider extends ServiceProvider
      */
     private function registerCacheFlush(): void
     {
-        /** @var Dispatcher $events */
+        /** @var \Illuminate\Contracts\Events\Dispatcher $events */
         $events = $this->app->make('events');
 
         // Laravel Octane — flush after each request

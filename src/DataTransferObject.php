@@ -155,7 +155,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 // Missing field: use default if available, otherwise type-appropriate empty value
                 $args[$name] = $prop['default'];
             } else {
-                $args[$name] = self::emptyValueForType($name, (bool) $prop['nullable'], $prop);
+                $args[$name] = self::emptyValueForType($name, $prop['nullable'], $prop);
             }
         }
 
@@ -540,8 +540,16 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Resolve metadata for this DTO class.
+     *
+     * Uses static caching with optional TTL-based invalidation.
+     * Results are stored in per-class static properties, not in the
+     * singleton EnumCache (each DTO class manages its own cache).
+     *
      * @return DtoResolvedMetadata
      * @phpstan-return DtoResolvedMetadata
+     *
+     * @throws \ReflectionException If the class cannot be reflected
      */
     private static function resolveMetadata(): array
     {
