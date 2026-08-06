@@ -14,6 +14,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * @method static array<string, mixed> validate(string $dtoClass, array<string, mixed> $data)
  * @method static DataTransferObject make(string $dtoClass, array<string, mixed> $data)
+ * @method static DataTransferObject makeFromJson(string $dtoClass, string $json)
  * @method static array<string, mixed> schema(string $dtoClass)
  */
 final class DTO extends Facade

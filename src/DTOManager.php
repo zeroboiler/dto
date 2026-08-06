@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
 
+use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
 /**
@@ -45,6 +46,19 @@ final class DTOManager
     public function make(string $dtoClass, array $data): DataTransferObject
     {
         return $dtoClass::fromArray($data);
+    }
+
+    /**
+     * Create a DTO instance from a JSON string.
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  string  $json  JSON string to decode
+     *
+     * @throws DTOException If the JSON cannot be decoded
+     */
+    public function makeFromJson(string $dtoClass, string $json): DataTransferObject
+    {
+        return $dtoClass::fromJson($json);
     }
 
     /**

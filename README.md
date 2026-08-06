@@ -137,11 +137,11 @@ Validation runs **before** hydration to reject invalid data early.
 ┌───────────────────────────────────────────────┐
 │  DataTransferObject (abstract base)           │
 │  ├─ fromArray() / fromRequest()               │  Hydration + validation
-│  ├─ fromPartialArray() / fromPartialRequest() │  PATCH semantics
-│  ├─ with() → new static (immutable update)    │
-│  ├─ toArray() / toJson() / jsonSerialize()     │  Serialization
+│  ├─ fromJson() / fromPartialArray()          │  JSON + PATCH semantics
+│  ├─ fromPartialRequest() / with()            │  PATCH + immutable update
+│  ├─ toArray() / toJson() / jsonSerialize()    │  Serialization
 │  ├─ only() / except() / allValues()           │  Selective output
-│  ├─ equals()                                   │  Value equality
+│  ├─ equals() / isEmpty() / isNotEmpty()     │  State checks
 │  └─ rules() / rulesFor() / validateArray()    │  Standalone validation
 └──────────┬────────────────────────────────────┘
            │
@@ -169,6 +169,8 @@ Validation runs **before** hydration to reject invalid data early.
 - **Immutable updates** — `$dto->with(['status' => 'inactive'])`
 - **Selective output** — `$dto->only('email', 'name')`, `$dto->except('password')`
 - **Equality** — `$dto1->equals($dto2)`
+- **State checks** — `$dto->isEmpty()`, `$dto->isNotEmpty()`
+- **JSON hydration** — `fromJson()` for decoding JSON strings
 - **Collection helpers** — `pluck()`, `pluckKey()` for extracting fields from DTO collections
 - **Eloquent casting** — store DTOs as JSON in database columns
 - **OpenAPI schema** — auto-generate API docs from DTO definitions
@@ -228,6 +230,10 @@ $dto = CreateUserDTO::fromArray([
 
 // Skip validation
 $dto = CreateUserDTO::fromArray($data, validate: false);
+
+// From JSON string
+$dto = CreateUserDTO::fromJson($request->getContent());
+$dto = CreateUserDTO::fromJson('{"email":"test@example.com","name":"Doruk"}');
 ```
 
 ### Serialization
@@ -574,6 +580,7 @@ All validation attributes accept an optional `message` parameter for custom erro
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `::fromArray(array, bool)` | `static` | Create from array (validates by default) |
+| `::fromJson(string, bool)` | `static` | Create from JSON string (validates by default) |
 | `::fromRequest(Request, bool)` | `static` | Create from HTTP request |
 | `::fromPartialArray(array, bool)` | `static` | Create from partial array (PATCH semantics) |
 | `::fromPartialRequest(Request, bool)` | `static` | Create from partial request |
@@ -589,6 +596,8 @@ All validation attributes accept an optional `message` parameter for custom erro
 | `->except(string\|array)` | `array` | Return all except specified fields |
 | `->with(array)` | `static` | Immutable copy with overrides (always validates) |
 | `->equals(self)` | `bool` | Value equality check |
+| `->isEmpty()` | `bool` | Check if all properties are empty/default |
+| `->isNotEmpty()` | `bool` | Check if at least one property has a value |
 | `::flushMetadataCache(?string)` | `void` | Clear metadata cache |
 
 ### DtoCollection
@@ -615,6 +624,7 @@ All validation attributes accept an optional `message` parameter for custom erro
 |---------------|-------------|
 | `DTO::validate(string, array)` | Validate data against a DTO class |
 | `DTO::make(string, array)` | Create DTO from data |
+| `DTO::makeFromJson(string, string)` | Create DTO from JSON string |
 | `DTO::schema(string)` | Generate OpenAPI schema |
 
 ### OpenApiSchemaGenerator

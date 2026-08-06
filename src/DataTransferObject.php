@@ -337,6 +337,67 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Check if all properties have their default or empty values.
+     *
+     * Useful for detecting DTOs that carry no meaningful data
+     * (e.g., in PATCH requests where nothing was provided).
+     *
+     *   if ($dto->isEmpty()) { return; }
+     */
+    public function isEmpty(): bool
+    {
+        foreach (self::resolveMetadata()['properties'] as $name => $prop) {
+            $value = $this->{$name};
+
+            // Skip properties that have a non-null value
+            if ($value !== null && $value !== '' && $value !== 0 && $value !== 0.0 && $value !== false && $value !== []) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the DTO has at least one non-empty property.
+     *
+     * Negation of {@see isEmpty()}.
+     */
+    public function isNotEmpty(): bool
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
+     * Create DTO instance from a JSON string.
+     *
+     * Convenience wrapper around {@see fromArray()} that decodes JSON first.
+     *
+     *   $dto = CreateUserDTO::fromJson($request->getContent());
+     *
+     * @param  string  $json  JSON string to decode
+     * @param  bool  $validate  Run validation before hydration
+     *
+     * @throws DTOException If the JSON cannot be decoded
+     * @throws ValidationException If validation fails and $validate is true
+     */
+    public static function fromJson(string $json, bool $validate = true): static
+    {
+        try {
+            /** @var array<string, mixed> $data */
+            $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw DTOException::invalidJson('(root)', $e->getMessage());
+        }
+
+        if (! is_array($data)) {
+            throw DTOException::invalidJson('(root)', 'Expected a JSON object, got '.get_debug_type($data));
+        }
+
+        return static::fromArray($data, $validate);
+    }
+
+    /**
      * Return an array containing only the specified fields.
      *
      * Uses toArray() (excludes hidden fields). Non-existent keys are

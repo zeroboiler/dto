@@ -13,10 +13,12 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Type casting via `#[Cast]`: integer, string, boolean, array, date, datetime
 - Field mapping via `#[MapFrom]`
 - Hidden fields via `#[Hidden]` — excluded from serialization
-|- Default values via `#[DefaultValue]`
+- Default values via `#[DefaultValue]`
 - Immutable updates: `with()` creates a validated copy
 - Selective output: `only()`, `except()`, `allValues()`
 - Value equality: `equals()`
+- State checks: `isEmpty()`, `isNotEmpty()`
+- JSON hydration: `fromJson()` for decoding JSON strings
 - `DtoCollection` — typed array wrapper with `pluck()`, `pluckKey()`, `map()`, `filter()`
 - Eloquent casting via `DTOCast` (JSON storage with optional validation)
 - Nested DTO hydration: `#[NestedArray]`, `#[Collection]`
@@ -28,7 +30,7 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Dev/testing cache auto-invalidation (2s TTL)
 - Octane/Swoole/RoadRunner cache flush via event listeners
 - Full PHPStan level 9 compliance (no baseline errors)
-- Comprehensive Pest test suite with 30+ test files
+- Comprehensive Pest test suite with 31+ test files
 
 ### Requirements
 - PHP 8.5+
