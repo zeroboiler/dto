@@ -57,8 +57,8 @@ describe('DataTransferObject fromJson()', function () {
 });
 
 describe('DataTransferObject isEmpty()', function () {
-    it('returns true when all properties are empty defaults', function () {
-        // EmptyDTO has nullable properties that default to null
+    it('returns true when all properties are null/empty defaults', function () {
+        // EmptyDTO: both foo and bar default to null
         $dto = EmptyDTO::fromArray([], validate: false);
 
         expect($dto->isEmpty())->toBeTrue();
@@ -76,39 +76,45 @@ describe('DataTransferObject isEmpty()', function () {
             'name' => 'Test User',
         ], validate: false);
 
+        // email and name are non-empty → not empty
         expect($dto->isEmpty())->toBeFalse();
     });
 
     it('considers empty string as empty', function () {
+        $dto = EmptyDTO::fromArray(['foo' => '', 'bar' => ''], validate: false);
+
+        expect($dto->isEmpty())->toBeTrue();
+    });
+
+    it('returns false when DTO has non-empty default values', function () {
+        // CreateUserDTO has status='active' as default — that is non-empty
         $dto = CreateUserDTO::fromArray([
             'email' => '',
             'name' => '',
         ], validate: false);
 
-        expect($dto->isEmpty())->toBeTrue();
-    });
-
-    it('considers default values as empty (string)', function () {
-        // status defaults to 'active', which is non-empty
-        $dto = CreateUserDTO::fromArray([
-            'email' => 'test@example.com',
-            'name' => 'Test User',
-        ], validate: false);
-
-        // status is 'active' — not empty
+        // status defaults to 'active' (non-empty) → isEmpty is false
         expect($dto->isEmpty())->toBeFalse();
     });
 
-    it('returns true for DTO with only null/empty properties', function () {
+    it('returns true for DTO with only null values', function () {
         $dto = EmptyDTO::fromArray(['foo' => null, 'bar' => null], validate: false);
 
         expect($dto->isEmpty())->toBeTrue();
     });
 
-    it('returns true for DTO with only empty array', function () {
-        $dto = EmptyDTO::fromArray(['foo' => '', 'bar' => ''], validate: false);
+    it('distinguishes zero and false as empty', function () {
+        // EmptyDTO only has ?string properties — so null, '', '' are all empty
+        $dto = EmptyDTO::fromArray(['foo' => '', 'bar' => null], validate: false);
 
         expect($dto->isEmpty())->toBeTrue();
+    });
+
+    it('considers zero as empty', function () {
+        $dto = EmptyDTO::fromArray(['foo' => '0', 'bar' => null], validate: false);
+
+        // '0' is a non-empty string
+        expect($dto->isEmpty())->toBeFalse();
     });
 });
 
@@ -120,7 +126,7 @@ describe('DataTransferObject isNotEmpty()', function () {
     });
 
     it('returns true for DTO with values', function () {
-        $dto = EmptyDTO::fromArray(['foo' => 'hello'], validate: false);
+        $dto = EmptyDTO::fromArray(['foo' => 'bar'], validate: false);
 
         expect($dto->isNotEmpty())->toBeTrue();
     });

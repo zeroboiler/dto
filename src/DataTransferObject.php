@@ -384,7 +384,6 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     public static function fromJson(string $json, bool $validate = true): static
     {
         try {
-            /** @var array<string, mixed> $data */
             $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw DTOException::invalidJson('(root)', $e->getMessage());
@@ -394,6 +393,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             throw DTOException::invalidJson('(root)', 'Expected a JSON object, got '.get_debug_type($data));
         }
 
+        // Reject sequential arrays — only associative arrays (JSON objects) are valid
+        if (array_is_list($data)) {
+            throw DTOException::invalidJson('(root)', 'Expected a JSON object (associative array), got a sequential array');
+        }
+
+        /** @var array<string, mixed> $data */
         return static::fromArray($data, $validate);
     }
 
