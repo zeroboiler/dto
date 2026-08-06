@@ -8,11 +8,8 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Tests\Fixtures;
 
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Illuminate\Support\Facades\Validator;
 use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Email;
-use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Nullable;
 use ZeroBoiler\DTO\Attributes\Required;
@@ -52,7 +49,7 @@ final class ActionScopedDTO extends DataTransferObject implements ValidatableDTO
      */
     public static function rulesFor(string $action): array
     {
-        $base = static::rules();
+        $base = self::rules();
 
         return match ($action) {
             'create' => $base,
