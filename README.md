@@ -674,3 +674,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 ## License
 
 Proprietary — © ZeroBoiler
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for our security policy.

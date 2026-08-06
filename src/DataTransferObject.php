@@ -624,7 +624,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             'string' => is_scalar($value) ? (string) $value : (is_object($value) && method_exists($value, '__toString') ? (string) $value : ''),
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
             'array' => is_array($value) ? $value : self::decodeJsonArray(is_string($value) ? $value : '', $propertyName),
-            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : (is_string($value) || is_int($value) || is_float($value) || $value === null ? new Carbon($value) : throw new \InvalidArgumentException("Cannot cast value of type '".get_debug_type($value)."' to date/datetime for property '{$propertyName}'")),
+            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : (is_string($value) || is_int($value) || is_float($value) ? new Carbon($value) : ($value === null ? null : throw new \InvalidArgumentException("Cannot cast value of type '".get_debug_type($value)."' to date/datetime for property '{$propertyName}'"))),
             default => $value,
         };
     }
