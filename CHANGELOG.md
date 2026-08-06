@@ -4,6 +4,9 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [1.1.0] - 2026-08-06
 
+### Changed
+- Test fixture DTOs (`EmptyDTO`, `CreateUserDTO`) marked as `final` for consistency
+
 ### Added
 - Base `DataTransferObject` with readonly promoted properties
 - Attribute-based validation: 30+ validation attributes covering all Laravel validation rules

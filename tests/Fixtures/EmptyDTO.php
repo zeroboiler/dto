@@ -10,7 +10,7 @@ namespace ZeroBoiler\DTO\Tests\Fixtures;
 
 use ZeroBoiler\DTO\DataTransferObject;
 
-class EmptyDTO extends DataTransferObject
+final class EmptyDTO extends DataTransferObject
 {
     public function __construct(
         public readonly ?string $foo = null,

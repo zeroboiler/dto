@@ -18,7 +18,7 @@ use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
-class CreateUserDTO extends DataTransferObject
+final class CreateUserDTO extends DataTransferObject
 {
     public function __construct(
         #[Required, Email]
