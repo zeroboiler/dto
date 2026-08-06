@@ -60,6 +60,51 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - Laravel 13+
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
+## Quick Start
+
+Create your first DTO in under a minute:
+
+```php
+// app/DTOs/CreateUserDTO.php
+use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class CreateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[Hidden]
+        public readonly ?string $password = null,
+    ) {}
+}
+
+// Hydrate from request (auto-validates)
+$dto = CreateUserDTO::fromRequest($request);
+
+// Or from array
+$dto = CreateUserDTO::fromArray(['email' => 'test@example.com', 'name' => 'Doruk']);
+
+// Serialize (hidden fields excluded)
+$dto->toArray();
+// ['email' => 'test@example.com', 'name' => 'Doruk']
+
+// Get validation rules (for Form Requests or API docs)
+CreateUserDTO::rules();
+// ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
+
+// OpenAPI schema
+php artisan zeroboiler:dto-schema "App\DTOs\CreateUserDTO" --json
+```
+
 ## Type System
 
 ### Readonly Promoted Properties
