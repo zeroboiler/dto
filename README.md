@@ -225,7 +225,7 @@ $dto = CreateUserDTO::fromRequest($request);
 $dto = CreateUserDTO::fromArray([
     'email'       => 'test@example.com',
     'name'        => 'Doruk',
-    'phone_number'=> '+905551234567',
+    'phone_number'=> '+905****4567',
 ]);
 
 // Skip validation
@@ -234,6 +234,11 @@ $dto = CreateUserDTO::fromArray($data, validate: false);
 // From JSON string
 $dto = CreateUserDTO::fromJson($request->getContent());
 $dto = CreateUserDTO::fromJson('{"email":"test@example.com","name":"Doruk"}');
+
+// fromJson throws DTOException on invalid input:
+// - Invalid JSON syntax → DTOException::invalidJson('(root)', 'Syntax error')
+// - Sequential array (JSON array, not object) → DTOException::invalidJson('(root)', 'Expected a JSON object')
+// - Valid JSON object → normal validation errors via ValidationException
 ```
 
 ### Serialization
@@ -644,6 +649,18 @@ All validation attributes accept an optional `message` parameter for custom erro
 | **Validated by default** | Validation runs automatically on hydration; opt-out with `validate: false` |
 | **Strict typing** | `declare(strict_types=1)` in every file; PHPStan level 9 clean |
 | **No mixed types** | Every property has an explicit type; every method has return types |
+| **Fail fast** | Invalid JSON throws `DTOException`; invalid data throws `ValidationException` |
+
+### Exception Hierarchy
+
+```
+DTOException (extends Exception)
+├─ invalidCast($property, $type, $value)  — Cast failure (#[Cast] attribute)
+└─ invalidJson($property, $jsonError)    — JSON decode failure (#[Cast('array')] / fromJson)
+
+ValidationException (Laravel)             — Thrown when attribute-derived rules fail
+InvalidArgumentException                 — Thrown for type mismatches, invalid nested data
+```
 
 ## Testing
 

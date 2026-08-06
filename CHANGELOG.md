@@ -30,7 +30,9 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Dev/testing cache auto-invalidation (2s TTL)
 - Octane/Swoole/RoadRunner cache flush via event listeners
 - Full PHPStan level 9 compliance (no baseline errors)
-- Comprehensive Pest test suite with 31+ test files
+- Comprehensive Pest test suite with 32+ test files
+- Exception hierarchy documentation in README
+- Enhanced `fromJson` error handling documentation
 
 ### Requirements
 - PHP 8.5+

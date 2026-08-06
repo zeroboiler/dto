@@ -57,7 +57,22 @@ final class MakeDtoTestCommand extends Command
         $rules = $dtoClass::rules();
         $ruleStrings = [];
         foreach ($rules as $field => $fieldRules) {
-            $ruleStrings[] = "    '{$field}' => [".implode(', ', array_map(fn ($r): string => "'{$r}'", $fieldRules)).'],';
+            $formattedRules = array_map(static function (mixed $r): string {
+                if ($r instanceof \Illuminate\Validation\Rules\Enum) {
+                    $ref = new \ReflectionProperty($r, 'rule');
+                    $ref->setAccessible(true);
+                    $enumClass = $ref->getValue($r);
+
+                    return "'enum:'.{$enumClass}::class";
+                }
+
+                if (is_object($r) && method_exists($r, '__toString')) {
+                    return (string) $r;
+                }
+
+                return is_string($r) ? "'{$r}'" : "'".(string) $r."'";
+            }, $fieldRules);
+            $ruleStrings[] = "    '{$field}' => [".implode(', ', $formattedRules).'],';
         }
         $rulesStr = implode("\n", $ruleStrings);
 
