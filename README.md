@@ -30,7 +30,7 @@ class CreateUserDTO extends DataTransferObject
         #[Required, Email]
         public readonly string $email,        // Must be set, validated as email, immutable
 
-        #[Default('active')]
+        #[DefaultValue('active')]
         public readonly string $status = 'active', // Optional with default, immutable
 
         #[Hidden]
@@ -63,7 +63,7 @@ this transformation pipeline:
 Raw Input Value
     │
     ├─ 1. Map source key (#[MapFrom('user_name')])
-    ├─ 2. Apply default if key missing (#[Default('active')])
+    ├─ 2. Apply default if key missing (#[DefaultValue('active')])
     ├─ 3. Cast type (#[Cast('integer')])
     ├─ 4. Instantiate ValueObject (detected from type)
     ├─ 5. Instantiate BackedEnum (detected from type)
@@ -133,7 +133,7 @@ Validation runs **before** hydration to reject invalid data early.
 - **Type casting** — `#[Cast('integer')]`, `#[Cast('array')]`, `#[Cast('boolean')]`
 - **Field mapping** — `#[MapFrom('user_name')]` for source key aliasing
 - **Hidden fields** — `#[Hidden]` excludes from `toArray()`/`toJson()`
-- **Default values** — `#[Default('active')]` when source key is missing
+- **Default values** — `#[DefaultValue('active')]` when source key is missing
 - **Serialization** — `toArray()`, `toJson()`, `jsonSerialize()`
 - **Immutable updates** — `$dto->with(['status' => 'inactive'])`
 - **Selective output** — `$dto->only('email', 'name')`, `$dto->except('password')`
@@ -149,7 +149,7 @@ Validation runs **before** hydration to reject invalid data early.
 
 ```php
 use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\Default;
+use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Email;
 use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\MapFrom;
@@ -167,7 +167,7 @@ class CreateUserDTO extends DataTransferObject
         #[Required, Min(2), Max(50)]
         public readonly string $name,
 
-        #[Default('active')]
+        #[DefaultValue('active')]
         public readonly string $status,
 
         #[Cast('array')]
@@ -525,7 +525,7 @@ DataTransferObject::flushMetadataCache();
 | `#[Cast('type')]` | Cast value during hydration (`'integer'`, `'string'`, `'boolean'`, `'array'`, `'date'`, `'datetime'`) |
 | `#[MapFrom('source_key')]` | Map from different source key |
 | `#[Hidden]` | Exclude from `toArray()` / `toJson()` output |
-| `#[Default(value)]` | Default value when key is missing |
+| `#[DefaultValue(value)]` | Default value when key is missing |
 | `#[NestedArray(DTOClass::class)]` | Hydrate array elements as nested DTO instances |
 | `#[Collection(DTOClass::class)]` | Hydrate as `DtoCollection` of DTO instances |
 
