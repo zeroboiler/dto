@@ -66,6 +66,26 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
  * Results are cached by the caller ({@see DataTransferObject::resolveMetadata()})
  * with TTL-based invalidation in dev environments.
  *
+ * @phpstan-type DtoPropertyMeta array{
+ *     map_from: string|null,
+ *     default: mixed,
+ *     has_default: bool,
+ *     cast: string|null,
+ *     hidden: bool,
+ *     nullable: bool,
+ *     value_object_class: class-string<ValueObjectContract>|null,
+ *     dto_class: class-string<DataTransferObject>|null,
+ *     enum_class: class-string<\BackedEnum>|null,
+ *     nested_array_class: class-string<DataTransferObject>|null,
+ *     collection_class: class-string<DataTransferObject>|null
+ * }
+ *
+ * @phpstan-type DtoResolvedMetadata array{
+ *     properties: array<string, DtoPropertyMeta>,
+ *     rules: array<string, array<int, mixed>>,
+ *     messages: array<string, string>
+ * }
+ *
  * @see \ZeroBoiler\DTO\DataTransferObject For the base class that calls this resolver
  * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
@@ -75,11 +95,8 @@ final class DtoMetadataResolver
      * Resolve all metadata for a DTO class.
      *
      * @param  class-string  $class
-     * @return array{
-     *     properties: array<non-empty-string, array<string, mixed>>,
-     *     rules: array<string, array<int, mixed>>,
-     *     messages: array<string, string>
-     * }
+     * @return DtoResolvedMetadata
+     * @phpstan-return DtoResolvedMetadata
      */
     public static function resolve(string $class): array
     {

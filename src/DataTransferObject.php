@@ -28,6 +28,24 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject;
  * @implements Arrayable<string, mixed>
  *
  * @phpstan-consistent-constructor
+ * @phpstan-type DtoPropertyMeta array{
+ *     map_from: string|null,
+ *     default: mixed,
+ *     has_default: bool,
+ *     cast: string|null,
+ *     hidden: bool,
+ *     nullable: bool,
+ *     value_object_class: class-string<ValueObject>|null,
+ *     dto_class: class-string<static>|null,
+ *     enum_class: class-string<\BackedEnum>|null,
+ *     nested_array_class: class-string<static>|null,
+ *     collection_class: class-string<static>|null
+ * }
+ * @phpstan-type DtoResolvedMetadata array{
+ *     properties: array<string, DtoPropertyMeta>,
+ *     rules: array<string, array<int, mixed>>,
+ *     messages: array<string, string>
+ * }
  */
 abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSerializable, ValidatableDTO
 {
@@ -522,13 +540,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
-     * @return array{
-     *     properties: array<string, array<string, mixed>>,
-     *     rules: array<string, array<int, mixed>>,
-     *     messages: array<string, string>
-     * }
-     *
-     * @phpstan-return array{properties: array<string, array<string, mixed>>, rules: array<string, array<int, mixed>>, messages: array<string, string>}
+     * @return DtoResolvedMetadata
+     * @phpstan-return DtoResolvedMetadata
      */
     private static function resolveMetadata(): array
     {
@@ -548,7 +561,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             self::$_metadataCacheTimestamps[$class] = microtime(true);
         }
 
-        /** @var array{properties: array<string, array<string, mixed>>, rules: array<string, array<int, mixed>>, messages: array<string, string>} $metadata */
+        /** @var DtoResolvedMetadata $metadata */
         $metadata = self::$_metadataCache[$class];
 
         return $metadata;
