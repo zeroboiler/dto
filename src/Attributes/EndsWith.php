@@ -24,8 +24,8 @@ final class EndsWith implements ValidationAttribute
      * @param  string|array<int, string>  $suffix
      */
     public function __construct(
-        public string|array $suffix,
-        public ?string $message = null,
+        public readonly string|array $suffix,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

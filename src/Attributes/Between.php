@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a numeric value or string length is between two bounds.
  *
  *   #[Between(1, 100)]
- *   public int $quantity;
+ *   public readonly int|float $min, $quantity;
  *
  *   #[Between(10, 255)]
  *   public string $description;
@@ -24,9 +24,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Between implements ValidationAttribute
 {
     public function __construct(
-        public int|float $min,
-        public int|float $max,
-        public ?string $message = null,
+        public readonly int|float $min,
+        public readonly int|float $max,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

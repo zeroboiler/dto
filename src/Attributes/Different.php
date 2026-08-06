@@ -21,8 +21,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Different implements ValidationAttribute
 {
     public function __construct(
-        public string $field,
-        public ?string $message = null,
+        public readonly string $field,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

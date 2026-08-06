@@ -24,9 +24,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class ArrayRule implements ValidationAttribute
 {
     public function __construct(
-        public ?int $min = null,
-        public ?int $max = null,
-        public ?string $message = null,
+        public readonly ?int $min = null,
+        public readonly ?int $max = null,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

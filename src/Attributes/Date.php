@@ -24,8 +24,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Date implements ValidationAttribute
 {
     public function __construct(
-        public ?string $format = null,
-        public ?string $message = null,
+        public readonly ?string $format = null,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

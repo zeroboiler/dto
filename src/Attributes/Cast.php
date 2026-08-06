@@ -17,7 +17,7 @@ use Attribute;
  * 'boolean', 'bool', 'array', 'date', 'datetime'.
  *
  *   #[Cast('integer')]
- *   public int $count;
+ *   public readonly int|float $min, $count;
  *
  *   #[Cast('float')]
  *   public float $price;
@@ -35,6 +35,6 @@ use Attribute;
 final class Cast
 {
     public function __construct(
-        public string $type,
+        public readonly string $type,
     ) {}
 }

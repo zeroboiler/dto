@@ -23,6 +23,6 @@ use Attribute;
 final class DefaultValue
 {
     public function __construct(
-        public mixed $value = null,
+        public readonly mixed $value = null,
     ) {}
 }

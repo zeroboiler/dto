@@ -15,13 +15,13 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as integer.
  *
  *   #[Integer]
- *   public int|string $age;
+ *   public readonly int|float $min,|string $age;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Integer implements ValidationAttribute
 {
     public function __construct(
-        public ?string $message = null,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

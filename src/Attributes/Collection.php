@@ -31,8 +31,8 @@ final class Collection implements ValidationAttribute
      * @param  class-string<DataTransferObject>  $dtoClass
      */
     public function __construct(
-        public string $dtoClass,
-        public ?string $message = null,
+        public readonly string $dtoClass,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

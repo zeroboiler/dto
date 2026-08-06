@@ -21,8 +21,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Max implements ValidationAttribute
 {
     public function __construct(
-        public int $value,
-        public ?string $message = null,
+        public readonly int $value,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

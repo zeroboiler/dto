@@ -21,7 +21,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Nullable implements ValidationAttribute
 {
     public function __construct(
-        public ?string $message = null,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

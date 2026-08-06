@@ -28,8 +28,8 @@ final class In implements ValidationAttribute
      * @param  array<int, string|int>  $values
      */
     public function __construct(
-        public array $values,
-        public ?string $message = null,
+        public readonly array $values,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

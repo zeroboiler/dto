@@ -26,8 +26,8 @@ final class Enum implements ValidationAttribute
      * @param  class-string<\BackedEnum>  $enumClass
      */
     public function __construct(
-        public string $enumClass,
-        public ?string $message = null,
+        public readonly string $enumClass,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

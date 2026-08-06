@@ -27,8 +27,8 @@ final class StartsWith implements ValidationAttribute
      * @param  string|array<int, string>  $prefix
      */
     public function __construct(
-        public string|array $prefix,
-        public ?string $message = null,
+        public readonly string|array $prefix,
+        public readonly ?string $message = null,
     ) {}
 
     public function ruleKey(): string

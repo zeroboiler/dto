@@ -23,6 +23,6 @@ use Attribute;
 final class MapFrom
 {
     public function __construct(
-        public string $key,
+        public readonly string $key,
     ) {}
 }

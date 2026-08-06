@@ -28,7 +28,7 @@ final class RequiredWithout implements ValidationAttribute
      */
     public function __construct(
         string|array $fields,
-        public ?string $message = null,
+        public readonly ?string $message = null,
     ) {
         $this->fields = is_array($fields) ? $fields : [$fields];
     }
