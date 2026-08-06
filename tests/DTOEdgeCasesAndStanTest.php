@@ -382,6 +382,7 @@ describe('DTO Edge Cases & PHPStan L9 Compliance', function () {
                 RequiredWith::class, RequiredWithAll::class, RequiredWithout::class,
                 RequiredWithoutAll::class, Same::class, Size::class, Sometimes::class,
                 StartsWith::class, Url::class, Uuid::class,
+                NestedArray::class, \ZeroBoiler\DTO\Attributes\Collection::class,
             ];
 
             foreach ($attrs as $attr) {
@@ -401,6 +402,8 @@ describe('DTO Edge Cases & PHPStan L9 Compliance', function () {
                 RequiredWith::class, RequiredWithAll::class, RequiredWithout::class,
                 RequiredWithoutAll::class, Same::class, Size::class, Sometimes::class,
                 StartsWith::class, Url::class, Uuid::class,
+                NestedArray::class, \ZeroBoiler\DTO\Attributes\Collection::class,
+                \ZeroBoiler\DTO\Attributes\ArrayRule::class,
             ];
 
             foreach ($attrs as $attr) {
@@ -420,6 +423,8 @@ describe('DTO Edge Cases & PHPStan L9 Compliance', function () {
                 RequiredWith::class, RequiredWithAll::class, RequiredWithout::class,
                 RequiredWithoutAll::class, Same::class, Size::class, Sometimes::class,
                 StartsWith::class, Url::class, Uuid::class,
+                NestedArray::class, \ZeroBoiler\DTO\Attributes\Collection::class,
+                \ZeroBoiler\DTO\Attributes\ArrayRule::class,
             ];
 
             foreach ($attrs as $attr) {
@@ -430,10 +435,9 @@ describe('DTO Edge Cases & PHPStan L9 Compliance', function () {
             }
         });
 
-        it('non-validation attributes are final', function () {
+        it('non-validation metadata attributes are final', function () {
             $attrs = [
                 Cast::class, DefaultValue::class, Hidden::class, MapFrom::class,
-                NestedArray::class,
             ];
 
             foreach ($attrs as $attr) {
