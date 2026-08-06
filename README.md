@@ -44,6 +44,11 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [OpenApiSchemaGenerator](#openapischemagenerator)
 - [Design Principles](#design-principles)
 - [Exception Hierarchy](#exception-hierarchy)
+- [Extending](#extending)
+  - [Custom DTO Methods](#custom-dto-methods)
+  - [Action-Scoped Rules](#action-scoped-rules)
+  - [Bypass Validation (Advanced)](#bypass-validation-advanced)
+  - [Custom Cast Types](#custom-cast-types)
 - [Testing](#testing)
 - [Contributing](#contributing)
 
@@ -750,6 +755,93 @@ DTOException (extends Exception)
 
 ValidationException (Laravel)             — Thrown when attribute-derived rules fail
 InvalidArgumentException                 — Thrown for type mismatches, invalid nested data
+```
+
+## Extending
+
+### Custom DTO Methods
+
+Add domain logic directly to your DTO classes:
+
+```php
+class CreateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(8)]
+        public readonly string $password,
+    ) {}
+
+    /**
+     * Check if this user is a high-security account (long password).
+     */
+    public function isHighSecurity(): bool
+    {
+        return strlen($this->password) >= 16;
+    }
+
+    /**
+     * Get the email domain for org-level routing.
+     */
+    public function emailDomain(): string
+    {
+        return substr(strrchr($this->email, '@'), 1);
+    }
+}
+```
+
+### Action-Scoped Rules
+
+Override `rulesFor()` in subclasses to provide different validation per action:
+
+```php
+class UpdateUserDTO extends DataTransferObject
+{
+    public static function rulesFor(string $action): array
+    {
+        return match ($action) {
+            'update' => [
+                'email' => ['sometimes', 'email', 'max:255'],
+                'name' => ['sometimes', 'string', 'max:50'],
+            ],
+            default => self::rules(),
+        };
+    }
+}
+```
+
+### Bypass Validation (Advanced)
+
+For performance-critical paths with pre-validated data:
+
+```php
+// Skip validation entirely (use with caution)
+$dto = MyDTO::fromArray($data, validate: false);
+
+// The with() method ALWAYS validates (deprecated $validate param has no effect)
+// This is intentional — it prevents invalid state propagation (#2).
+$updated = $dto->with(['status' => 'active']);
+```
+
+### Custom Cast Types
+
+Extend `castValue()` by using `#[Cast('custom_type')]` and handling it in a subclass,
+or use the ValueObject integration for complex types:
+
+```php
+// For simple types, use Cast:
+#[Cast('integer')]
+public readonly int $age;
+
+// For complex types, use ValueObjects:
+use ZeroBoiler\ValueObjects\Money;
+
+#[Required]
+public readonly Money $salary;
+// Auto-hydrated from ['amount' => 5000, 'currency' => 'USD']
+// Auto-serialized to ['amount' => 5000, 'currency' => 'USD']
 ```
 
 ## Changelog
