@@ -23,11 +23,9 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  */
 final class MakeDtoSchemaCommand extends Command
 {
-    /** @var string */
-    protected $signature = 'zeroboiler:dto-schema {class : The DTO class FQN} {--json : Output as raw JSON}';
+    protected string $signature = 'zeroboiler:dto-schema {class : The DTO class FQN} {--json : Output as raw JSON}';
 
-    /** @var string */
-    protected $description = 'Generate OpenAPI schema from a ZeroBoiler DTO class';
+    protected string $description = 'Generate OpenAPI schema from a ZeroBoiler DTO class';
 
     #[\Override]
     public function handle(): int
