@@ -14,7 +14,13 @@ use ReflectionClass;
 /**
  * Generate Pest tests for a DTO class.
  *
+ * Reads the DTO's constructor parameters via reflection to generate
+ * type-appropriate fake data, and outputs a complete Pest test file
+ * with rules, fromArray, toArray, and toJson tests.
+ *
  *   php artisan zeroboiler:dto-test "App\DTO\CreateUserDTO"
+ *
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand For schema generation
  */
 final class MakeDtoTestCommand extends Command
 {
@@ -206,8 +212,8 @@ PHP;
         if ($type instanceof \ReflectionNamedType) {
             return match ($type->getName()) {
                 'string' => 'test-'.$name,
-                'int' => random_int(1, 100),
-                'float' => round(random_int(100, 10000) / 100, 2),
+                'int' => 42,
+                'float' => 99.99,
                 'bool' => true,
                 'array' => [],
                 default => null,

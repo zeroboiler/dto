@@ -32,7 +32,15 @@ use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
- * Generate OpenAPI schema from a DTO class.
+ * Generate OpenAPI 3.0 schemas from DTO class definitions.
+ *
+ * Reads constructor parameters and validation attributes via reflection
+ * to produce accurate property schemas with types, constraints, and
+ * required-field lists. Supports nested DTOs (via `$ref` to component
+ * schemas) and union types (via `oneOf`).
+ *
+ * @see \ZeroBoiler\DTO\DataTransferObject For the base DTO class
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand For the CLI command
  */
 final class OpenApiSchemaGenerator
 {

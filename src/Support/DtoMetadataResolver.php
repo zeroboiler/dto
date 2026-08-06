@@ -57,9 +57,17 @@ use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
- * Resolves validation rules and property metadata from DTO attributes.
+ * Resolves validation rules and property metadata from DTO attribute definitions.
  *
- * Extracted from DataTransferObject to reduce complexity.
+ * Reads constructor parameters via reflection, detects attribute types
+ * (ValueObject, BackedEnum, nested DTO), infers base validation rules
+ * from PHP types, and collects validation attribute rules.
+ *
+ * Results are cached by the caller ({@see DataTransferObject::resolveMetadata()})
+ * with TTL-based invalidation in dev environments.
+ *
+ * @see \ZeroBoiler\DTO\DataTransferObject For the base class that calls this resolver
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 final class DtoMetadataResolver
 {
