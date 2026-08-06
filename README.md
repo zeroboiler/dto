@@ -536,6 +536,63 @@ All validation attributes accept an optional `message` parameter for custom erro
 #[Min(8, message: 'Password must be at least 8 characters')]
 ```
 
+## API Quick Reference
+
+### DataTransferObject (abstract base)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `::fromArray(array, bool)` | `static` | Create from array (validates by default) |
+| `::fromRequest(Request, bool)` | `static` | Create from HTTP request |
+| `::fromPartialArray(array, bool)` | `static` | Create from partial array (PATCH semantics) |
+| `::fromPartialRequest(Request, bool)` | `static` | Create from partial request |
+| `::validateArray(array)` | `array` | Validate data, return validated data |
+| `::validatePartialArray(array)` | `array` | Validate only present fields |
+| `::rules()` | `array<string, array>` | Get validation rules |
+| `::rulesFor(string)` | `array<string, array>` | Get rules for a specific action |
+| `->toArray()` | `array` | Serialize (excludes hidden fields) |
+| `->allValues()` | `array` | Serialize (includes hidden fields) |
+| `->toJson(int)` | `string` | JSON serialization |
+| `->jsonSerialize()` | `mixed` | JSONSerializable implementation |
+| `->only(string\|array)` | `array` | Return only specified fields |
+| `->except(string\|array)` | `array` | Return all except specified fields |
+| `->with(array)` | `static` | Immutable copy with overrides (always validates) |
+| `->equals(self)` | `bool` | Value equality check |
+| `::flushMetadataCache(?string)` | `void` | Clear metadata cache |
+
+### DtoCollection
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `::make(array)` | `self` | Static factory constructor |
+| `->push(DataTransferObject)` | `self` | Append DTO (fluent) |
+| `->first()` | `?DataTransferObject` | First item or null |
+| `->last()` | `?DataTransferObject` | Last item or null |
+| `->map(callable)` | `array` | Map over items (returns plain array) |
+| `->filter(callable)` | `self` | Filter items (returns new collection) |
+| `->pluck(string)` | `array` | Extract single field from all DTOs |
+| `->pluckKey(string, ?string)` | `array` | Key/value map from fields |
+| `->items()` | `array` | Raw DTO instances |
+| `->toArray()` | `array` | All DTOs serialized via toArray() |
+| `->count()` | `int` | Item count |
+| `->isEmpty()` | `bool` | Check if empty |
+| `->isNotEmpty()` | `bool` | Check if not empty |
+
+### DTOManager (via Facade)
+
+| Facade Method | Description |
+|---------------|-------------|
+| `DTO::validate(string, array)` | Validate data against a DTO class |
+| `DTO::make(string, array)` | Create DTO from data |
+| `DTO::schema(string)` | Generate OpenAPI schema |
+
+### OpenApiSchemaGenerator
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `::generate(string)` | `array` | Basic schema (throws on nested DTOs) |
+| `::generateWithComponents(string)` | `array{schema, components}` | Schema with component definitions |
+
 ## Design Principles
 
 | Principle | Implementation |

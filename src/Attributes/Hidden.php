@@ -13,6 +13,10 @@ use Attribute;
 /**
  * Exclude a property from toArray()/toJson() output.
  *
+ * Hidden properties are still accessible on the DTO instance itself
+ * and included in allValues() output. Only the public serialization
+ * methods (toArray, toJson, jsonSerialize) respect this attribute.
+ *
  *   #[Hidden]
  *   public string $password;
  */

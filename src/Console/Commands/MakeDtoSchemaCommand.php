@@ -16,13 +16,20 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  *
  *   php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO"
  *   php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --json
+ *
+ * Outputs the generated OpenAPI 3.0 schema to the console.
+ * For DTOs with nested DTO references, use {@see OpenApiSchemaGenerator::generateWithComponents()}
+ * to get component schema definitions alongside the main schema.
  */
 final class MakeDtoSchemaCommand extends Command
 {
+    /** @var string */
     protected $signature = 'zeroboiler:dto-schema {class : The DTO class FQN} {--json : Output as raw JSON}';
 
+    /** @var string */
     protected $description = 'Generate OpenAPI schema from a ZeroBoiler DTO class';
 
+    #[\Override]
     public function handle(): int
     {
         /** @var string $dtoClass */

@@ -232,6 +232,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * Useful for extracting a list of IDs, emails, or any single field
      * from a collection of DTOs without manual mapping.
      *
+     * Accesses the property directly via `$dto->{$key}`.
+     *
      * @return array<int, mixed>
      */
     public function pluck(string $key): array
