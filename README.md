@@ -553,8 +553,11 @@ $dto = DTO::make(CreateUserDTO::class, ['email' => 'test@example.com', 'name' =>
 // Validate data against a DTO class
 $validated = DTO::validate(CreateUserDTO::class, $data);
 
-// Create a DTO from JSON
+// Create a DTO from JSON string
 $dto = DTO::makeFromJson(CreateUserDTO::class, $jsonString);
+
+// Validate data (standalone, without creating DTO)
+$validated = DTO::validate(CreateUserDTO::class, $rawData);
 
 // Generate OpenAPI schema
 $schema = DTO::schema(CreateUserDTO::class);
