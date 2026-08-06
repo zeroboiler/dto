@@ -3,6 +3,37 @@
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
 auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Type System](#type-system)
+  - [Readonly Promoted Properties](#readonly-promoted-properties)
+  - [Property Types](#property-types)
+  - [Hydration Pipeline](#hydration-pipeline)
+  - [Architecture](#architecture)
+- [Features](#features)
+- [Usage](#usage)
+  - [Hydration](#hydration)
+  - [Serialization](#serialization)
+  - [Immutable Update](#immutable-update)
+  - [Selective Output](#selective-output)
+  - [Collection Helpers](#collection-helpers)
+  - [Partial Updates (PATCH)](#partial-updates-patch)
+  - [Validation Rules](#validation-rules)
+  - [Nested DTOs](#nested-dtos)
+  - [DTO Collections](#dto-collections)
+  - [Value Object Integration](#value-object-integration)
+  - [Eloquent Cast](#eloquent-cast)
+  - [CLI Commands](#cli-commands)
+  - [DTO Facade / Manager](#dto-facade--manager)
+  - [OpenAPI Schema Generation](#openapi-schema-generation)
+- [Configuration](#configuration)
+- [Attributes Reference](#attributes-reference)
+- [API Quick Reference](#api-quick-reference)
+- [Design Principles](#design-principles)
+- [Testing](#testing)
+- [Contributing](#contributing)
+
 ## Installation
 
 ```bash

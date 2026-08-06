@@ -13,7 +13,7 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Type casting via `#[Cast]`: integer, string, boolean, array, date, datetime
 - Field mapping via `#[MapFrom]`
 - Hidden fields via `#[Hidden]` — excluded from serialization
-- Default values via `#[Default]`
+|- Default values via `#[DefaultValue]`
 - Immutable updates: `with()` creates a validated copy
 - Selective output: `only()`, `except()`, `allValues()`
 - Value equality: `equals()`
