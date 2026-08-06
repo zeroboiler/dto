@@ -31,6 +31,8 @@ final class DTOManager
      * @param  class-string<DataTransferObject>  $dtoClass
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails
      */
     public function validate(string $dtoClass, array $data): array
     {
@@ -42,6 +44,8 @@ final class DTOManager
      *
      * @param  class-string<DataTransferObject>  $dtoClass
      * @param  array<string, mixed>  $data
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails
      */
     public function make(string $dtoClass, array $data): DataTransferObject
     {
@@ -66,6 +70,9 @@ final class DTOManager
      *
      * @param  class-string<DataTransferObject>  $dtoClass
      * @return array<string, mixed>
+     *
+     * @throws \LogicException If the DTO contains nested DTO references
+     * @throws \ReflectionException If the class does not exist
      */
     public function schema(string $dtoClass): array
     {

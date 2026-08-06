@@ -112,6 +112,12 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         return $this->items[$offset] ?? null;
     }
 
+    /**
+     * @param  int|null  $offset
+     * @param  T  $value
+     *
+     * @throws \InvalidArgumentException If value is not a DataTransferObject instance
+     */
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -158,6 +164,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * Push a DTO onto the end of the collection.
      *
      * @param  T  $dto
+     *
+     * @return self
      *
      * @phpstan-return DtoCollection<DataTransferObject>
      */
