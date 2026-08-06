@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field to be declined — must be one of: no, off, 0, false.
  *
  *   #[Declined]
- *   public mixed $optOut;
+ *   public readonly bool $optOut;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Declined implements ValidationAttribute

@@ -32,7 +32,7 @@ use ZeroBoiler\DTO\DataTransferObject;
  *
  * @implements CastsAttributes<T, T|array<string, mixed>|null>
  */
-class DTOCast implements CastsAttributes
+final class DTOCast implements CastsAttributes
 {
     /**
      * @param  class-string<T>  $dtoClass

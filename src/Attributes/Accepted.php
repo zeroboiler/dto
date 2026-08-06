@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field to be accepted — must be one of: yes, on, 1, true.
  *
  *   #[Accepted]
- *   public mixed $terms;
+ *   public readonly bool $terms;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Accepted implements ValidationAttribute

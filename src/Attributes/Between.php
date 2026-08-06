@@ -15,10 +15,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a numeric value or string length is between two bounds.
  *
  *   #[Between(1, 100)]
- *   public readonly int|float $min, $quantity;
+ *   public readonly int $quantity;
  *
  *   #[Between(10, 255)]
- *   public string $description;
+ *   public readonly string $description;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Between implements ValidationAttribute

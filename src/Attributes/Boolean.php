@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as boolean.
  *
  *   #[Boolean]
- *   public mixed $acceptsTerms;
+ *   public readonly bool $acceptsTerms;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Boolean implements ValidationAttribute
