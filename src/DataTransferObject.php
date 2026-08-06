@@ -322,7 +322,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
     public function toJson(int $options = 0): string
     {
-        return json_encode($this->jsonSerialize(), $options) ?: '';
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        return $json === false ? '' : $json;
     }
 
     #[\Override]
@@ -347,6 +349,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     public function isEmpty(): bool
     {
         foreach (self::resolveMetadata()['properties'] as $name => $prop) {
+            /** @var mixed $value */
             $value = $this->{$name};
 
             // Skip properties that have a non-null value
@@ -413,7 +416,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      */
     public function only(array|string $keys): array
     {
-        return Arr::only($this->toArray(), is_array($keys) ? $keys : func_get_args());
+        $resolvedKeys = is_array($keys) ? $keys : [$keys];
+
+        return Arr::only($this->toArray(), $resolvedKeys);
     }
 
     /**
@@ -427,7 +432,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      */
     public function except(array|string $keys): array
     {
-        return Arr::except($this->toArray(), is_array($keys) ? $keys : func_get_args());
+        $resolvedKeys = is_array($keys) ? $keys : [$keys];
+
+        return Arr::except($this->toArray(), $resolvedKeys);
     }
 
     /**
@@ -470,8 +477,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         // ValueObject auto-instantiation (#689)
         if ($value !== null && $voClass !== null && ! $value instanceof $voClass) {
             $value = self::castValueToValueObject($value, $voClass);
-        } elseif (($prop['cast'] ?? null) !== null && $value !== null) {
-            $castType = is_string($prop['cast']) ? $prop['cast'] : '';
+        } elseif ($prop['cast'] !== null && $value !== null) {
+            /** @var string $castType */
+            $castType = $prop['cast'];
             $value = self::castValue($value, $castType, $name);
         }
 
@@ -559,7 +567,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
                 continue;
             }
 
-            $result[$name] = $this->normalizeValue($this->{$name}, $includeHidden);
+            /** @var mixed $value */
+            $value = $this->{$name};
+            $result[$name] = $this->normalizeValue($value, $includeHidden);
         }
 
         return $result;
