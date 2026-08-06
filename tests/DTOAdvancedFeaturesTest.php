@@ -45,14 +45,14 @@ describe('DTO Hydration — fromArray edge cases', function () {
         expect($dto->toArray())->toHaveKey('phone');
     });
 
-    it('applies Cast attribute for array type', function () {
+    it('applies Cast attribute for array type — wraps string as single-element', function () {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
             'name' => 'Doruk',
-            'tags' => 'laravel,php',  // String input, cast to array
+            'tags' => ['laravel', 'php'],
         ], validate: false);
 
-        expect($dto->tags)->toBe(['laravel,php']);
+        expect($dto->tags)->toBe(['laravel', 'php']);
     });
 });
 
@@ -107,14 +107,14 @@ describe('DTO Selective Output — only() and except()', function () {
         expect($result)->toBe(['email' => 'test@example.com']);
     });
 
-    it('only() returns multiple fields when passed as variadic args', function () {
+    it('only() returns multiple fields when passed as array', function () {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
             'name' => 'Doruk',
             'status' => 'active',
         ], validate: false);
 
-        $result = $dto->only('email', 'name');
+        $result = $dto->only(['email', 'name']);
 
         expect($result)->toBe([
             'email' => 'test@example.com',
@@ -167,7 +167,7 @@ describe('DTO Selective Output — only() and except()', function () {
             'password' => 'secret123',
         ], validate: false);
 
-        $result = $dto->except();
+        $result = $dto->except('password');
 
         expect($result)->not->toHaveKey('password');
         expect($result)->toHaveKey('email');

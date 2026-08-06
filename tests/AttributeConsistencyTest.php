@@ -23,7 +23,7 @@ describe('ValidationAttribute interface compliance', function (): void {
     });
 
     it('RequiredWithoutAll implements ValidationAttribute', function (): void {
-        $attr = new RequiredWithoutAll('email', 'phone');
+        $attr = new RequiredWithoutAll(['email', 'phone']);
         expect($attr)->toBeInstanceOf(ValidationAttribute::class);
         expect($attr->ruleKey())->toBe('required_without_all');
         expect($attr->fields)->toBe(['email', 'phone']);
