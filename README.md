@@ -536,6 +536,17 @@ All validation attributes accept an optional `message` parameter for custom erro
 #[Min(8, message: 'Password must be at least 8 characters')]
 ```
 
+## Design Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Zero config** | No service provider config — works out of the box via auto-discovery |
+| **Immutable** | All properties are `public readonly`; `with()` returns a new instance |
+| **Attribute-first** | All validation and metadata declared via PHP 8 attributes |
+| **Validated by default** | Validation runs automatically on hydration; opt-out with `validate: false` |
+| **Strict typing** | `declare(strict_types=1)` in every file; PHPStan level 9 clean |
+| **No mixed types** | Every property has an explicit type; every method has return types |
+
 ## Testing
 
 ```bash
@@ -553,6 +564,24 @@ composer ci
 ```
 
 All checks must pass before merging. The package targets PHPStan level 9 with a clean baseline (zero suppressed errors).
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Ensure all CI checks pass (`composer ci`)
+4. Commit with conventional commits (`feat:`, `fix:`, `refactor:`)
+5. Push and open a Pull Request
+
+### Code Standards
+
+- **PHP 8.5 syntax** — use the latest language features
+- **Strict types** — every file must have `declare(strict_types=1)`
+- **PHPStan level 9** — zero errors, no baseline suppressions
+- **Docblocks** — all public methods and properties documented
+- **Typed properties** — no `mixed` types in source code
+- **Readonly properties** — all DTO properties must be `public readonly`
+- **Final classes** — all attributes, services, and collections are `final`
 
 ## License
 
