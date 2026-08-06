@@ -13,6 +13,20 @@ use Illuminate\Support\ServiceProvider;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand;
 use ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand;
 
+/**
+ * Laravel service provider for ZeroBoiler DTOs.
+ *
+ * Registers the DTOManager as a singleton and artisan commands
+ * for DTO test generation and OpenAPI schema generation.
+ * Configures dev cache invalidation and registers cache flush
+ * listeners for long-running processes (Octane, Swoole, RoadRunner).
+ *
+ * Auto-discovered via Laravel's package discovery — no manual registration needed.
+ *
+ * @see \ZeroBoiler\DTO\DTOManager
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand
+ */
 final class DTOSServiceProvider extends ServiceProvider
 {
     #[\Override]
