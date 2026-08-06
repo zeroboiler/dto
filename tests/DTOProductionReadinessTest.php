@@ -477,5 +477,30 @@ describe('DTO Production Readiness', function () {
 
             expect(true)->toBeTrue(); // No error
         });
+
+        it('rulesFor returns same as rules by default', function () {
+            $rules = EmptyDTO::rules();
+            $rulesForCreate = EmptyDTO::rulesFor('create');
+            $rulesForUpdate = EmptyDTO::rulesFor('update');
+
+            expect($rulesForCreate)->toBe($rules);
+            expect($rulesForUpdate)->toBe($rules);
+        });
+
+        it('fromPartialArray with no data returns DTO with defaults', function () {
+            $dto = CreateUserDTO::fromPartialArray([], validatePresent: false);
+
+            expect($dto)->toBeInstanceOf(CreateUserDTO::class);
+            expect($dto->status)->toBe('active');
+        });
+
+        it('fromPartialArray preserves defaults and overrides specified fields', function () {
+            $dto = CreateUserDTO::fromPartialArray([
+                'name' => 'Updated',
+            ], validatePresent: false);
+
+            expect($dto->name)->toBe('Updated');
+            expect($dto->status)->toBe('active');
+        });
     });
 });
