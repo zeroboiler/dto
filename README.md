@@ -1,5 +1,10 @@
 # ZeroBoiler DTO
 
+[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
+[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
+[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
+
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
 auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 
@@ -13,6 +18,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Architecture](#architecture)
 - [Features](#features)
 - [Usage](#usage)
+  - [Basic DTO](#basic-dto)
   - [Hydration](#hydration)
   - [Serialization](#serialization)
   - [Immutable Update](#immutable-update)
@@ -29,8 +35,15 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [OpenAPI Schema Generation](#openapi-schema-generation)
 - [Configuration](#configuration)
 - [Attributes Reference](#attributes-reference)
+  - [Validation Attributes](#validation-attributes)
+  - [Metadata Attributes](#metadata-attributes)
 - [API Quick Reference](#api-quick-reference)
+  - [DataTransferObject (abstract base)](#datatransferobject-abstract-base)
+  - [DtoCollection](#dtocollection)
+  - [DTOManager (via Facade)](#dtomanager-via-facade)
+  - [OpenApiSchemaGenerator](#openapischemagenerator)
 - [Design Principles](#design-principles)
+- [Exception Hierarchy](#exception-hierarchy)
 - [Testing](#testing)
 - [Contributing](#contributing)
 
@@ -161,7 +174,7 @@ Validation runs **before** hydration to reject invalid data early.
 - **Auto-hydration** — `fromArray()`, `fromRequest()` with zero boilerplate
 - **Partial updates** — `fromPartialArray()`, `fromPartialRequest()` for PATCH semantics
 - **Auto-validation** — rules derived from attributes, validated on hydration
-- **Type casting** — `#[Cast('integer')]`, `#[Cast('array')]`, `#[Cast('boolean')]`
+- **Type casting** — `#[Cast('integer')]`, `#[Cast('array')]`, `#[Cast('boolean')]`, `#[Cast('date')]`
 - **Field mapping** — `#[MapFrom('user_name')]` for source key aliasing
 - **Hidden fields** — `#[Hidden]` excludes from `toArray()`/`toJson()`
 - **Default values** — `#[DefaultValue('active')]` when source key is missing
@@ -176,9 +189,12 @@ Validation runs **before** hydration to reject invalid data early.
 - **OpenAPI schema** — auto-generate API docs from DTO definitions
 - **Nested DTO schemas** — `$ref` to component schemas for nested DTOs
 - **Union type support** — `oneOf` schemas for union types
+- **Value Object integration** — auto-hydrate and serialize zeroboiler/value-objects
 - **CLI tools** — `zeroboiler:dto-test`, `zeroboiler:dto-schema`
 
 ## Usage
+
+### Basic DTO
 
 ```php
 use ZeroBoiler\DTO\Attributes\Cast;
@@ -260,6 +276,7 @@ $dto->toJson();
 ```php
 $updated = $dto->with(['status' => 'inactive']);
 // Original $dto is unchanged
+// Validation always runs in with() to prevent invalid state
 ```
 
 ### Selective Output
@@ -272,11 +289,17 @@ $dto->only('email', 'name');
 // Exclude sensitive fields
 $dto->except('password');
 // All fields except 'password'
+
+// Accepts string or array
+$dto->only('email');     // single key as string
+$dto->only('email', 'name'); // multiple keys
 ```
 
 ### Collection Helpers
 
 ```php
+use ZeroBoiler\DTO\DtoCollection;
+
 $collection = new DtoCollection([$dto1, $dto2, $dto3]);
 // Or via static factory
 $collection = DtoCollection::make([$dto1, $dto2]);
@@ -354,21 +377,24 @@ class OrderDTO extends DataTransferObject
         #[Required]
         public readonly string $orderNumber,
 
+        public readonly AddressDTO $shippingAddress,
+
         #[NestedArray(AddressDTO::class)]
         public readonly array $items = [],
     ) {}
 }
 
-// items array automatically hydrated as DTO instances
+// Nested DTO auto-hydrated
 $order = OrderDTO::fromArray([
     'orderNumber' => 'ORD-001',
+    'shippingAddress' => ['street' => '123 Main St', 'city' => 'Istanbul'],
     'items' => [
-        ['street' => '123 Main St', 'city' => 'Istanbul'],
         ['street' => '456 Oak Ave', 'city' => 'Ankara'],
     ],
 ]);
 
-$order->items; // array of AddressDTO instances
+$order->shippingAddress; // AddressDTO instance
+$order->items;            // array of AddressDTO instances
 ```
 
 ### DTO Collections
@@ -446,6 +472,19 @@ protected $casts = [
 ];
 ```
 
+The `DTOCast` handles serialization/deserialization transparently:
+- **get**: JSON string → DTO instance (no validation for stored data)
+- **set**: DTO/array → JSON string (validates by default)
+
+Disable validation on set for performance-critical paths:
+
+```php
+protected function casts(): array
+{
+    return ['payload' => new DTOCast(CreateUserDTO::class, validate: false)];
+}
+```
+
 ### CLI Commands
 
 ```bash
@@ -464,6 +503,9 @@ $dto = DTO::make(CreateUserDTO::class, ['email' => 'test@example.com', 'name' =>
 // Validate data against a DTO class
 $validated = DTO::validate(CreateUserDTO::class, $data);
 
+// Create a DTO from JSON
+$dto = DTO::makeFromJson(CreateUserDTO::class, $jsonString);
+
 // Generate OpenAPI schema
 $schema = DTO::schema(CreateUserDTO::class);
 ```
@@ -473,7 +515,7 @@ $schema = DTO::schema(CreateUserDTO::class);
 ```php
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
-// Basic schema
+// Basic schema (throws on nested DTOs)
 $schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
 
 // With component schemas for nested DTOs
@@ -557,7 +599,7 @@ DataTransferObject::flushMetadataCache();
 | `#[RequiredWithAll('f1', 'f2')]` | Required when all specified fields are present |
 | `#[RequiredWithout('field')]` | Required when another field is not present |
 | `#[RequiredWithoutAll('f1', 'f2')]` | Required when all specified fields are absent |
-| `#[ArrayRule]` | Must be an array (optionally with `min`/`max` count) |
+| `#[ArrayRule]` | Must be an array |
 | `#[ArrayRule(min: 1, max: 10)]` | Array with 1–10 elements |
 
 ### Metadata Attributes
@@ -593,6 +635,8 @@ All validation attributes accept an optional `message` parameter for custom erro
 | `::validatePartialArray(array)` | `array` | Validate only present fields |
 | `::rules()` | `array<string, array>` | Get validation rules |
 | `::rulesFor(string)` | `array<string, array>` | Get rules for a specific action |
+| `::flushMetadataCache(?string)` | `void` | Clear metadata cache |
+| `::setMetadataCacheTtl(float)` | `void` | Set metadata cache TTL (static) |
 | `->toArray()` | `array` | Serialize (excludes hidden fields) |
 | `->allValues()` | `array` | Serialize (includes hidden fields) |
 | `->toJson(int)` | `string` | JSON serialization |
@@ -603,7 +647,6 @@ All validation attributes accept an optional `message` parameter for custom erro
 | `->equals(self)` | `bool` | Value equality check |
 | `->isEmpty()` | `bool` | Check if all properties are empty/default |
 | `->isNotEmpty()` | `bool` | Check if at least one property has a value |
-| `::flushMetadataCache(?string)` | `void` | Clear metadata cache |
 
 ### DtoCollection
 
@@ -619,6 +662,7 @@ All validation attributes accept an optional `message` parameter for custom erro
 | `->pluckKey(string, ?string)` | `array` | Key/value map from fields |
 | `->items()` | `array` | Raw DTO instances |
 | `->toArray()` | `array` | All DTOs serialized via toArray() |
+| `->allValues()` | `array` | All DTOs serialized including hidden |
 | `->count()` | `int` | Item count |
 | `->isEmpty()` | `bool` | Check if empty |
 | `->isNotEmpty()` | `bool` | Check if not empty |
@@ -650,6 +694,7 @@ All validation attributes accept an optional `message` parameter for custom erro
 | **Strict typing** | `declare(strict_types=1)` in every file; PHPStan level 9 clean |
 | **No mixed types** | Every property has an explicit type; every method has return types |
 | **Fail fast** | Invalid JSON throws `DTOException`; invalid data throws `ValidationException` |
+| **Final classes** | All attributes, services, collections, and resolvers are `final` |
 
 ### Exception Hierarchy
 
