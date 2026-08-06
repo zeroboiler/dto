@@ -844,6 +844,43 @@ public readonly Money $salary;
 // Auto-serialized to ['amount' => 5000, 'currency' => 'USD']
 ```
 
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `Class "X" not found` extending DataTransferObject | DTO class not loaded / missing autoloader | Run `composer dump-autoload` to regenerate the class map |
+| `ValidationException` on `fromArray()` | Input data fails attribute-derived rules | Check `DTO::rules()` to see generated rules; add `validate: false` to skip |
+| `DTOException: Cannot decode JSON` | `fromJson()` received invalid JSON | Validate JSON before calling `fromJson()`, or catch `DTOException` |
+| `DTOException: Expected a JSON object` | `fromJson()` received a JSON array (`[...]`) | The package only accepts JSON objects (`{...}`), not arrays |
+| `fromPartialArray()` throws required validation | Missing required fields not handled | Required fields use `'sometimes'` in partial mode, but may still need explicit handling |
+| `toArray()` includes `password` | `#[Hidden]` attribute missing | Add `#[Hidden]` to sensitive properties; use `allValues()` to explicitly include all |
+| `with()` ignores `$validate: false` | Validation always runs in `with()` | This is intentional — `with()` prevents invalid state propagation |
+| Nested DTO not auto-hydrated | Type not recognized as DTO | Ensure the nested class extends `DataTransferObject`; use `#[NestedArray(...)]` for arrays |
+| `MapFrom` not working | Key mismatch in source data | Ensure the source key matches the `#[MapFrom('key')]` value exactly (supports dot notation) |
+| `Collection` items not DtoCollection | Missing `#[Collection(...)]` attribute | Add `#[Collection(ItemDTO::class)]` to the property |
+
+### FAQ
+
+**Q: Can I use DTOs without Laravel?**
+A: The `DataTransferObject` base class requires Laravel's `Validator` facade for validation. The serialization, hydration, and immutability features technically work without Laravel if you disable validation (`validate: false`), but full functionality requires the framework.
+
+**Q: How does `with()` differ from modifying properties directly?**
+A: DTOs use `readonly` properties, so direct modification is impossible at the language level. `with()` creates a new instance with merged data and always validates to prevent invalid state.
+
+**Q: Can DTOs have computed/derived properties?**
+A: Yes — add public methods to your DTO class. Computed properties won't appear in `toArray()`/`toJson()` automatically, but you can override `toArray()` if needed.
+
+**Q: How do I handle optional fields with `fromPartialArray()`?**
+A: Fields present in the input are validated; missing fields use defaults or type-appropriate empty values. Use `validatePresent: true` (default) to validate only present fields.
+
+**Q: What's the difference between `#[NestedArray]` and `#[Collection]`?**
+A: `#[NestedArray(DTOClass::class)]` hydrates array elements as plain DTO instances (returns `array`). `#[Collection(DTOClass::class)]` wraps them in a `DtoCollection` with additional helpers (`pluck`, `map`, `filter`).
+
+**Q: Can I use union types in DTO properties?**
+A: Yes. Union types (e.g., `string|int`) are supported for hydration. For OpenAPI schemas, union types produce `oneOf` definitions.
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
