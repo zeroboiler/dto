@@ -246,7 +246,6 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *
      * @throws ValidationException
      */
-    #[\Override]
     public static function fromPartialRequest(Request $request, bool $validate = true): static
     {
         return static::fromPartialArray($request->all(), $validate);
