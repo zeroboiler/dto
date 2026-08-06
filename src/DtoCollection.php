@@ -83,6 +83,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         return $this->items;
     }
 
+    #[\Override]
     public function count(): int
     {
         return count($this->items);
@@ -91,6 +92,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     /**
      * @return Traversable<int, T>
      */
+    #[\Override]
     public function getIterator(): Traversable
     {
         foreach ($this->items as $key => $item) {
@@ -98,16 +100,19 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         }
     }
 
+    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->items[$offset]);
     }
 
+    #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->items[$offset] ?? null;
     }
 
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if (! $value instanceof DataTransferObject) {
@@ -123,6 +128,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         }
     }
 
+    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         unset($this->items[$offset]);
@@ -130,6 +136,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         $this->items = array_values($this->items);
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->toArray();

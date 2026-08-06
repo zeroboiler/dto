@@ -48,6 +48,7 @@ class DTOCast implements CastsAttributes
      * @param  array<string, mixed>  $attributes
      * @return T|null
      */
+    #[\Override]
     public function get(object $model, string $key, $value, array $attributes)
     {
         if ($value === null) {
@@ -75,6 +76,7 @@ class DTOCast implements CastsAttributes
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
      * @throws ValidationException When validation is enabled and data is invalid
      */
+    #[\Override]
     public function set(object $model, string $key, $value, array $attributes)
     {
         if ($value === null) {
@@ -108,6 +110,7 @@ class DTOCast implements CastsAttributes
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>|null
      */
+    #[\Override]
     public function serialize(object $model, string $key, $value, array $attributes)
     {
         return $value?->toArray();

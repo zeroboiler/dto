@@ -246,6 +246,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *
      * @throws ValidationException
      */
+    #[\Override]
     public static function fromPartialRequest(Request $request, bool $validate = true): static
     {
         return static::fromPartialArray($request->all(), $validate);
@@ -254,6 +255,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * @throws ValidationException
      */
+    #[\Override]
     public static function fromRequest(Request $request, bool $validate = true): static
     {
         return static::fromArray($request->all(), $validate);
@@ -278,6 +280,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * @return array<string, array<int, mixed>>
      */
+    #[\Override]
     public static function rules(): array
     {
         return self::resolveMetadata()['rules'];
@@ -295,6 +298,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @param  string  $action  The action context
      * @return array<string, array<int, mixed>>
      */
+    #[\Override]
     public static function rulesFor(string $action): array
     {
         return static::rules();
@@ -311,6 +315,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * @return array<string, mixed>
      */
+    #[\Override]
     public function toArray(): array
     {
         return $this->convertProperties(includeHidden: false);
@@ -321,6 +326,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         return json_encode($this->jsonSerialize(), $options) ?: '';
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->toArray();

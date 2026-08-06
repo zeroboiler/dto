@@ -19,6 +19,8 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  *   DTO::validate(CreateUserDTO::class, $data);
  *   DTO::make(CreateUserDTO::class, $data);
  *   DTO::schema(CreateUserDTO::class);
+ *
+ * @see \ZeroBoiler\DTO\Facades\DTO
  */
 final class DTOManager
 {
