@@ -11,7 +11,7 @@ use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
-class ValidationTestDTO extends DataTransferObject
+final class ValidationTestDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

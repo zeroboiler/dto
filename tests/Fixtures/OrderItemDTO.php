@@ -10,7 +10,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * DTO with nested DTO property for testing OpenAPI schema generation (#76).
  */
-class OrderItemDTO extends DataTransferObject
+final class OrderItemDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

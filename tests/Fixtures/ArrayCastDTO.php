@@ -11,7 +11,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * DTO with array cast for testing edge cases (#64).
  */
-class ArrayCastDTO extends DataTransferObject
+final class ArrayCastDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

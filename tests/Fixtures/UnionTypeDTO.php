@@ -10,7 +10,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * DTO with union type property for testing OpenAPI union type support (#75).
  */
-class UnionTypeDTO extends DataTransferObject
+final class UnionTypeDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

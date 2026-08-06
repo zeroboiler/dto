@@ -11,7 +11,7 @@ use ZeroBoiler\DTO\Attributes\Numeric;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
-class ProductDTO extends DataTransferObject
+final class ProductDTO extends DataTransferObject
 {
     public function __construct(
         #[Required, Min(1), Max(255)]

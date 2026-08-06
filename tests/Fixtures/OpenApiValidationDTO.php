@@ -26,7 +26,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * Fixture DTO that exercises all validation attributes for OpenAPI schema generation.
  */
-class OpenApiValidationDTO extends DataTransferObject
+final class OpenApiValidationDTO extends DataTransferObject
 {
     public function __construct(
         #[Email]

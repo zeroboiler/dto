@@ -7,7 +7,7 @@ namespace ZeroBoiler\DTO\Tests\Fixtures;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
-class AddressDTO extends DataTransferObject
+final class AddressDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

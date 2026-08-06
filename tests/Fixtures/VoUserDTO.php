@@ -15,7 +15,7 @@ use ZeroBoiler\ValueObjects\Url;
  *
  * Demonstrates VO auto-instantiation from raw values.
  */
-class VoUserDTO extends DataTransferObject
+final class VoUserDTO extends DataTransferObject
 {
     public function __construct(
         #[Required]

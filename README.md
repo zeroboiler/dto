@@ -662,6 +662,10 @@ ValidationException (Laravel)             — Thrown when attribute-derived rule
 InvalidArgumentException                 — Thrown for type mismatches, invalid nested data
 ```
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
+
 ## Testing
 
 ```bash

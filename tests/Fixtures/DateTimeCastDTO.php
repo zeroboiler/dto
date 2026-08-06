@@ -7,7 +7,7 @@ namespace ZeroBoiler\DTO\Tests\Fixtures;
 use ZeroBoiler\DTO\Attributes\Cast;
 use ZeroBoiler\DTO\DataTransferObject;
 
-class DateTimeCastDTO extends DataTransferObject
+final class DateTimeCastDTO extends DataTransferObject
 {
     public function __construct(
         #[Cast('datetime')]
