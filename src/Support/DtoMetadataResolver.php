@@ -337,12 +337,23 @@ final class DtoMetadataResolver
      * Uses each attribute's ruleKey() method for message key generation,
      * ensuring keys always match Laravel's rule names (#9).
      *
+     * Only attributes implementing {@see ValidationAttribute} with a non-null
+     * `message` property contribute messages. The `message` property is accessed
+     * via reflection to avoid PHPStan level 9 warnings on dynamic property access.
+     *
      * @param  array<string, string>  $messages
      */
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {
-        if ($instance instanceof ValidationAttribute && property_exists($instance, 'message') && $instance->message !== null) {
-            $messages["{$name}.{$instance->ruleKey()}"] = (string) $instance->message;
+        if (! ($instance instanceof ValidationAttribute)) {
+            return;
+        }
+
+        $ref = new \ReflectionProperty($instance, 'message');
+        $messageValue = $ref->getValue($instance);
+
+        if ($messageValue !== null) {
+            $messages["{$name}.{$instance->ruleKey()}"] = (string) $messageValue;
         }
     }
 
