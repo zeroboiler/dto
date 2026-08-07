@@ -1093,6 +1093,35 @@ The test suite includes **65+ test files** covering:
 - **Readonly properties** — all DTO properties must be `public readonly`
 - **Final classes** — all attributes, services, and collections are `final`
 
+## Compatibility
+
+| Dependency | Minimum Version | Maximum Version | Notes |
+|------------|----------------|-----------------|-------|
+| PHP | 8.5 | — | Uses `readonly` promoted properties, attributes, match expressions |
+| Laravel | 13.0 | — | Requires `illuminate/contracts`, `illuminate/http`, `illuminate/support`, `illuminate/validation` |
+| `zeroboiler/value-objects` | 1.0 | — | ValueObject integration for auto-instantiation and serialization |
+| Pest (dev) | 3.0 | — | Test framework — not required for production |
+| PHPStan (dev) | 2.0 | — | Static analysis — targets level 9 |
+
+**PHP 8.5 Feature Usage:**
+
+| Feature | Where Used | Purpose |
+|---------|-----------|---------|
+| `readonly` promoted properties | All DTO classes, `DataTransferObject` | Language-level immutability |
+| `Attribute` | All 30+ validation/metadata attributes | PHP 8 attribute system |
+| `match` expressions | `DtoMetadataResolver`, `DataTransferObject::castValue()` | Type-safe pattern matching |
+| `named arguments` | Attribute constructors, `fromArray()`, `with()` | Explicit parameter naming |
+| `first-class callable syntax` | `DtoCollection::map()`, `filter()` | `array_map(fn ..., $items)` |
+| `#[Override]` | Service provider, `DTOCast`, DTO contracts | Explicit interface/parent implementation |
+| `array_is_list` | `DataTransferObject::fromJson()` | Sequential array detection |
+| `array_any` | `OpenApiSchemaGenerator::hasAttribute()` | Predicate-based array search |
+
+**Laravel Compatibility:**
+
+The package uses only stable Laravel contracts (`CastsAttributes`, `ValidationRule`,
+`ServiceProvider`, `Facade`, `Validator`). No bleeding-edge or internal APIs are
+used, ensuring forward compatibility with future Laravel releases.
+
 ## License
 
 Proprietary — © ZeroBoiler

@@ -4,6 +4,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- `SECURITY.md` — Security policy with supported versions, reporting process, and security considerations
+- Compatibility Matrix section in README (PHP/Laravel versions, feature usage table)
+
 ### Changed
 - Improved `with()` docblock — added explicit `@deprecated` tag for `$validate` parameter, documented `@throws`
 - Enriched README with Internal Components section (DtoMetadataResolver, OpenApiSchemaGenerator, Class Structure)
