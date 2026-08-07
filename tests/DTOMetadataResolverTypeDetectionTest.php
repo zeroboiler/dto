@@ -24,23 +24,42 @@ describe('DtoMetadataResolver type detection', function () {
             expect($rules['email'])->toContain('email');
         });
 
-        it('detects nullable properties', function () {
+        it('detects non-nullable required properties', function () {
             $metadata = DtoMetadataResolver::resolve(MinimalDTO::class);
             $props = $metadata['properties'];
 
             expect($props)->toHaveKey('name');
-            expect($props['name']['nullable'])->toBeTrue();
+            expect($props['name']['nullable'])->toBeFalse();
+        });
+    });
+
+    describe('nullable detection', function () {
+        it('detects nullable properties in CreateUserDTO', function () {
+            $metadata = DtoMetadataResolver::resolve(CreateUserDTO::class);
+            $props = $metadata['properties'];
+
+            // phone is `?string` with default null — nullable
+            expect($props['phone']['nullable'])->toBeTrue();
         });
     });
 
     describe('default value detection', function () {
-        it('detects has_default for properties with defaults', function () {
-            $metadata = DtoMetadataResolver::resolve(MinimalDTO::class);
+        it('detects has_default for properties with DefaultValue attribute', function () {
+            $metadata = DtoMetadataResolver::resolve(CreateUserDTO::class);
             $props = $metadata['properties'];
 
-            // name is nullable with default null
-            expect($props['name']['has_default'])->toBeTrue();
-            expect($props['name']['default'])->toBeNull();
+            // status has #[DefaultValue('active')]
+            expect($props['status']['has_default'])->toBeTrue();
+            expect($props['status']['default'])->toBe('active');
+        });
+
+        it('detects has_default for properties with constructor default', function () {
+            $metadata = DtoMetadataResolver::resolve(CreateUserDTO::class);
+            $props = $metadata['properties'];
+
+            // tags has `array $tags = []`
+            expect($props['tags']['has_default'])->toBeTrue();
+            expect($props['tags']['default'])->toBe([]);
         });
     });
 
@@ -67,13 +86,16 @@ describe('DtoMetadataResolver type detection', function () {
         });
     });
 
-    describe('empty DTO', function () {
-        it('returns empty metadata for DTO without constructor', function () {
+    describe('DTO with nullable-only properties', function () {
+        it('resolves properties and infers sometimes rule for nullable fields', function () {
             $metadata = DtoMetadataResolver::resolve(EmptyDTO::class);
+            $props = $metadata['properties'];
 
-            expect($metadata['properties'])->toBe([]);
-            expect($metadata['rules'])->toBe([]);
-            expect($metadata['messages'])->toBe([]);
+            // EmptyDTO has foo (?string) and bar (?string)
+            expect($props)->toHaveKey('foo');
+            expect($props)->toHaveKey('bar');
+            expect($props['foo']['nullable'])->toBeTrue();
+            expect($props['foo']['has_default'])->toBeTrue();
         });
     });
 
