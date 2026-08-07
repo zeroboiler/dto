@@ -23,6 +23,11 @@ use ZeroBoiler\DTO\DataTransferObject;
  *   DTO::schema(CreateUserDTO::class);
  *
  * @see \ZeroBoiler\DTO\DTOManager For the underlying singleton implementation
+ *
+ * @method static array<string, mixed> validate(string $dtoClass, array<string, mixed> $data) Validate data against a DTO class.
+ * @method static \ZeroBoiler\DTO\DataTransferObject make(string $dtoClass, array<string, mixed> $data) Create a DTO instance from data.
+ * @method static \ZeroBoiler\DTO\DataTransferObject makeFromJson(string $dtoClass, string $json) Create a DTO instance from a JSON string.
+ * @method static array<string, mixed> schema(string $dtoClass) Generate OpenAPI schema for a DTO class.
  */
 final class DTO extends Facade
 {
