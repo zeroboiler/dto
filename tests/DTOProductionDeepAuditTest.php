@@ -378,7 +378,7 @@ describe('DTO Hydration Pipeline Edge Cases', function () {
     });
 
     it('fromJson with invalid JSON throws DTOException', function () {
-        expect(fn () => AllConstraintsDTO::fromJson('not valid json{'))
+        expect(fn () => AllConstraintsDTO::fromJson('{not valid json'))
             ->toThrow(DTOException::class);
     });
 
