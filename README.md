@@ -1054,17 +1054,17 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **60+ test files** covering:
+The test suite includes **65+ test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
 | **Core** | `DTOTest`, `DataTransferObjectTest` | `fromArray()`, `fromRequest()`, `fromJson()`, `toArray()`, `toJson()` |
-| **Serialization** | `SelectiveOutputTest`, `DTOJsonAndEmptyTest` | `only()`, `except()`, `allValues()`, `isEmpty()`, `isNotEmpty()` |
+| **Serialization** | `SelectiveOutputTest`, `DTOJsonAndEmptyTest`, `DTOStateAndEdgeCaseTest` | `only()`, `except()`, `allValues()`, `isEmpty()`, `isNotEmpty()`, state checks |
 | **Immutability** | Various | `with()`, `equals()`, readonly enforcement |
 | **Partial Updates** | `PartialUpdateTest` | `fromPartialArray()`, `fromPartialRequest()`, `validatePartialArray()` |
 | **Validation** | `WithValidationTest`, `ValidationExecutionTest`, `ConstraintCompositeTest` | Attribute rules, custom messages, composite rules |
 | **Nested DTOs** | `NestedDtoAndValidationTest` | Auto-hydration, recursive `toArray()` |
-| **Collections** | `DtoCollectionTest`, `DtoCollectionComprehensiveTest` | `pluck()`, `pluckKey()`, `map()`, `filter()`, `push()` |
+| **Collections** | `DtoCollectionTest`, `DtoCollectionComprehensiveTest`, `DtoCollectionPluckAndHelpersTest` | `pluck()`, `pluckKey()`, `map()`, `filter()`, `push()`, `offsetUnset`, `jsonSerialize` |
 | **Value Objects** | `ValueObjectIntegrationTest` | Auto-instantiation, serialization to primitives |
 | **Enum Integration** | `EnumRoundtripTest` | Backed enum casting and roundtrip |
 | **JSON** | `InvalidJsonCastTest`, `ArrayCastEdgeCasesTest` | JSON decode errors, sequential array rejection |
