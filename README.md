@@ -1055,7 +1055,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **65+ test files** covering:
+The test suite includes **66+ test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
@@ -1074,7 +1074,7 @@ The test suite includes **65+ test files** covering:
 | **CLI** | `ConsoleCommandsTest` | `dto-test` and `dto-schema` commands |
 | **Edge Cases** | `DTOEdgeCasesAndStanTest`, `DTOComprehensiveEdgeCaseTest` | Empty DTOs, union types, action-scoped rules |
 | **PHPStan** | `DTOPhpStanComplianceTest`, `DTOStanComplianceTest`, `PhpStanCleanTest` | No mixed types, strict comparisons |
-| **Fixtures** | `CreateUserDTO`, `AddressDTO`, `OrderDTO`, `ProductDTO`, etc. | Various DTO patterns and configurations |
+| **Fixtures** | `CreateUserDTO`, `AddressDTO`, `OrderDTO`, `ProductDTO`, `MixedAttributesDTO`, `DeepNestedDTO`, etc. | Various DTO patterns and configurations |
 
 ## Contributing
 
