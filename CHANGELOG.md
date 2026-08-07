@@ -8,6 +8,7 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - `CONTRIBUTING.md` — Contribution guide with code standards, development setup, quality checks, architecture overview, and PR process
 - `SECURITY.md` — Security policy with supported versions, reporting process, and security considerations
 - Compatibility Matrix section in README (PHP/Laravel versions, feature usage table)
+- `DTOProductionDeepAuditTest` — Comprehensive deep audit test covering all 30+ validation attributes (Email, Pattern, Boolean, Uuid, In, StartsWith, EndsWith, Size, ArrayRule, Distinct, Present, Prohibited, Sometimes, Json, Nullable, Confirmed, Different, Same, Accepted, Declined, RequiredIf, MapFrom, Hidden, Cast, DefaultValue), hydration pipeline edge cases (fromJson invalid JSON, nested array, collection), partial update semantics, serialization edge cases (toJson, equals, only, except, with), isEmpty/isNotEmpty, rules inference, metadata cache flush, exception factories, and DtoCollection edge cases (filter, map, offsetUnset re-index, type guard)
 
 ### Changed
 - Improved `with()` docblock — added explicit `@deprecated` tag for `$validate` parameter, documented `@throws`
