@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as integer.
  *
  *   #[Integer]
- *   public readonly string $age;
+ *   public readonly int $age;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Integer implements ValidationAttribute

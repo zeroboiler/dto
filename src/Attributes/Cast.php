@@ -17,7 +17,7 @@ use Attribute;
  * 'boolean', 'bool', 'array', 'date', 'datetime'.
  *
  *   #[Cast('integer')]
- *   public readonly int|float $min, $count;
+ *   public readonly int $count;
  *
  *   #[Cast('float')]
  *   public float $price;
