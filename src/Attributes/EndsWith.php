@@ -21,7 +21,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class EndsWith implements ValidationAttribute
 {
     /**
-     * @param  string|array<int, string>  $suffix
+     * @param  string|array<int, string>  $suffix  Required suffix or list of suffixes
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         public readonly string|array $suffix,

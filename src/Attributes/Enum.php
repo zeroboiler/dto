@@ -23,7 +23,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Enum implements ValidationAttribute
 {
     /**
-     * @param  class-string<\BackedEnum>  $enumClass
+     * @param  class-string<\\BackedEnum>  $enumClass  The enum class to validate against
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The selected :attribute is invalid.'
      */
     public function __construct(
         public readonly string $enumClass,

@@ -25,7 +25,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class In implements ValidationAttribute
 {
     /**
-     * @param  array<int, string|int>  $values
+     * @param  array<int, string|int>  $values  List of allowed values
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         public readonly array $values,

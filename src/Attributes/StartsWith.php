@@ -24,7 +24,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class StartsWith implements ValidationAttribute
 {
     /**
-     * @param  string|array<int, string>  $prefix
+     * @param  string|array<int, string>  $prefix  Required prefix or list of prefixes
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         public readonly string|array $prefix,

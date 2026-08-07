@@ -25,6 +25,7 @@ final class RequiredWithout implements ValidationAttribute
 
     /**
      * @param  string|array<int, string>  $fields  Field names; required if ANY is absent.
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         string|array $fields,

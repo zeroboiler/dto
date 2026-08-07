@@ -28,7 +28,8 @@ use ZeroBoiler\DTO\DataTransferObject;
 final class Collection implements ValidationAttribute
 {
     /**
-     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  class-string<DataTransferObject>  $dtoClass  The DTO class for each collection element
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         public readonly string $dtoClass,

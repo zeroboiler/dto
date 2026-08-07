@@ -25,6 +25,7 @@ final class RequiredWith implements ValidationAttribute
 
     /**
      * @param  string|array<int, string>  $fields  Field name(s); required if ANY is present.
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         string|array $fields,

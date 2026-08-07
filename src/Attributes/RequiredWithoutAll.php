@@ -24,7 +24,8 @@ final class RequiredWithoutAll implements ValidationAttribute
     public readonly array $fields;
 
     /**
-     * @param  string|array<int, string>  $fields
+     * @param  string|array<int, string>  $fields  Field name(s); required if ALL are absent.
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         string|array $fields = [],

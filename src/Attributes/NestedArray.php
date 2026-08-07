@@ -25,7 +25,8 @@ use ZeroBoiler\DTO\DataTransferObject;
 final class NestedArray implements ValidationAttribute
 {
     /**
-     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  class-string<DataTransferObject>  $dtoClass  The DTO class for each array element
+     * @param  string|null  $message  Custom validation message
      */
     public function __construct(
         public readonly string $dtoClass,
@@ -38,3 +39,4 @@ final class NestedArray implements ValidationAttribute
         return 'array';
     }
 }
+
