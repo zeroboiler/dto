@@ -908,6 +908,132 @@ A: Yes. Union types (e.g., `string|int`) are supported for hydration. For OpenAP
 
 See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 
+## Internal Components
+
+### DtoMetadataResolver
+
+The `DtoMetadataResolver` reads constructor parameters via reflection, detects
+attribute types (ValueObject, BackedEnum, nested DTO), infers base validation
+rules from PHP types, and collects validation attribute rules. Results are
+cached by `DataTransferObject::resolveMetadata()` with TTL-based invalidation.
+
+```php
+use ZeroBoiler\DTO\Support\DtoMetadataResolver;
+
+$metadata = DtoMetadataResolver::resolve(CreateUserDTO::class);
+// Returns:
+// [
+//     'properties' => [
+//         'email' => ['map_from' => null, 'default' => null, 'has_default' => false, ...],
+//         ...
+//     ],
+//     'rules' => [
+//         'email' => ['required', 'email'],
+//         'name'  => ['required', 'min:2', 'max:50'],
+//     ],
+//     'messages' => [],
+// ]
+```
+
+Direct usage is typically only needed for custom tooling or extensions.
+The resolver automatically detects:
+- **ValueObject** types (from `zeroboiler/value-objects`)
+- **BackedEnum** types for auto-casting and validation rule generation
+- **Nested DTO** types for recursive hydration
+- **Union types** with special handling for each member
+
+### OpenApiSchemaGenerator
+
+Generates OpenAPI 3.0 schemas from DTO class definitions with full support for:
+
+- Scalar types (`string`, `int`, `float`, `bool`)
+- Nullable properties (`nullable: true`)
+- Validation constraints (`minimum`, `maximum`, `minLength`, `maxLength`, `pattern`, `format`)
+- Enum constraints (`enum: [values]`)
+- Nested DTOs (`$ref` to component schemas)
+- Union types (`oneOf` schemas)
+- ValueObject types (inferred from `columnType()`)
+- Required field detection (from type nullability, defaults, and `#[Required]`)
+
+```php
+use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
+
+// Basic schema (no nested DTOs)
+$schema = OpenApiSchemaGenerator::generate(CreateUserDTO::class);
+
+// With component schemas for nested DTOs
+$result = OpenApiSchemaGenerator::generateWithComponents(OrderDTO::class);
+// ['schema' => [...], 'components' => ['schemas' => ['AddressDTO' => [...]]]]
+```
+
+### Class Structure
+
+```
+src/
+├── Attributes/
+│   ├── Required.php       #[Required]              — Required field
+│   ├── Email.php          #[Email]                  — Email validation
+│   ├── Max.php            #[Max(255)]               — Maximum length/value
+│   ├── Min.php            #[Min(2)]                 — Minimum length/value
+│   ├── Pattern.php        #[Pattern('/regex/')]     — Regex pattern
+│   ├── Enum.php           #[Enum(Status::class)]    — Backed enum validation
+│   ├── In.php             #[In(['a', 'b'])]         — Whitelist values
+│   ├── Url.php            #[Url]                    — URL validation
+│   ├── Uuid.php           #[Uuid]                   — UUID validation
+│   ├── Between.php        #[Between(1, 10)]         — Range constraint
+│   ├── Boolean.php        #[Boolean]                — Boolean validation
+│   ├── Integer.php        #[Integer]                — Integer validation
+│   ├── Numeric.php        #[Numeric]                — Numeric validation
+│   ├── Date.php           #[Date] / #[Date('Y-m-d')] — Date validation
+│   ├── StartsWith.php     #[StartsWith('prefix')]   — Prefix constraint
+│   ├── EndsWith.php       #[EndsWith('suffix')]     — Suffix constraint
+│   ├── Json.php           #[Json]                   — JSON string validation
+│   ├── Accepted.php       #[Accepted]               — Must be accepted
+│   ├── Declined.php       #[Declined]               — Must be declined
+│   ├── Confirmed.php      #[Confirmed]              — Confirmation field
+│   ├── Distinct.php       #[Distinct]               — Unique array elements
+│   ├── Prohibited.php     #[Prohibited]             — Must not be present
+│   ├── Present.php        #[Present]                — Must be present
+│   ├── Sometimes.php      #[Sometimes]              — Validate only if present
+│   ├── Nullable.php       #[Nullable]               — Allows null
+│   ├── Same.php           #[Same('field')]           — Must match another field
+│   ├── Different.php      #[Different('field')]     — Must differ from field
+│   ├── RequiredIf.php     #[RequiredIf('field', val)] — Conditional required
+│   ├── RequiredUnless.php #[RequiredUnless(...)]      — Conditional required
+│   ├── RequiredWith.php   #[RequiredWith('field')]   — Conditional required
+│   ├── RequiredWithAll.php #[RequiredWithAll(...)]   — Conditional required
+│   ├── RequiredWithout.php #[RequiredWithout(...)]   — Conditional required
+│   ├── RequiredWithoutAll.php #[RequiredWithoutAll(...)] — Conditional required
+│   ├── ArrayRule.php      #[ArrayRule] / #[ArrayRule(min:1, max:10)] — Array constraint
+│   ├── Size.php           #[Size(5)]                — Exact size constraint
+│   ├── Cast.php           #[Cast('integer')]         — Type casting during hydration
+│   ├── MapFrom.php        #[MapFrom('source_key')]  — Source key aliasing
+│   ├── Hidden.php         #[Hidden]                 — Exclude from serialization
+│   ├── DefaultValue.php   #[DefaultValue('active')] — Default when missing
+│   ├── NestedArray.php    #[NestedArray(DTO::class)] — Array of nested DTOs
+│   └── Collection.php     #[Collection(DTO::class)]  — DtoCollection of DTOs
+├── Casts/
+│   └── DTOCast.php        — Eloquent cast for DTO ↔ JSON
+├── Console/Commands/
+│   ├── MakeDtoTestCommand.php  — Test generation CLI
+│   └── MakeDtoSchemaCommand.php — OpenAPI schema CLI
+├── Contracts/
+│   ├── FromRequestDTO.php     — Hydration from HTTP request
+│   ├── ValidatableDTO.php     — Validation rules contract
+│   └── ValidationAttribute.php — Validation attribute contract
+├── Exceptions/
+│   └── DTOException.php   — Named constructors for DTO errors
+├── Facades/
+│   └── DTO.php            — Laravel facade for DTOManager
+├── Support/
+│   ├── DtoMetadataResolver.php     — Reflection-based metadata resolution
+│   └── OpenApiSchemaGenerator.php  — OpenAPI 3.0 schema generation
+├── DataTransferObject.php — Abstract base class with all public API
+├── DtoCollection.php      — Type-safe collection of DTO instances
+├── DTOManager.php         — Runtime DTO helper (facade-backed)
+└── DTOSServiceProvider.php — Auto-discovery service provider
+```
+
 ## Testing
 
 ```bash
@@ -925,6 +1051,29 @@ composer ci
 ```
 
 All checks must pass before merging. The package targets PHPStan level 9 with a clean baseline (zero suppressed errors).
+
+### Test Coverage
+
+The test suite includes **60+ test files** covering:
+
+| Category | Tests | What's Covered |
+|----------|-------|----------------|
+| **Core** | `DTOTest`, `DataTransferObjectTest` | `fromArray()`, `fromRequest()`, `fromJson()`, `toArray()`, `toJson()` |
+| **Serialization** | `SelectiveOutputTest`, `DTOJsonAndEmptyTest` | `only()`, `except()`, `allValues()`, `isEmpty()`, `isNotEmpty()` |
+| **Immutability** | Various | `with()`, `equals()`, readonly enforcement |
+| **Partial Updates** | `PartialUpdateTest` | `fromPartialArray()`, `fromPartialRequest()`, `validatePartialArray()` |
+| **Validation** | `WithValidationTest`, `ValidationExecutionTest`, `ConstraintCompositeTest` | Attribute rules, custom messages, composite rules |
+| **Nested DTOs** | `NestedDtoAndValidationTest` | Auto-hydration, recursive `toArray()` |
+| **Collections** | `DtoCollectionTest`, `DtoCollectionComprehensiveTest` | `pluck()`, `pluckKey()`, `map()`, `filter()`, `push()` |
+| **Value Objects** | `ValueObjectIntegrationTest` | Auto-instantiation, serialization to primitives |
+| **Enum Integration** | `EnumRoundtripTest` | Backed enum casting and roundtrip |
+| **JSON** | `InvalidJsonCastTest`, `ArrayCastEdgeCasesTest` | JSON decode errors, sequential array rejection |
+| **OpenAPI** | `OpenApiSchemaTest`, `OpenApiNestedAndUnionTest` | Schema generation, `$ref`, `oneOf` |
+| **Eloquent** | `DTOCastTest`, `DTOCastValidationTest` | get/set/serialize with type validation |
+| **CLI** | `ConsoleCommandsTest` | `dto-test` and `dto-schema` commands |
+| **Edge Cases** | `DTOEdgeCasesAndStanTest`, `DTOComprehensiveEdgeCaseTest` | Empty DTOs, union types, action-scoped rules |
+| **PHPStan** | `DTOPhpStanComplianceTest`, `DTOStanComplianceTest`, `PhpStanCleanTest` | No mixed types, strict comparisons |
+| **Fixtures** | `CreateUserDTO`, `AddressDTO`, `OrderDTO`, `ProductDTO`, etc. | Various DTO patterns and configurations |
 
 ## Contributing
 

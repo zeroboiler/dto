@@ -2,6 +2,12 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Enriched README with Internal Components section (DtoMetadataResolver, OpenApiSchemaGenerator, Class Structure)
+- Added Test Coverage table to README documenting 60+ test files across all categories
+
 ## [1.1.0] - 2026-08-06
 
 ### Changed
