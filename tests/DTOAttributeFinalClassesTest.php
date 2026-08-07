@@ -6,8 +6,6 @@
 
 declare(strict_types=1);
 
-namespace ZeroBoiler\DTO\Tests\Attributes;
-
 use Attribute;
 use ZeroBoiler\DTO\Attributes\Accepted;
 use ZeroBoiler\DTO\Attributes\ArrayRule;
