@@ -5,6 +5,7 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Changed
+- Improved `with()` docblock — added explicit `@deprecated` tag for `$validate` parameter, documented `@throws`
 - Enriched README with Internal Components section (DtoMetadataResolver, OpenApiSchemaGenerator, Class Structure)
 - Added Test Coverage table to README documenting 60+ test files across all categories
 

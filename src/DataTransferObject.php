@@ -459,9 +459,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Create an immutable copy with the given overrides.
      *
      * Always validates the merged data to prevent invalid state (#2).
+     * The original DTO instance remains unchanged — a new instance is returned.
      *
-     * @param  array<string, mixed>  $overrides
-     * @param  bool  $validate  Deprecated: has no effect. Validation always runs to prevent invalid state.
+     * @param  array<string, mixed>  $overrides  Properties to merge into the DTO
+     * @param  bool  $validate  @deprecated Has no effect. Validation always runs to prevent invalid state.
+     *
+     * @throws ValidationException If the merged data fails validation
      */
     public function with(array $overrides, bool $validate = true): static
     {
