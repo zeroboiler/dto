@@ -177,9 +177,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * Get a type-appropriate empty value for a missing field.
      *
-     * Uses reflection on the constructor parameter to determine the type.
+     * Uses the cached property metadata from resolveMetadata() to avoid
+     * repeated reflection on every partial update. Falls back to
+     * cast type inference or reflection only as a last resort.
      *
-     * @param  array<string, mixed>  $propMeta
+     * @param  string  $paramName  Property name (for error messages)
+     * @param  bool  $nullable  Whether the property accepts null
+     * @param  array<string, mixed>  $propMeta  Cached property metadata
      */
     private static function emptyValueForType(string $paramName, bool $nullable, array $propMeta): mixed
     {
@@ -188,7 +192,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             return null;
         }
 
-        // Try to infer from cast type
+        // Try to infer from cast type (most common path)
         $cast = $propMeta['cast'] ?? null;
         if ($cast !== null) {
             return match ($cast) {
@@ -201,7 +205,18 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             };
         }
 
-        // Use reflection to get the type from the constructor parameter
+        // For known complex types (DTO, ValueObject, Enum, NestedArray, Collection),
+        // skip reflection — partial updates can't construct these without source data.
+        if ($propMeta['value_object_class'] !== null
+            || $propMeta['dto_class'] !== null
+            || $propMeta['enum_class'] !== null
+            || $propMeta['nested_array_class'] !== null
+            || $propMeta['collection_class'] !== null
+        ) {
+            return null;
+        }
+
+        // Use reflection to get the type from the constructor parameter (last resort)
         $reflection = new \ReflectionClass(static::class);
         $constructor = $reflection->getConstructor();
 
