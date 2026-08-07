@@ -17,7 +17,6 @@ describe('DataTransferObject isEmpty and state checks', function (): void {
             'status' => '',
         ], validate: false);
 
-        // status has default 'active', but we overrode it with ''
         expect($dto->isEmpty())->toBeTrue();
     });
 
@@ -48,27 +47,26 @@ describe('DataTransferObject isEmpty and state checks', function (): void {
         expect($nonEmpty->isNotEmpty())->toBeTrue();
     });
 
-    it('considers numeric zero as empty', function (): void {
-        // For DTOs with numeric properties, 0 should be considered empty
-        expect(true)->toBeTrue(); // placeholder — relies on DTO having numeric props
+    it('considers null properties as empty', function (): void {
+        $dto = EmptyDTO::fromArray([], validate: false);
+
+        // EmptyDTO has nullable properties with no defaults — all null
+        expect($dto->foo)->toBeNull();
+        expect($dto->bar)->toBeNull();
+        expect($dto->isEmpty())->toBeTrue();
     });
 
-    it('considers false boolean as empty', function (): void {
-        // isEmpty checks: value !== false
-        // If a DTO has a bool property set to false, it's considered empty
-        expect(true)->toBeTrue(); // placeholder
-    });
-
-    it('considers empty array as empty', function (): void {
+    it('considers default array values as empty when empty', function (): void {
         $dto = CreateUserDTO::fromArray([
             'email' => '',
             'name' => '',
+            'status' => '',
             'tags' => [],
         ], validate: false);
 
         // tags=[] is considered empty by isEmpty()
-        // But other fields may have defaults that count as empty
         expect($dto->tags)->toBe([]);
+        expect($dto->isEmpty())->toBeTrue();
     });
 });
 
