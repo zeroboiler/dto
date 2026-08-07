@@ -21,7 +21,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Pattern implements ValidationAttribute
 {
     public function __construct(
+        /** @param string $regex The regular expression pattern (with delimiters) */
         public readonly string $regex,
+        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 

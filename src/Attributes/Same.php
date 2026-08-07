@@ -21,7 +21,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Same implements ValidationAttribute
 {
     public function __construct(
+        /** @param string $field The field name to match */
         public readonly string $field,
+        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 

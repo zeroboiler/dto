@@ -21,7 +21,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Min implements ValidationAttribute
 {
     public function __construct(
-        public readonly int $value,
+        /** @param int|float $value Minimum value (numeric) or length (string) */
+        public readonly int|float $value,
+        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 

@@ -24,6 +24,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class ArrayRule implements ValidationAttribute
 {
     public function __construct(
+        /** @param int|null $min Minimum item count */
+        /** @param int|null $max Maximum item count */
+        /** @param string|null $message Custom validation message */
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?string $message = null,
