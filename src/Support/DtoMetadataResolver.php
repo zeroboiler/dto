@@ -568,7 +568,6 @@ final class DtoMetadataResolver
     private static function enumRuleKey(\Illuminate\Validation\Rules\Enum $rule): string
     {
         $ref = new \ReflectionProperty($rule, 'rule');
-        $ref->setAccessible(true);
         /** @var string|class-string<\BackedEnum> $enumClass */
         $enumClass = $ref->getValue($rule);
 

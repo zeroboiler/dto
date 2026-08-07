@@ -20,12 +20,18 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredUnless implements ValidationAttribute
 {
+    /**
+     * @param  string  $field  The name of the other field to check
+     * @param  mixed  $value  The value that exempts the requirement (string, int, bool, or array)
+     * @param  string|null  $message  Custom validation message
+     */
     public function __construct(
         public readonly string $field,
         public readonly mixed $value = null,
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('required_unless') */
     public function ruleKey(): string
     {
         return 'required_unless';

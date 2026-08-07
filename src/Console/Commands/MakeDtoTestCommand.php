@@ -66,7 +66,6 @@ final class MakeDtoTestCommand extends Command
             $formattedRules = array_map(static function (mixed $r): string {
                 if ($r instanceof \Illuminate\Validation\Rules\Enum) {
                     $ref = new \ReflectionProperty($r, 'rule');
-                    $ref->setAccessible(true);
                     $enumClass = $ref->getValue($r);
 
                     return "'enum:'.{$enumClass}::class";

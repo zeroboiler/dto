@@ -499,6 +499,10 @@ final class OpenApiSchemaGenerator
 
     /**
      * Check if a reflection property has a given attribute.
+     *
+     * @param  \ReflectionProperty|null  $prop  The property to check, or null if the property doesn't exist
+     * @param  string  $attributeClass  The fully-qualified attribute class name
+     * @return bool True if the property has the attribute
      */
     private static function hasAttribute(?ReflectionProperty $prop, string $attributeClass): bool
     {
@@ -509,6 +513,14 @@ final class OpenApiSchemaGenerator
         return array_any($prop->getAttributes(), fn (\ReflectionAttribute $attr): bool => $attr->getName() === $attributeClass);
     }
 
+    /**
+     * Infer the OpenAPI type name from a PHP reflection type.
+     *
+     * Handles named types (including ValueObjects), union types,
+     * intersection types, and falls back to 'string' for unknown types.
+     *
+     * @return string OpenAPI type identifier ('string', 'integer', 'number', 'boolean', 'array', 'object')
+     */
     private static function inferType(?\ReflectionType $type): string
     {
         if ($type instanceof \ReflectionNamedType) {
