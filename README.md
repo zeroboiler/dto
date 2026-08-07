@@ -51,6 +51,8 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Bypass Validation (Advanced)](#bypass-validation-advanced)
   - [Custom Cast Types](#custom-cast-types)
 - [Testing](#testing)
+- [Full-Stack Example](#full-stack-example)
+- [Performance Considerations](#performance-considerations)
 - [Contributing](#contributing)
 
 ## Installation
@@ -904,6 +906,101 @@ A: `#[NestedArray(DTOClass::class)]` hydrates array elements as plain DTO instan
 
 **Q: Can I use union types in DTO properties?**
 A: Yes. Union types (e.g., `string|int`) are supported for hydration. For OpenAPI schemas, union types produce `oneOf` definitions.
+
+## Full-Stack Example
+
+A complete request lifecycle showing how DTOs integrate with controllers,
+services, and enums:
+
+```php
+// app/DTOs/UpdateProfileDTO.php
+use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Nullable;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class UpdateProfileDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Nullable, Max(255)]
+        public readonly ?string $bio = null,
+
+        #[Hidden]
+        public readonly ?string $password = null,
+    ) {}
+}
+
+// app/Http/Controllers/ProfileController.php
+class ProfileController extends Controller
+{
+    public function update(Request $request): JsonResponse
+    {
+        $dto = UpdateProfileDTO::fromRequest($request);
+
+        // Use DTO values directly — all validated
+        $user->update($dto->except('password')->toArray());
+
+        // Immutable update with specific overrides
+        $audit = $dto->with(['_audit_reason' => 'profile_update']);
+
+        return response()->json([
+            'user' => $dto->toArray(),
+        ]);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json([
+            'user' => $user->payload->toArray(),  // Eloquent DTO cast
+        ]);
+    }
+}
+
+// app/Models/User.php
+class User extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'payload' => UpdateProfileDTO::class,  // Auto cast JSON ↔ DTO
+            'status'  => UserStatus::class,        // ZeroBoiler Enum cast
+        ];
+    }
+}
+```
+
+## Performance Considerations
+
+| Operation | First Call | Subsequent Calls | Notes |
+|-----------|-----------|-----------------|-------|
+| `fromArray()` | Reflection + metadata build | O(1) hash lookup | Metadata cached per-class statically |
+| `fromArray()` with validation | + Validator instantiation | + Validator instantiation | Validation always runs unless explicitly disabled |
+| `toArray()` / `toJson()` | N property reads + normalization | Same | No caching — creates new array each call |
+| `fromPartialArray()` | Metadata lookup + partial validation | Same | Uses `sometimes` instead of `required` |
+| `DtoCollection::pluck()` | N × ReflectionProperty | N × ReflectionProperty | Uses reflection for PHPStan compatibility |
+| `fromJson()` | json_decode + fromArray | Same | Rejects sequential arrays |
+| `DTOCast::get()` | json_decode + fromArray | Same | Validation skipped for stored data |
+| `DTOCast::set()` | json_encode + optional validation | Same | Validates by default |
+
+**Tips for high-performance applications:**
+- Metadata is cached after the first `fromArray()` call — no reflection overhead on subsequent calls
+- For Octane/Swoole: the package auto-flushes metadata on `octane.terminate`
+- In `local`/`testing` environments, metadata TTL is set to 2 seconds for hot-reload support
+- Use `validate: false` for pre-validated data (e.g., reading from trusted storage)
+- `DtoCollection::pluck()` uses reflection — if you need maximum performance, use `$collection->map(fn($dto) => $dto->field)` instead
+- `with()` always validates — for performance-critical paths, batch updates via `fromArray()` with `validate: false` then validate manually
+- `toArray()` is called on every serialization — cache the result if used repeatedly
 
 ## Changelog
 
