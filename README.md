@@ -544,23 +544,43 @@ php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --json
 
 ### DTO Facade / Manager
 
+The `DTO` facade provides a runtime interface for DTO operations
+(validation, creation, JSON hydration, and OpenAPI schema generation)
+without directly calling static methods on DTO classes.
+Internally it delegates to the `DTOManager` singleton (registered via the
+service provider as `zeroboiler.dto`).
+
 ```php
 use ZeroBoiler\DTO\Facades\DTO;
 
-// Create a DTO from data
-$dto = DTO::make(CreateUserDTO::class, ['email' => 'test@example.com', 'name' => 'Doruk']);
+// Create a DTO from data (auto-validates)
+$dto = DTO::make(CreateUserDTO::class, [
+    'email' => 'test@example.com',
+    'name' => 'Doruk',
+]);
 
-// Validate data against a DTO class
-$validated = DTO::validate(CreateUserDTO::class, $data);
+// Validate data against a DTO class (without creating an instance)
+$validated = DTO::validate(CreateUserDTO::class, $rawData);
+// Returns validated data array, throws ValidationException on failure
 
 // Create a DTO from JSON string
 $dto = DTO::makeFromJson(CreateUserDTO::class, $jsonString);
+// Throws DTOException on invalid JSON, ValidationException on invalid data
 
-// Validate data (standalone, without creating DTO)
-$validated = DTO::validate(CreateUserDTO::class, $rawData);
-
-// Generate OpenAPI schema
+// Generate OpenAPI schema for API documentation
 $schema = DTO::schema(CreateUserDTO::class);
+// Returns OpenAPI 3.0 property schema array
+```
+
+The DTOManager can also be injected directly from the container:
+
+```php
+use ZeroBoiler\DTO\DTOManager;
+
+$manager = app(DTOManager::class);
+$dto = $manager->make(CreateUserDTO::class, $data);
+$validated = $manager->validate(CreateUserDTO::class, $data);
+$schema = $manager->schema(CreateUserDTO::class);
 ```
 
 ### OpenAPI Schema Generation
