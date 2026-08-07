@@ -647,7 +647,7 @@ DataTransferObject::flushMetadataCache();
 | `#[Between(min, max)]` | Value must be between min and max |
 | `#[Pattern('/regex/')]` | Must match regex |
 | `#[In(['a', 'b'])]` | Must be one of values |
-| `#[Enum(EnumClass::class)]` | Must be valid enum value |
+| `#[Enum(EnumClass::class)]` | Must be valid enum value (accepts `message` for custom error) |
 | `#[Integer]` | Must be integer |
 | `#[Numeric]` | Must be numeric |
 | `#[Boolean]` | Must be boolean |
@@ -672,8 +672,8 @@ DataTransferObject::flushMetadataCache();
 | `#[RequiredWithAll('f1', 'f2')]` | Required when all specified fields are present |
 | `#[RequiredWithout('field')]` | Required when another field is not present |
 | `#[RequiredWithoutAll('f1', 'f2')]` | Required when all specified fields are absent |
-| `#[ArrayRule]` | Must be an array |
-| `#[ArrayRule(min: 1, max: 10)]` | Array with 1–10 elements |
+| `#[ArrayRule]` | Must be an array (accepts `message`) |
+| `#[ArrayRule(min: 1, max: 10)]` | Array with 1–10 elements (accepts `message`) |
 
 ### Metadata Attributes
 
@@ -683,8 +683,8 @@ DataTransferObject::flushMetadataCache();
 | `#[MapFrom('source_key')]` | Map from different source key |
 | `#[Hidden]` | Exclude from `toArray()` / `toJson()` output |
 | `#[DefaultValue(value)]` | Default value when key is missing |
-| `#[NestedArray(DTOClass::class)]` | Hydrate array elements as nested DTO instances |
-| `#[Collection(DTOClass::class)]` | Hydrate as `DtoCollection` of DTO instances |
+| `#[NestedArray(DTOClass::class)]` | Hydrate array elements as nested DTO instances (accepts `message`) |
+| `#[Collection(DTOClass::class)]` | Hydrate as `DtoCollection` of DTO instances (accepts `message`) |
 
 All validation attributes accept an optional `message` parameter for custom error messages:
 
