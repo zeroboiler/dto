@@ -32,6 +32,7 @@ final class In implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('in') */
     public function ruleKey(): string
     {
         return 'in';

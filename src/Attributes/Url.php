@@ -24,6 +24,7 @@ final class Url implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('url') */
     public function ruleKey(): string
     {
         return 'url';

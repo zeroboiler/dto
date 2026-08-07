@@ -25,6 +25,7 @@ final class Same implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('same') */
     public function ruleKey(): string
     {
         return 'same';

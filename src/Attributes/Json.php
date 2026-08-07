@@ -24,6 +24,7 @@ final class Json implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('json') */
     public function ruleKey(): string
     {
         return 'json';

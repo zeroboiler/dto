@@ -25,6 +25,7 @@ final class Pattern implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('regex') */
     public function ruleKey(): string
     {
         return 'regex';

@@ -28,6 +28,7 @@ final class Size implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('size') */
     public function ruleKey(): string
     {
         return 'size';

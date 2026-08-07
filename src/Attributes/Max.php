@@ -25,6 +25,7 @@ final class Max implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('max') */
     public function ruleKey(): string
     {
         return 'max';

@@ -28,6 +28,7 @@ final class Date implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('date') */
     public function ruleKey(): string
     {
         return 'date';

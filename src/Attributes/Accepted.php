@@ -24,6 +24,7 @@ final class Accepted implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('accepted') */
     public function ruleKey(): string
     {
         return 'accepted';

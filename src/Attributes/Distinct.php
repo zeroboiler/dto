@@ -24,6 +24,7 @@ final class Distinct implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('distinct') */
     public function ruleKey(): string
     {
         return 'distinct';

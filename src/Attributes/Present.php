@@ -24,6 +24,7 @@ final class Present implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('present') */
     public function ruleKey(): string
     {
         return 'present';

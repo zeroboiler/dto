@@ -33,6 +33,7 @@ final class RequiredWithoutAll implements ValidationAttribute
         $this->fields = is_array($fields) ? $fields : [$fields];
     }
 
+    /** @return string The Laravel validation rule key ('required_without_all') */
     public function ruleKey(): string
     {
         return 'required_without_all';

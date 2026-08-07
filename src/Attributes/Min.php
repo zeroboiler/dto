@@ -25,6 +25,7 @@ final class Min implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
+    /** @return string The Laravel validation rule key ('min') */
     public function ruleKey(): string
     {
         return 'min';
