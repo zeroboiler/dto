@@ -5,6 +5,7 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Added
+- `CONTRIBUTING.md` — Contribution guide with code standards, development setup, quality checks, architecture overview, and PR process
 - `SECURITY.md` — Security policy with supported versions, reporting process, and security considerations
 - Compatibility Matrix section in README (PHP/Laravel versions, feature usage table)
 
