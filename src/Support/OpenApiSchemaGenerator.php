@@ -358,15 +358,16 @@ final class OpenApiSchemaGenerator
     /**
      * Apply a Min constraint as either minimum (numeric) or minLength (string).
      *
+     * @param  int|float  $value  Constraint value (kept as-is for numeric types, cast to int for string lengths)
      * @param  array<string, mixed>  $propSchema
      * @return array<string, mixed>
      */
-    private static function applyMinConstraint(int $value, array $propSchema): array
+    private static function applyMinConstraint(int|float $value, array $propSchema): array
     {
         if (self::isNumericType($propSchema)) {
             $propSchema['minimum'] = $value;
         } else {
-            $propSchema['minLength'] = $value;
+            $propSchema['minLength'] = (int) $value;
         }
 
         return $propSchema;
@@ -375,15 +376,16 @@ final class OpenApiSchemaGenerator
     /**
      * Apply a Max constraint as either maximum (numeric) or maxLength (string).
      *
+     * @param  int|float  $value  Constraint value (kept as-is for numeric types, cast to int for string lengths)
      * @param  array<string, mixed>  $propSchema
      * @return array<string, mixed>
      */
-    private static function applyMaxConstraint(int $value, array $propSchema): array
+    private static function applyMaxConstraint(int|float $value, array $propSchema): array
     {
         if (self::isNumericType($propSchema)) {
             $propSchema['maximum'] = $value;
         } else {
-            $propSchema['maxLength'] = $value;
+            $propSchema['maxLength'] = (int) $value;
         }
 
         return $propSchema;
@@ -392,14 +394,17 @@ final class OpenApiSchemaGenerator
     /**
      * Apply a Between constraint (both min and max) with type-aware mapping.
      *
+     * Preserves float values for numeric types (e.g. between 0.5 and 99.9)
+     * and casts to int for string types (e.g. between 1 and 255 characters).
+     *
      * @param  array<string, mixed>  $propSchema
      * @return array<string, mixed>
      */
     private static function applyBetweenConstraint(Between $between, array $propSchema): array
     {
-        $propSchema = self::applyMinConstraint((int) $between->min, $propSchema);
+        $propSchema = self::applyMinConstraint($between->min, $propSchema);
 
-        return self::applyMaxConstraint((int) $between->max, $propSchema);
+        return self::applyMaxConstraint($between->max, $propSchema);
     }
 
     /**
