@@ -13,15 +13,24 @@ use Attribute;
 /**
  * Map a source key (from request/array) to a differently-named DTO property.
  *
+ * When hydrating from an array or request, the resolver looks for the mapped
+ * key instead of the property name. Supports dot notation for nested keys.
+ *
  *   #[MapFrom('user_name')]
- *   public string $name;
+ *   public readonly ?string $name;
  *
  *   #[MapFrom('meta.phone')]
- *   public ?string $phone;
+ *   public readonly ?string $phone;
+ *
+ * The mapped key is also used for partial updates ({@see fromPartialArray()})
+ * and validation rule field matching.
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class MapFrom
 {
+    /**
+     * @param  string  $key  The source key name (supports dot notation for nested keys, e.g. 'meta.phone')
+     */
     public function __construct(
         public readonly string $key,
     ) {}

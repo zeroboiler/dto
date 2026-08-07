@@ -11,14 +11,21 @@ namespace ZeroBoiler\DTO\Attributes;
 use Attribute;
 
 /**
- * Exclude a property from toArray()/toJson() output.
+ * Exclude a property from public serialization output.
  *
  * Hidden properties are still accessible on the DTO instance itself
- * and included in allValues() output. Only the public serialization
- * methods (toArray, toJson, jsonSerialize) respect this attribute.
+ * and included in {@see DataTransferObject::allValues()} output.
+ * Only the public serialization methods ({@see DataTransferObject::toArray()},
+ * {@see DataTransferObject::toJson()}, {@see DataTransferObject::jsonSerialize()})
+ * respect this attribute.
  *
  *   #[Hidden]
- *   public string $password;
+ *   public readonly string $password;
+ *
+ * This attribute has no constructor parameters.
+ *
+ * @see MapFrom For source key aliasing (metadata attribute)
+ * @see Cast For type casting (metadata attribute)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Hidden {}
