@@ -417,6 +417,17 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Useful for detecting DTOs that carry no meaningful data
      * (e.g., in PATCH requests where nothing was provided).
      *
+     * A property is considered "empty" if it is:
+     * - `null` (for nullable properties or optional properties without a value)
+     * - An empty string `''`
+     * - An empty array `[]`
+     * - `false` (for boolean properties)
+     *
+     * Note: `0` and `0.0` are considered **non-empty** because they are
+     * valid, meaningful values (e.g., `$quantity = 0`, `$price = 0.0`).
+     * Only nullable properties treat `null` as empty; non-nullable int/float
+     * properties with value `0` are not considered empty.
+     *
      *   if ($dto->isEmpty()) { return; }
      */
     public function isEmpty(): bool
@@ -425,8 +436,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             /** @var mixed $value */
             $value = $this->{$name};
 
-            // Skip properties that have a non-null value
-            if ($value !== null && $value !== '' && $value !== 0 && $value !== 0.0 && $value !== false && $value !== []) {
+            // Non-nullable int/float with value 0 or 0.0 is NOT empty (it's a valid value)
+            if (! $prop['nullable'] && $value !== null && $value !== '' && $value !== false && $value !== []) {
+                return false;
+            }
+
+            // Nullable properties: null is empty, non-null scalars are not
+            if ($prop['nullable'] && $value !== null && $value !== '' && $value !== false && $value !== []) {
                 return false;
             }
         }
