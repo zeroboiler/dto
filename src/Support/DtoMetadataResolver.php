@@ -92,6 +92,24 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 final class DtoMetadataResolver
 {
     /**
+     * PHP builtin types that are never classes/interfaces/enums.
+     *
+     * @var list<string>
+     */
+    private const BUILTIN_TYPES = [
+        'int', 'float', 'string', 'bool', 'array', 'mixed', 'object',
+        'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent',
+    ];
+
+    /**
+     * Check if a type name is a PHP builtin.
+     */
+    private static function isBuiltinType(string $typeName): bool
+    {
+        return in_array($typeName, self::BUILTIN_TYPES, true);
+    }
+
+    /**
      * Resolve all metadata for a DTO class.
      *
      * Reads constructor parameters via reflection, detects attribute types
@@ -392,7 +410,7 @@ final class DtoMetadataResolver
     private static function checkValueObject(string $typeName): ?string
     {
         // Skip PHP scalar/builtin types
-        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+        if (self::isBuiltinType($typeName)) {
             return null;
         }
 
@@ -442,7 +460,7 @@ final class DtoMetadataResolver
      */
     private static function checkEnumClass(string $typeName): ?string
     {
-        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+        if (self::isBuiltinType($typeName)) {
             return null;
         }
 
@@ -493,7 +511,7 @@ final class DtoMetadataResolver
      */
     private static function checkDtoClass(string $typeName): ?string
     {
-        if (in_array($typeName, ['int', 'float', 'string', 'bool', 'array', 'mixed', 'object', 'callable', 'iterable', 'null', 'void', 'never', 'self', 'static', 'parent'], true)) {
+        if (self::isBuiltinType($typeName)) {
             return null;
         }
 
