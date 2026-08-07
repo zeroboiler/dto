@@ -15,6 +15,6 @@ final class DateCastDTO extends DataTransferObject
 {
     public function __construct(
         #[Cast('date')]
-        public readonly mixed $event_date = null,
+        public readonly ?\Carbon\Carbon $event_date = null,
     ) {}
 }
