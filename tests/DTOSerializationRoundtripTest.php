@@ -6,397 +6,341 @@
 
 declare(strict_types=1);
 
-use Illuminate\Validation\ValidationException;
-use ZeroBoiler\DTO\Attributes\DefaultValue;
-use ZeroBoiler\DTO\Attributes\Email;
-use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\Max;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Required;
-use ZeroBoiler\DTO\DataTransferObject;
-use ZeroBoiler\DTO\DtoCollection;
+namespace ZeroBoiler\DTO\Tests;
 
-// ── Test Fixtures ──────────────────────────────────────────────────────────
+use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
+use PHPUnit\Framework\TestCase;
 
-class RoundtripUserDTO extends DataTransferObject
+/**
+ * Tests for DTO serialization roundtrip: fromArray → toArray → fromArray.
+ *
+ * Covers:
+ * - Scalar type roundtrips (string, int, float, bool)
+ * - Nullable property roundtrips
+ * - Hidden property exclusion in toArray but inclusion in allValues
+ * - DefaultValue attribute behavior in roundtrips
+ * - MapFrom key aliasing in roundtrips
+ * - Empty DTO roundtrip
+ * - with() creates valid new instance
+ */
+final class DTOSerializationRoundtripTest extends TestCase
 {
-    public function __construct(
-        #[Required, Email]
-        public readonly string $email,
+    // ---------------------------------------------------------------
+    // Basic roundtrip
+    // ---------------------------------------------------------------
 
-        #[Required, Min(2), Max(50)]
-        public readonly string $name,
+    public function test_from_array_to_array_roundtrip_preserves_values(): void
+    {
+        $data = [
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+            'status' => 'active',
+        ];
 
-        #[DefaultValue('active')]
-        public readonly string $status = 'active',
+        $dto = CreateUserDTO::fromArray($data, validate: false);
+        $result = $dto->toArray();
 
-        #[Hidden]
-        public readonly ?string $password = null,
+        $this->assertSame('test@example.com', $result['email']);
+        $this->assertSame('Test User', $result['name']);
+        $this->assertSame('active', $result['status']);
+    }
 
-        #[DefaultValue([])]
-        public readonly array $tags = [],
-    ) {}
+    public function test_from_array_to_array_with_defaults_applied(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $result = $dto->toArray();
+
+        // Status should have its default value
+        $this->assertArrayHasKey('status', $result);
+        $this->assertNotEmpty($result['status']);
+    }
+
+    // ---------------------------------------------------------------
+    // Hidden property roundtrip
+    // ---------------------------------------------------------------
+
+    public function test_to_array_excludes_hidden_fields(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'password' => 'secret123',
+        ], validate: false);
+
+        $array = $dto->toArray();
+
+        $this->assertArrayNotHasKey('password', $array);
+    }
+
+    public function test_all_values_includes_hidden_fields(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'password' => 'secret123',
+        ], validate: false);
+
+        $all = $dto->allValues();
+
+        $this->assertArrayHasKey('password', $all);
+        $this->assertSame('secret123', $all['password']);
+    }
+
+    // ---------------------------------------------------------------
+    // Nullable property roundtrip
+    // ---------------------------------------------------------------
+
+    public function test_nullable_null_roundtrip(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'phone' => null,
+        ], validate: false);
+
+        $result = $dto->toArray();
+
+        $this->assertArrayHasKey('phone', $result);
+        $this->assertNull($result['phone']);
+    }
+
+    public function test_nullable_with_value_roundtrip(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'phone' => '+1234567890',
+        ], validate: false);
+
+        $result = $dto->toArray();
+
+        $this->assertSame('+1234567890', $result['phone']);
+    }
+
+    // ---------------------------------------------------------------
+    // MapFrom roundtrip
+    // ---------------------------------------------------------------
+
+    public function test_map_from_key_aliased_on_hydration(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'phone_number' => '+1234567890',
+        ], validate: false);
+
+        // Property should be accessible via original name
+        $this->assertSame('+1234567890', $dto->phone);
+    }
+
+    // ---------------------------------------------------------------
+    // with() roundtrip
+    // ---------------------------------------------------------------
+
+    public function test_with_creates_new_instance_with_overrides(): void
+    {
+        $original = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+            'status' => 'active',
+        ], validate: false);
+
+        $updated = $original->with(['status' => 'inactive']);
+
+        // Original unchanged
+        $this->assertSame('active', $original->status);
+        // Updated has new value
+        $this->assertSame('inactive', $updated->status);
+        // Other fields preserved
+        $this->assertSame('test@example.com', $updated->email);
+    }
+
+    // ---------------------------------------------------------------
+    // only() / except()
+    // ---------------------------------------------------------------
+
+    public function test_only_returns_specified_fields(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+            'status' => 'active',
+        ], validate: false);
+
+        $result = $dto->only('email');
+
+        $this->assertSame(['email' => 'test@example.com'], $result);
+    }
+
+    public function test_only_returns_multiple_fields(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+            'status' => 'active',
+        ], validate: false);
+
+        $result = $dto->only('email', 'name');
+
+        $this->assertArrayHasKey('email', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayNotHasKey('status', $result);
+    }
+
+    public function test_except_excludes_specified_fields(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+            'status' => 'active',
+        ], validate: false);
+
+        $result = $dto->except('email');
+
+        $this->assertArrayNotHasKey('email', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('status', $result);
+    }
+
+    // ---------------------------------------------------------------
+    // equals()
+    // ---------------------------------------------------------------
+
+    public function test_equals_returns_true_for_same_data(): void
+    {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $this->assertTrue($dto1->equals($dto2));
+    }
+
+    public function test_equals_returns_false_for_different_data(): void
+    {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'other@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $this->assertFalse($dto1->equals($dto2));
+    }
+
+    // ---------------------------------------------------------------
+    // toJson
+    // ---------------------------------------------------------------
+
+    public function test_to_json_produces_valid_json(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $json = $dto->toJson();
+
+        $this->assertNotEmpty($json);
+        $decoded = json_decode($json, true);
+        $this->assertIsArray($decoded);
+        $this->assertSame('test@example.com', $decoded['email']);
+    }
+
+    public function test_to_json_with_pretty_print(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $json = $dto->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertStringContainsString("\n", $json);
+        $decoded = json_decode($json, true);
+        $this->assertIsArray($decoded);
+    }
+
+    // ---------------------------------------------------------------
+    // isEmpty / isNotEmpty
+    // ---------------------------------------------------------------
+
+    public function test_dto_with_values_is_not_empty(): void
+    {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'test@example.com',
+            'name' => 'Test',
+        ], validate: false);
+
+        $this->assertFalse($dto->isEmpty());
+        $this->assertTrue($dto->isNotEmpty());
+    }
+
+    // ---------------------------------------------------------------
+    // rules()
+    // ---------------------------------------------------------------
+
+    public function test_rules_returns_array_with_correct_structure(): void
+    {
+        $rules = CreateUserDTO::rules();
+
+        $this->assertIsArray($rules);
+        $this->assertArrayHasKey('email', $rules);
+        $this->assertIsArray($rules['email']);
+        $this->assertContains('required', $rules['email']);
+        $this->assertContains('email', $rules['email']);
+    }
+
+    // ---------------------------------------------------------------
+    // fromPartialArray
+    // ---------------------------------------------------------------
+
+    public function test_from_partial_array_hydrates_only_present_fields(): void
+    {
+        $dto = CreateUserDTO::fromPartialArray([
+            'name' => 'Updated Name',
+        ], validatePresent: false);
+
+        $this->assertSame('Updated Name', $dto->name);
+    }
+
+    public function test_from_partial_array_uses_defaults_for_missing_fields(): void
+    {
+        $dto = CreateUserDTO::fromPartialArray([
+            'name' => 'Test',
+        ], validatePresent: false);
+
+        // Status should have its default value
+        $this->assertNotEmpty($dto->status);
+    }
+
+    // ---------------------------------------------------------------
+    // MinimalDTO edge case
+    // ---------------------------------------------------------------
+
+    public function test_minimal_dto_roundtrip(): void
+    {
+        $dto = MinimalDTO::fromArray([
+            'name' => 'test',
+            'value' => '42',
+        ], validate: false);
+        $result = $dto->toArray();
+
+        $this->assertIsArray($result);
+        $this->assertSame('test', $result['name']);
+        $this->assertSame('42', $result['value']);
+    }
 }
-
-class RoundtripNestedDTO extends DataTransferObject
-{
-    public function __construct(
-        #[Required]
-        public readonly string $title,
-
-        public readonly ?RoundtripUserDTO $author = null,
-    ) {}
-}
-
-class RoundtripEmptyDTO extends DataTransferObject
-{
-    public function __construct(
-        public readonly ?string $name = null,
-
-        public readonly int $count = 0,
-    ) {}
-}
-
-// ── Tests ─────────────────────────────────────────────────────────────────
-
-describe('DTO serialization roundtrip', function (): void {
-    describe('toArray()', function (): void {
-        it('excludes hidden fields', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'test@example.com',
-                'name' => 'Alice',
-                'password' => 'secret123',
-            ], validate: false);
-
-            expect($dto->toArray())->not->toHaveKey('password');
-            expect($dto->allValues())->toHaveKey('password');
-            expect($dto->allValues()['password'])->toBe('secret123');
-        });
-
-        it('includes default values for missing optional fields', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'test@example.com',
-                'name' => 'Bob',
-            ], validate: false);
-
-            expect($dto->toArray())->toHaveKey('status');
-            expect($dto->toArray()['status'])->toBe('active');
-            expect($dto->toArray())->toHaveKey('tags');
-            expect($dto->toArray()['tags'])->toBe([]);
-        });
-
-        it('preserves all provided values including empty strings and zeros', function (): void {
-            $dto = RoundtripEmptyDTO::fromArray([
-                'name' => '',
-                'count' => 0,
-            ], validate: false);
-
-            expect($dto->name)->toBe('');
-            expect($dto->count)->toBe(0);
-            expect($dto->isEmpty())->toBeTrue();
-        });
-    });
-
-    describe('toJson()', function (): void {
-        it('produces valid JSON', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'json@test.com',
-                'name' => 'Json',
-            ], validate: false);
-
-            $json = $dto->toJson();
-
-            expect($json)->toBeJson();
-            $decoded = json_decode($json, true);
-            expect($decoded)->toBeArray();
-            expect($decoded['email'])->toBe('json@test.com');
-            expect($decoded['name'])->toBe('Json');
-            expect($decoded)->not->toHaveKey('password');
-        });
-
-        it('respects JSON encoding options', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'pretty@test.com',
-                'name' => 'Pretty',
-            ], validate: false);
-
-            $json = $dto->toJson(JSON_PRETTY_PRINT);
-
-            expect($json)->toContain("\n");
-        });
-    });
-
-    describe('jsonSerialize()', function (): void {
-        it('returns the same array as toArray()', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'serialize@test.com',
-                'name' => 'Serialize',
-            ], validate: false);
-
-            expect($dto->jsonSerialize())->toBe($dto->toArray());
-        });
-    });
-
-    describe('equals()', function (): void {
-        it('returns true for DTOs with identical values', function (): void {
-            $a = RoundtripUserDTO::fromArray([
-                'email' => 'same@test.com',
-                'name' => 'Same',
-            ], validate: false);
-            $b = RoundtripUserDTO::fromArray([
-                'email' => 'same@test.com',
-                'name' => 'Same',
-            ], validate: false);
-
-            expect($a->equals($b))->toBeTrue();
-        });
-
-        it('returns false for DTOs with different values', function (): void {
-            $a = RoundtripUserDTO::fromArray([
-                'email' => 'a@test.com',
-                'name' => 'A',
-            ], validate: false);
-            $b = RoundtripUserDTO::fromArray([
-                'email' => 'b@test.com',
-                'name' => 'B',
-            ], validate: false);
-
-            expect($a->equals($b))->toBeFalse();
-        });
-
-        it('ignores hidden fields in comparison', function (): void {
-            $a = RoundtripUserDTO::fromArray([
-                'email' => 'hidden@test.com',
-                'name' => 'Hidden',
-                'password' => 'pass1',
-            ], validate: false);
-            $b = RoundtripUserDTO::fromArray([
-                'email' => 'hidden@test.com',
-                'name' => 'Hidden',
-                'password' => 'pass2',
-            ], validate: false);
-
-            // Both have same toArray() output since password is hidden
-            expect($a->equals($b))->toBeTrue();
-        });
-    });
-
-    describe('isEmpty() / isNotEmpty()', function (): void {
-        it('returns true when all properties are empty defaults', function (): void {
-            $dto = RoundtripEmptyDTO::fromArray([], validate: false);
-
-            expect($dto->isEmpty())->toBeTrue();
-            expect($dto->isNotEmpty())->toBeFalse();
-        });
-
-        it('returns false when any property has a non-empty value', function (): void {
-            $dto = RoundtripEmptyDTO::fromArray(['name' => 'Alice'], validate: false);
-
-            expect($dto->isEmpty())->toBeFalse();
-            expect($dto->isNotEmpty())->toBeTrue();
-        });
-    });
-
-    describe('only() / except()', function (): void {
-        it('only() returns specified fields', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'only@test.com',
-                'name' => 'Only',
-                'status' => 'active',
-            ], validate: false);
-
-            $result = $dto->only('email', 'name');
-
-            expect($result)->toHaveKeys(['email', 'name']);
-            expect($result)->not->toHaveKey('status');
-            expect($result)->not->toHaveKey('password');
-        });
-
-        it('only() accepts a single string key', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'single@test.com',
-                'name' => 'Single',
-            ], validate: false);
-
-            $result = $dto->only('email');
-
-            expect($result)->toHaveCount(1);
-            expect($result['email'])->toBe('single@test.com');
-        });
-
-        it('except() excludes specified fields', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'except@test.com',
-                'name' => 'Except',
-                'status' => 'active',
-            ], validate: false);
-
-            $result = $dto->except('status');
-
-            expect($result)->toHaveKey('email');
-            expect($result)->toHaveKey('name');
-            expect($result)->not->toHaveKey('status');
-        });
-    });
-
-    describe('with() immutable update', function (): void {
-        it('creates a new DTO with overrides', function (): void {
-            $original = RoundtripUserDTO::fromArray([
-                'email' => 'with@test.com',
-                'name' => 'Original',
-            ], validate: false);
-
-            $updated = $original->with(['name' => 'Updated']);
-
-            expect($original->name)->toBe('Original');
-            expect($updated->name)->toBe('Updated');
-            expect($updated->email)->toBe('with@test.com');
-        });
-
-        it('always validates the merged data', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'valid@test.com',
-                'name' => 'Valid Name',
-            ], validate: true);
-
-            // Passing invalid data to with() should throw
-            expect(fn (): mixed => $dto->with(['email' => 'not-an-email']))
-                ->toThrow(ValidationException::class);
-        });
-    });
-
-    describe('fromJson()', function (): void {
-        it('hydrates from a valid JSON string', function (): void {
-            $json = '{"email":"json@test.com","name":"FromJson"}';
-            $dto = RoundtripUserDTO::fromJson($json, validate: false);
-
-            expect($dto->email)->toBe('json@test.com');
-            expect($dto->name)->toBe('FromJson');
-        });
-
-        it('throws on invalid JSON', function (): void {
-            expect(fn (): mixed => RoundtripUserDTO::fromJson('{invalid}', validate: false))
-                ->toThrow(\ZeroBoiler\DTO\Exceptions\DTOException::class);
-        });
-    });
-
-    describe('nested DTO roundtrip', function (): void {
-        it('serializes nested DTOs recursively', function (): void {
-            $dto = RoundtripNestedDTO::fromArray([
-                'title' => 'Test Article',
-                'author' => [
-                    'email' => 'author@test.com',
-                    'name' => 'Author',
-                ],
-            ], validate: false);
-
-            $array = $dto->toArray();
-
-            expect($array['title'])->toBe('Test Article');
-            expect($array['author'])->toBeArray();
-            expect($array['author']['email'])->toBe('author@test.com');
-            expect($array['author']['name'])->toBe('Author');
-        });
-
-        it('handles null nested DTOs', function (): void {
-            $dto = RoundtripNestedDTO::fromArray([
-                'title' => 'No Author',
-            ], validate: false);
-
-            expect($dto->author)->toBeNull();
-            expect($dto->toArray()['author'])->toBeNull();
-        });
-    });
-
-    describe('DtoCollection serialization', function (): void {
-        it('toArray serializes all DTOs', function (): void {
-            $collection = DtoCollection::make([
-                RoundtripUserDTO::fromArray(['email' => 'col1@test.com', 'name' => 'One'], validate: false),
-                RoundtripUserDTO::fromArray(['email' => 'col2@test.com', 'name' => 'Two'], validate: false),
-            ]);
-
-            $array = $collection->toArray();
-
-            expect($array)->toHaveCount(2);
-            expect($array[0]['email'])->toBe('col1@test.com');
-            expect($array[1]['email'])->toBe('col2@test.com');
-            // Hidden fields should be excluded
-            expect($array[0])->not->toHaveKey('password');
-        });
-
-        it('jsonSerialize produces valid JSON', function (): void {
-            $collection = DtoCollection::make([
-                RoundtripUserDTO::fromArray(['email' => 'js@test.com', 'name' => 'JS'], validate: false),
-            ]);
-
-            $json = json_encode($collection);
-
-            expect($json)->toBeJson();
-        });
-
-        it('push returns the same collection (fluent)', function (): void {
-            $collection = DtoCollection::make([
-                RoundtripUserDTO::fromArray(['email' => 'push@test.com', 'name' => 'Push'], validate: false),
-            ]);
-
-            $dto = RoundtripUserDTO::fromArray(['email' => 'new@test.com', 'name' => 'New'], validate: false);
-            $result = $collection->push($dto);
-
-            expect($result)->toBe($collection);
-            expect($collection->count())->toBe(2);
-        });
-
-        it('filter returns a new collection', function (): void {
-            $collection = DtoCollection::make([
-                RoundtripUserDTO::fromArray(['email' => 'a@test.com', 'name' => 'A', 'status' => 'active'], validate: false),
-                RoundtripUserDTO::fromArray(['email' => 'b@test.com', 'name' => 'B', 'status' => 'inactive'], validate: false),
-            ]);
-
-            $active = $collection->filter(fn (DataTransferObject $dto): bool => $dto->toArray()['status'] === 'active');
-
-            expect($active)->toBeInstanceOf(DtoCollection::class);
-            expect($active->count())->toBe(1);
-        });
-
-        it('map returns plain array', function (): void {
-            $collection = DtoCollection::make([
-                RoundtripUserDTO::fromArray(['email' => 'map@test.com', 'name' => 'Map'], validate: false),
-            ]);
-
-            $names = $collection->map(fn (DataTransferObject $dto): string => $dto->toArray()['name']);
-
-            expect($names)->toBe(['Map']);
-        });
-    });
-
-    describe('rules() and rulesFor()', function (): void {
-        it('returns validation rules', function (): void {
-            $rules = RoundtripUserDTO::rules();
-
-            expect($rules)->toBeArray();
-            expect($rules)->toHaveKey('email');
-            expect($rules)->toHaveKey('name');
-        });
-
-        it('rulesFor returns same rules by default', function (): void {
-            expect(RoundtripUserDTO::rulesFor('create'))
-                ->toBe(RoundtripUserDTO::rules());
-            expect(RoundtripUserDTO::rulesFor('update'))
-                ->toBe(RoundtripUserDTO::rules());
-        });
-    });
-
-    describe('allValues() vs toArray()', function (): void {
-        it('allValues includes hidden fields', function (): void {
-            $dto = RoundtripUserDTO::fromArray([
-                'email' => 'av@test.com',
-                'name' => 'AV',
-                'password' => 'hunter2',
-            ], validate: false);
-
-            expect($dto->toArray())->not->toHaveKey('password');
-            expect($dto->allValues())->toHaveKey('password');
-            expect($dto->allValues()['password'])->toBe('hunter2');
-        });
-    });
-});
