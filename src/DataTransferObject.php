@@ -724,9 +724,40 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             'string' => is_scalar($value) ? (string) $value : (is_object($value) && method_exists($value, '__toString') ? (string) $value : ''),
             'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
             'array' => is_array($value) ? $value : self::decodeJsonArray(is_string($value) ? $value : '', $propertyName),
-            'date', 'datetime' => $value instanceof \DateTimeInterface ? $value : (is_string($value) || is_int($value) || is_float($value) ? new Carbon($value) : ($value === null ? null : throw new \InvalidArgumentException("Cannot cast value of type '".get_debug_type($value)."' to date/datetime for property '{$propertyName}'"))),
+            'date', 'datetime' => self::castToDate($value, $propertyName),
             default => $value,
         };
+    }
+
+    /**
+     * Cast a raw value to a Carbon instance.
+     *
+     * Passes through existing DateTimeInterface instances, parses
+     * strings/ints/floats via Carbon, returns null for null, and
+     * throws for unsupported types.
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @param  string  $propertyName  Property name for error messages
+     *
+     * @throws \InvalidArgumentException When the value cannot be cast to date/datetime
+     */
+    private static function castToDate(mixed $value, string $propertyName): ?Carbon
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value instanceof Carbon ? $value : Carbon::instance($value);
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_string($value) || is_int($value) || is_float($value)) {
+            return new Carbon($value);
+        }
+
+        throw new \InvalidArgumentException(
+            "Cannot cast value of type '".get_debug_type($value)."' to date/datetime for property '{$propertyName}'"
+        );
     }
 
     /**

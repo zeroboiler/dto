@@ -167,10 +167,21 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string|EnumRule>  $propRules
-     * @param  array<string, mixed>  $propMeta
-     * @param  array<string, string>  $messages
-     * @param  array<string, array<int, mixed>>  $extraRules
+     * Resolve all attributes on a property into metadata and validation rules.
+     *
+     * Iterates over all reflection attributes on the given property and:
+     * - Applies validation rules from {@see ValidationAttribute} implementations
+     * - Sets metadata flags (hidden, map_from, cast, nested_array_class, collection_class)
+     * - Sets default values from {@see DefaultValue} attributes
+     * - Collects custom validation messages keyed by rule name
+     * - Registers wildcard rules for composite attributes (e.g., Distinct → `field.*`)
+     *
+     * @param  ReflectionProperty  $propReflection  The property to inspect
+     * @param  array<string, mixed>  $propMeta  Property metadata (modified by reference)
+     * @param  list<string|EnumRule>  $propRules  Accumulated validation rules (modified by reference)
+     * @param  array<string, string>  $messages  Custom validation messages (modified by reference)
+     * @param  array<string, array<int, mixed>>  $extraRules  Wildcard rules for array elements (modified by reference)
+     * @param  string  $name  Property name for rule key generation
      */
     private static function resolveAttributes(
         ReflectionProperty $propReflection,
