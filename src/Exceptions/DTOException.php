@@ -12,6 +12,13 @@ use Exception;
 
 final class DTOException extends Exception
 {
+    /**
+     * Thrown when a property value cannot be cast to the target type.
+     *
+     * @param  string  $property  The property being cast
+     * @param  string  $type  The target cast type (e.g. 'integer', 'date')
+     * @param  mixed  $value  The value that failed casting
+     */
     public static function invalidCast(string $property, string $type, mixed $value): self
     {
         $typeStr = get_debug_type($value);

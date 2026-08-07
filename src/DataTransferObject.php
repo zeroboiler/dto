@@ -69,12 +69,24 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *
      * Called by the service provider when APP_ENV is local or testing.
      * Pass 0 to disable TTL-based invalidation (production default).
+     *
+     * @param  float  $seconds  Cache TTL in seconds (0 = disabled)
      */
     public static function setMetadataCacheTtl(float $seconds): void
     {
         self::$_metadataCacheTtl = $seconds;
     }
 
+    /**
+     * Flush metadata cache entries.
+     *
+     * When $class is provided, only that class's cache is cleared.
+     * When null (default), all cached metadata is cleared.
+     *
+     * Used by the service provider for Octane/Swoole cache flush.
+     *
+     * @param  string|null  $class  Specific class to flush, or null for all
+     */
     public static function flushMetadataCache(?string $class = null): void
     {
         if ($class !== null) {
@@ -260,9 +272,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
-     * Create DTO from a partial request (PATCH/PUT with sparse data).
+     * Create DTO from a partial HTTP request (PATCH semantics).
      *
-     * @throws ValidationException
+     * Only fields present in the request are validated and hydrated.
+     * Missing fields fall back to their default values or type-appropriate
+     * empty values when no default exists.
+     *
+     * @throws ValidationException If validation fails and $validate is true
      */
     public static function fromPartialRequest(Request $request, bool $validate = true): static
     {
@@ -270,7 +286,14 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
-     * @throws ValidationException
+     * Create DTO instance from an HTTP request.
+     *
+     * Delegates to {@see fromArray()} with the request's input data.
+     *
+     * @param  Request  $request  The HTTP request
+     * @param  bool  $validate  Run validation before hydration
+     *
+     * @throws ValidationException If validation fails and $validate is true
      */
     #[\Override]
     public static function fromRequest(Request $request, bool $validate = true): static
@@ -322,6 +345,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Convert all properties to array, including hidden fields.
+     *
+     * Unlike {@see toArray()}, this includes properties marked with #[Hidden].
+     * Useful for internal operations, debugging, and Eloquent cast serialization.
+     *
      * @return array<string, mixed>
      */
     public function allValues(): array
@@ -330,6 +358,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Convert all public (non-hidden) properties to an associative array.
+     *
+     * Properties marked with #[Hidden] are excluded from output.
+     * Nested DTOs, DtoCollections, ValueObjects, BackedEnums, and
+     * DateTimeInterface instances are recursively normalized to primitives.
+     *
      * @return array<string, mixed>
      */
     #[\Override]
@@ -338,6 +372,14 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         return $this->convertProperties(includeHidden: false);
     }
 
+    /**
+     * Serialize the DTO to a JSON string.
+     *
+     * Uses the same output as {@see toArray()} (hidden fields excluded).
+     *
+     * @param  int  $options  JSON encoding options (e.g. JSON_PRETTY_PRINT)
+     * @return string JSON string, empty string on encoding failure
+     */
     public function toJson(int $options = 0): string
     {
         $json = json_encode($this->jsonSerialize(), $options);
@@ -345,12 +387,25 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         return $json === false ? '' : $json;
     }
 
+    /**
+     * Serialize the DTO for json_encode().
+     *
+     * @return array<string, mixed> The toArray() output
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
 
+    /**
+     * Check if two DTOs have the same serialized output.
+     *
+     * Compares toArray() results — hidden fields are excluded from comparison.
+     * Two DTOs are "equal" if they produce the same public-facing array.
+     *
+     *   if ($dto1->equals($dto2)) { ... }
+     */
     public function equals(self $other): bool
     {
         return $this->toArray() === $other->toArray();
@@ -579,6 +634,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Convert DTO properties to an associative array.
+     *
+     * Iterates over all resolved properties and normalizes each value
+     * (hydrating nested DTOs, serializing ValueObjects, etc.).
+     *
+     * @param  bool  $includeHidden  Whether to include #[Hidden] properties
      * @return array<string, mixed>
      */
     private function convertProperties(bool $includeHidden): array
@@ -599,6 +660,15 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         return $result;
     }
 
+    /**
+     * Normalize a single property value for serialization.
+     *
+     * Handles DtoCollection, nested DataTransferObject, arrays (recursively),
+     * and delegates scalar normalization to {@see normalizeScalar()}.
+     *
+     * @param  mixed  $value  The raw property value
+     * @param  bool  $includeHidden  Whether nested DTOs should include hidden fields
+     */
     private function normalizeValue(mixed $value, bool $includeHidden): mixed
     {
         if ($value instanceof DtoCollection) {
@@ -631,6 +701,16 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         return $this->normalizeScalar($value);
     }
 
+    /**
+     * Normalize a scalar or object value to a JSON-serializable primitive.
+     *
+     * Handles ValueObject (toPrimitive/toArray), BackedEnum (value),
+     * UnitEnum (name), and DateTimeInterface (ATOM format).
+     * All other values pass through unchanged.
+     *
+     * @param  mixed  $value  The value to normalize
+     * @return mixed The normalized primitive value
+     */
     private function normalizeScalar(mixed $value): mixed
     {
         if ($value instanceof ValueObject) {
