@@ -55,6 +55,10 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 - [Full-Stack Example](#full-stack-example)
 - [Performance Considerations](#performance-considerations)
 - [Contributing](#contributing)
+- [Migration Guide](#migration-guide)
+  - [From Form Requests](#from-form-requests)
+  - [From Manual Array Casting](#from-manual-array-casting)
+  - [From Eloquent Accessors/Casts](#from-eloquent-accessorscasts)
 
 ## Installation
 
@@ -1439,6 +1443,141 @@ used, ensuring forward compatibility with future Laravel releases.
 ## License
 
 Proprietary — © ZeroBoiler
+
+## Migration Guide
+
+### From Form Requests
+
+If you're migrating from Laravel Form Requests with manual validation:
+
+**Before (Form Request):**
+
+```php
+class StoreUserRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'email'    => ['required', 'email', 'max:255'],
+            'name'     => ['required', 'string', 'min:2', 'max:50'],
+            'password' => ['required', 'string', 'min:8'],
+            'phone'    => ['nullable', 'string'],
+        ];
+    }
+}
+
+class UserController extends Controller
+{
+    public function store(StoreUserRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $user = User::create($validated);
+
+        return response()->json($user);
+    }
+}
+```
+
+**After (ZeroBoiler DTO):**
+
+```php
+class CreateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email, Max(255)]
+        public readonly string $email,
+
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[Required, Min(8)]
+        #[Hidden]
+        public readonly string $password,
+
+        public readonly ?string $phone = null,
+    ) {}
+}
+
+class UserController extends Controller
+{
+    public function store(Request $request): JsonResponse
+    {
+        $dto = CreateUserDTO::fromRequest($request);
+        $user = User::create($dto->toArray());
+
+        return response()->json([
+            'user' => $dto->except('password')->toArray(),
+        ]);
+    }
+}
+```
+
+Benefits of the DTO approach:
+- Validation rules live next to the data definition (single source of truth)
+- Hidden fields excluded from output automatically
+- Type-safe access (`$dto->email` is `string`, not `array-access`)
+- Reusable across controllers (API + web)
+- PATCH semantics via `fromPartialRequest()`
+- OpenAPI schema generation from the same class
+
+### From Manual Array Casting
+
+```php
+// Before — manual array DTO with no validation
+class UserDTO
+{
+    public function __construct(
+        public readonly string $email,
+        public readonly string $name,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self($data['email'], $data['name']);
+    }
+
+    public function toArray(): array
+    {
+        return ['email' => $this->email, 'name' => $this->name];
+    }
+}
+
+// After — ZeroBoiler handles hydration, validation, serialization
+class UserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+    ) {}
+}
+```
+
+### From Eloquent Accessors/Casts
+
+```php
+// Before — manual JSON casting + accessor logic
+class User extends Model
+{
+    protected $casts = ['metadata' => 'array'];
+
+    public function getMetadataAttribute($value): ?array
+    {
+        return is_string($value) ? json_decode($value, true) : $value;
+    }
+}
+
+// After — ZeroBoiler DTO cast (auto-validates on set)
+class User extends Model
+{
+    protected function casts(): array
+    {
+        return ['metadata' => UserMetadataDTO::class];
+    }
+}
+```
 
 ## Security
 
