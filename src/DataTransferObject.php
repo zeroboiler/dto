@@ -836,11 +836,38 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             'int', 'integer' => is_numeric($value) ? (int) $value : 0,
             'float', 'double' => is_numeric($value) ? (float) $value : 0.0,
             'string' => is_scalar($value) ? (string) $value : (is_object($value) && method_exists($value, '__toString') ? (string) $value : ''),
-            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+            'bool', 'boolean' => self::castToBool($value),
             'array' => is_array($value) ? $value : self::decodeJsonArray(is_string($value) ? $value : '', $propertyName),
             'date', 'datetime' => self::castToDate($value, $propertyName),
             default => $value,
         };
+    }
+
+    /**
+     * Cast a raw value to a boolean.
+     *
+     * Follows PHP's `filter_var(FILTER_VALIDATE_BOOLEAN)` semantics for
+     * string values ("1", "true", "on", "yes" → true; "0", "false", "off",
+     * "no", "" → false), with explicit handling for int, float, and null.
+     *
+     * @param  mixed  $value  Raw value from input data
+     * @return bool Always returns a strict boolean (never null)
+     */
+    private static function castToBool(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return $value !== 0 && $value !== 0.0;
+        }
+
+        if (is_string($value)) {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
+        return false;
     }
 
     /**

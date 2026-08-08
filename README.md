@@ -1217,6 +1217,13 @@ class User extends Model
 
 See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 
+## Version History
+
+| Version | Date | Highlights |
+|---------|------|------------|
+| 1.0.0 | 2025-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
+| 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
+
 ## Internal Components
 
 ### DtoMetadataResolver
@@ -1363,7 +1370,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **66+ test files** covering:
+The test suite includes **130+ test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
