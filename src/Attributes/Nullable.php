@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Explicitly allow the field to be null.
  *
  *   #[Nullable]
- *   public ?string $bio;
+ *   public readonly ?string $bio;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Nullable implements ValidationAttribute

@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Only run validation rules when the field is present in the input data.
  *
  *   #[Sometimes]
- *   public ?string $nickname;
+ *   public readonly ?string $nickname;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Sometimes implements ValidationAttribute

@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Maximum length/value constraint.
  *
  *   #[Max(255)]
- *   public string $name;
+ *   public readonly string $name;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Max implements ValidationAttribute

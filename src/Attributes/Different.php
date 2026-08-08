@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field's value to be different from another field's value.
  *
  *   #[Different('email')]
- *   public string $secondaryEmail;
+ *   public readonly string $secondaryEmail;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Different implements ValidationAttribute

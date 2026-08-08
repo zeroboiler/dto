@@ -15,10 +15,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a value has an exact size (length for strings, count for arrays).
  *
  *   #[Size(5)]
- *   public string $code;
+ *   public readonly string $code;
  *
  *   #[Size(3)]
- *   public array $items;
+ *   public readonly array $items;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Size implements ValidationAttribute

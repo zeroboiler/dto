@@ -15,10 +15,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a field is an array, optionally with min/max count.
  *
  *   #[ArrayRule]
- *   public array $tags;
+ *   public readonly array $tags;
  *
  *   #[ArrayRule(min: 1, max: 10)]
- *   public array $items;
+ *   public readonly array $items;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class ArrayRule implements ValidationAttribute

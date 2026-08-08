@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field's value to match another field's value.
  *
  *   #[Same('password')]
- *   public string $passwordRepeat;
+ *   public readonly string $passwordRepeat;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Same implements ValidationAttribute

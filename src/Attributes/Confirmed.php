@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require a matching `{field}_confirmation` field (e.g., password confirmation).
  *
  *   #[Confirmed]
- *   public string $password;
+ *   public readonly string $password;
  *
  * Validates that `password_confirmation` matches `password`.
  */

@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property against a regex pattern.
  *
  *   #[Pattern('/^[A-Z]{3}-\d{4}$/')]
- *   public string $code;
+ *   public readonly string $code;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Pattern implements ValidationAttribute

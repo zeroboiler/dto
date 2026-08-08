@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a string ends with the given suffix(es).
  *
  *   #[EndsWith('@company.com')]
- *   public string $workEmail;
+ *   public readonly string $workEmail;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class EndsWith implements ValidationAttribute

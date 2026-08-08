@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that the value is a valid JSON string.
  *
  *   #[Json]
- *   public string $metadata;
+ *   public readonly string $metadata;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Json implements ValidationAttribute

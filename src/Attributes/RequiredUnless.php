@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field unless another field equals a specific value.
  *
  *   #[RequiredUnless('type', 'company')]
- *   public ?string $firstName;
+ *   public readonly ?string $firstName;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredUnless implements ValidationAttribute

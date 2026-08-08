@@ -15,10 +15,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate that a string starts with the given prefix(es).
  *
  *   #[StartsWith('https://')]
- *   public string $url;
+ *   public readonly string $url;
  *
  *   #[StartsWith(['+90', '+1'])]
- *   public string $phone;
+ *   public readonly string $phone;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class StartsWith implements ValidationAttribute

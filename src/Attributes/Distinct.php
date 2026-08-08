@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require array elements to be distinct (no duplicates).
  *
  *   #[Distinct]
- *   public array $tags;
+ *   public readonly array $tags;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Distinct implements ValidationAttribute

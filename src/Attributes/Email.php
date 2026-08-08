@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as email.
  *
  *   #[Email]
- *   public string $email;
+ *   public readonly string $email;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Email implements ValidationAttribute

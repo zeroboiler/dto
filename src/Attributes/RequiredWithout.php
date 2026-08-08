@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field when any of the given fields are absent.
  *
  *   #[RequiredWithout(['email'])]
- *   public ?string $username;
+ *   public readonly ?string $username;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredWithout implements ValidationAttribute

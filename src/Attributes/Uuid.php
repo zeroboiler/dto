@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as UUID.
  *
  *   #[Uuid]
- *   public string $id;
+ *   public readonly string $id;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Uuid implements ValidationAttribute

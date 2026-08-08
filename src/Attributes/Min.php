@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Minimum length/value constraint.
  *
  *   #[Min(3)]
- *   public string $name;
+ *   public readonly string $name;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Min implements ValidationAttribute

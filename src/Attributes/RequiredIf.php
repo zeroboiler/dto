@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field only when another field equals a specific value.
  *
  *   #[RequiredIf('type', 'individual')]
- *   public ?string $firstName;
+ *   public readonly ?string $firstName;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredIf implements ValidationAttribute

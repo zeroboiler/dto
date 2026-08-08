@@ -15,10 +15,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as a date or date format.
  *
  *   #[Date]
- *   public string $birthDate;
+ *   public readonly string $birthDate;
  *
  *   #[Date(format: 'd-m-Y')]
- *   public string $birthDate;
+ *   public readonly string $birthDate;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Date implements ValidationAttribute

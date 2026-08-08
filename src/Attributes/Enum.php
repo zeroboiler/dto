@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property against a backed enum class.
  *
  *   #[Enum(UserStatus::class)]
- *   public string $status;
+ *   public readonly string $status;
  *
  * Requires zeroboiler/enums for full integration.
  */

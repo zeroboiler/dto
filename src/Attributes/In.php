@@ -15,11 +15,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property value is in a list of allowed values.
  *
  *   #[In(['draft', 'published', 'archived'])]
- *   public string $status;
+ *   public readonly string $status;
  *
  * Or with enum:
  *   #[Enum(UserStatus::class)]
- *   public string $status;
+ *   public readonly string $status;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class In implements ValidationAttribute

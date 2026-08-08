@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Validate property as URL.
  *
  *   #[Url]
- *   public string $website;
+ *   public readonly string $website;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Url implements ValidationAttribute

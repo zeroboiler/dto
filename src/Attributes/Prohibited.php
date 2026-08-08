@@ -15,7 +15,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Require this field to be absent from the input data.
  *
  *   #[Prohibited]
- *   public ?string $internalField;
+ *   public readonly ?string $internalField;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Prohibited implements ValidationAttribute
