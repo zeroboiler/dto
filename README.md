@@ -12,6 +12,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 ## Table of Contents
 
 - [Installation](#installation)
+- [Quick Reference Card](#quick-reference-card)
 - [Type System](#type-system)
   - [Readonly Promoted Properties](#readonly-promoted-properties)
   - [Property Types](#property-types)
@@ -67,6 +68,94 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - PHP 8.5+
 - Laravel 13+
 - `zeroboiler/value-objects` (installed automatically as a dependency)
+
+## Quick Reference Card
+
+A cheat sheet for the most common operations:
+
+```php
+use ZeroBoiler\DTO\Attributes\{Email, Hidden, MapFrom, Max, Min, Required};
+use ZeroBoiler\DTO\Attributes\{Cast, DefaultValue, NestedArray, Collection};
+use ZeroBoiler\DTO\DataTransferObject;
+
+// ── Define ──────────────────────────────────────────────────
+class UserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[MapFrom('user_name')]
+        public readonly ?string $displayName = null,
+
+        #[Cast('integer')]
+        public readonly int $age = 0,
+
+        #[DefaultValue('active')]
+        public readonly string $status = 'active',
+
+        #[Cast('date')]
+        public readonly ?\Carbon\Carbon $createdAt = null,
+
+        #[Hidden]
+        public readonly ?string $password = null,
+    ) {}
+}
+
+// ── Create ─────────────────────────────────────────────────
+$dto = UserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice']);
+$dto = UserDTO::fromRequest($request);
+$dto = UserDTO::fromJson('{"email":"a@b.com","name":"Alice"}');
+
+// ── Serialize ──────────────────────────────────────────────
+$dto->toArray();    // public fields only (password excluded)
+$dto->allValues();  // includes hidden fields
+$dto->toJson();     // JSON string
+
+// ── Selective Output ───────────────────────────────────────
+$dto->only('email', 'name');   // ['email' => 'a@b.com', 'name' => 'Alice']
+$dto->except('age');          // all except 'age'
+
+// ── Immutable Update ───────────────────────────────────────
+$updated = $dto->with(['name' => 'Bob']);  // always validates
+
+// ── Equality & State ──────────────────────────────────────
+$dto->equals($other);     // true if toArray() matches
+$dto->isEmpty();          // all properties empty/default
+$dto->isNotEmpty();       // at least one property has value
+
+// ── Partial Update (PATCH) ──────────────────────────────────
+$patched = UserDTO::fromPartialArray(['name' => 'Updated']);
+$patched = UserDTO::fromPartialRequest($request);
+
+// ── Validation ─────────────────────────────────────────────
+UserDTO::rules();              // ['email' => ['required', 'email'], ...]
+UserDTO::validateArray($data); // returns validated data, throws on fail
+UserDTO::rulesFor('update');   // action-scoped rules
+
+// ── Collections ─────────────────────────────────────────────
+use ZeroBoiler\DTO\DtoCollection;
+$col = DtoCollection::make([$dto1, $dto2]);
+$col->pluck('email');         // ['a@b.com', 'c@d.com']
+$col->pluckKey('email', 'name'); // ['a@b.com' => 'Alice', ...]
+$col->map(fn($d) => $d->name);    // ['Alice', 'Charlie']
+$col->filter(fn($d) => $d->age > 18);
+$col->count(); $col->isEmpty(); $col->first(); $col->last();
+
+// ── Facade ─────────────────────────────────────────────────
+use ZeroBoiler\DTO\Facades\DTO;
+DTO::make(UserDTO::class, $data);
+DTO::validate(UserDTO::class, $data);
+DTO::makeFromJson(UserDTO::class, $json);
+DTO::schema(UserDTO::class);
+
+// ── CLI ────────────────────────────────────────────────────
+php artisan zeroboiler:dto-test "App\DTOs\UserDTO"
+php artisan zeroboiler:dto-schema "App\DTOs\UserDTO" --json
+```
 
 ## Quick Start
 
@@ -636,64 +725,178 @@ DataTransferObject::flushMetadataCache();
 
 ## Attributes Reference
 
-### Validation Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `#[Required]` | Field is required |
-| `#[Email]` | Must be valid email |
-| `#[Url]` | Must be valid URL |
-| `#[Uuid]` | Must be valid UUID |
-| `#[Min(n)]` | Minimum length/value |
-| `#[Max(n)]` | Maximum length/value |
-| `#[Size(n)]` | Must be exactly size n |
-| `#[Between(min, max)]` | Value must be between min and max |
-| `#[Pattern('/regex/')]` | Must match regex |
-| `#[In(['a', 'b'])]` | Must be one of values |
-| `#[Enum(EnumClass::class)]` | Must be valid enum value (accepts `message` for custom error) |
-| `#[Integer]` | Must be integer |
-| `#[Numeric]` | Must be numeric |
-| `#[Boolean]` | Must be boolean |
-| `#[Date]` | Must be valid date |
-| `#[Date('Y-m-d')]` | Must match date format |
-| `#[Json]` | Must be valid JSON string |
-| `#[StartsWith('prefix')]` | Must start with given prefix(es) |
-| `#[EndsWith('suffix')]` | Must end with given suffix(es) |
-| `#[Accepted]` | Must be accepted (yes, on, 1, true) |
-| `#[Declined]` | Must be declined (no, off, 0, false) |
-| `#[Confirmed]` | Must have a matching `{field}_confirmation` |
-| `#[Distinct]` | Array elements must be unique |
-| `#[Prohibited]` | Field must not be present |
-| `#[Present]` | Field must be present (even if empty) |
-| `#[Sometimes]` | Only validate if field is present |
-| `#[Nullable]` | Allows null value |
-| `#[Same('field')]` | Must match another field's value |
-| `#[Different('field')]` | Must differ from another field's value |
-| `#[RequiredIf('field', value)]` | Required when another field has a value |
-| `#[RequiredUnless('field', value)]` | Required unless another field has a value |
-| `#[RequiredWith('field')]` | Required when another field is present |
-| `#[RequiredWithAll('f1', 'f2')]` | Required when all specified fields are present |
-| `#[RequiredWithout('field')]` | Required when another field is not present |
-| `#[RequiredWithoutAll('f1', 'f2')]` | Required when all specified fields are absent |
-| `#[ArrayRule]` | Must be an array (accepts `message`) |
-| `#[ArrayRule(min: 1, max: 10)]` | Array with 1–10 elements (accepts `message`) |
-
-### Metadata Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `#[Cast('type')]` | Cast value during hydration (`'integer'`, `'string'`, `'boolean'`, `'array'`, `'date'`, `'datetime'`) |
-| `#[MapFrom('source_key')]` | Map from different source key |
-| `#[Hidden]` | Exclude from `toArray()` / `toJson()` output |
-| `#[DefaultValue(value)]` | Default value when key is missing |
-| `#[NestedArray(DTOClass::class)]` | Hydrate array elements as nested DTO instances (accepts `message`) |
-| `#[Collection(DTOClass::class)]` | Hydrate as `DtoCollection` of DTO instances (accepts `message`) |
-
-All validation attributes accept an optional `message` parameter for custom error messages:
+All validation attributes accept an optional `message` parameter for custom Laravel error messages:
 
 ```php
 #[Email(message: 'Please provide a valid email address')]
 #[Min(8, message: 'Password must be at least 8 characters')]
+```
+
+### Validation Attributes
+
+| Attribute | Rule Generated | Description |
+|-----------|---------------|-------------|
+| `#[Required]` | `required` | Field must be present and non-empty |
+| `#[Email]` | `email` | Must be a valid email address |
+| `#[Url]` | `url` | Must be a valid URL |
+| `#[Uuid]` | `uuid` | Must be a valid UUID |
+| `#[Min(n)]` | `min:n` | Minimum value (numeric) or length (string) |
+| `#[Max(n)]` | `max:n` | Maximum value (numeric) or length (string) |
+| `#[Size(n)]` | `size:n` | Exact size — length for strings, count for arrays |
+| `#[Between(min, max)]` | `between:min,max` | Value/length must be between two bounds |
+| `#[Pattern('/regex/')]` | `regex:...` | Must match a regular expression |
+| `#[In(['a', 'b'])]` | `in:a,b` | Must be one of the given values |
+| `#[Enum(MyEnum::class)]` | Laravel `Enum` rule | Must be a valid backed enum value |
+| `#[Integer]` | `integer` | Must be an integer |
+| `#[Numeric]` | `numeric` | Must be numeric |
+| `#[Boolean]` | `boolean` | Must be a boolean |
+| `#[Date]` | `date` | Must be a valid date |
+| `#[Date('Y-m-d')]` | `date_format:Y-m-d` | Must match a specific date format |
+| `#[Json]` | `json` | Must be a valid JSON string |
+| `#[StartsWith('pre')]` | `starts_with:pre` | Must start with prefix (single or array) |
+| `#[EndsWith('suf')]` | `ends_with:suf` | Must end with suffix (single or array) |
+| `#[Accepted]` | `accepted` | Must be yes, on, 1, or true |
+| `#[Declined]` | `declined` | Must be no, off, 0, or false |
+| `#[Confirmed]` | `confirmed` | Must have a matching `{field}_confirmation` |
+| `#[Distinct]` | `distinct` | Array elements must be unique |
+| `#[Prohibited]` | `prohibited` | Field must not be present |
+| `#[Present]` | `present` | Field must be present (even if empty) |
+| `#[Sometimes]` | `sometimes` | Only validate when field is present |
+| `#[Nullable]` | `nullable` | Allows null values to pass |
+| `#[Same('field')]` | `same:field` | Must match another field's value |
+| `#[Different('field')]` | `different:field` | Must differ from another field |
+| `#[RequiredIf('field', val)]` | `required_if:...` | Required when another field equals a value |
+| `#[RequiredUnless('field', val)]` | `required_unless:...` | Required unless another field equals a value |
+| `#[RequiredWith('field')]` | `required_with:...` | Required when another field is present |
+| `#[RequiredWithAll('f1', 'f2')]` | `required_with_all:...` | Required when all specified fields are present |
+| `#[RequiredWithout('field')]` | `required_without:...` | Required when another field is absent |
+| `#[RequiredWithoutAll('f1')]` | `required_without_all:...` | Required when all specified fields are absent |
+| `#[ArrayRule]` | `array` | Must be an array |
+| `#[ArrayRule(min: 1, max: 10)]` | `array`, `min:1`, `max:10` | Array with element count bounds |
+
+### Attribute Usage Examples
+
+Basic validation:
+
+```php
+class RegisterDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(8), Max(128)]
+        public readonly string $password,
+
+        #[Accepted]
+        public readonly bool $terms,
+    ) {}
+}
+```
+
+Numeric and date constraints:
+
+```php
+class ProductDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Between(0.01, 99999.99)]
+        public readonly float $price,
+
+        #[Integer, Min(0)]
+        public readonly int $stock,
+
+        #[Date('Y-m-d')]
+        public readonly string $releasedAt,
+
+        #[Size(13)]
+        public readonly string $isbn,
+    ) {}
+}
+```
+
+String pattern and conditional validation:
+
+```php
+class AddressDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Pattern('/^[A-Z]{2}\d{4}[A-Z]{2}$/')]
+        public readonly string $postalCode,
+
+        #[Required, StartsWith('https://')]
+        public readonly string $website,
+
+        #[RequiredIf('country', 'TR')]
+        public readonly ?string $taxId = null,
+
+        #[RequiredWith('phone')]
+        public readonly ?string $phonePrefix = null,
+    ) {}
+}
+```
+
+Array and enum validation:
+
+```php
+class ArticleDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, In(['draft', 'published', 'archived'])]
+        public readonly string $status,
+
+        #[Enum(UserRole::class)]
+        public readonly string $authorRole,
+
+        #[ArrayRule(min: 1, max: 10), Distinct]
+        public readonly array $tags = [],
+    ) {}
+}
+```
+
+### Metadata Attributes
+
+| Attribute | Target | Description |
+|-----------|--------|-------------|
+| `#[Cast('type')]` | Property | Cast value during hydration (`'integer'`, `'string'`, `'boolean'`, `'array'`, `'date'`, `'datetime'`) |
+| `#[MapFrom('source_key')]` | Property | Map from a different source key (supports dot notation) |
+| `#[Hidden]` | Property | Exclude from `toArray()` / `toJson()` output |
+| `#[DefaultValue(value)]` | Property | Default value when the source key is missing from input |
+| `#[NestedArray(DTOClass::class)]` | Property | Hydrate array elements as nested DTO instances |
+| `#[Collection(DTOClass::class)]` | Property | Hydrate as `DtoCollection` of DTO instances |
+
+Metadata attribute examples:
+
+```php
+class OrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $orderNumber,
+
+        #[MapFrom('customer_email')]
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Cast('integer')]
+        public readonly int $totalCents = 0,
+
+        #[DefaultValue('pending')]
+        public readonly string $status = 'pending',
+
+        #[Cast('date')]
+        public readonly ?\Carbon\Carbon $shippedAt = null,
+
+        #[Hidden]
+        public readonly ?string $internalNotes = null,
+
+        #[NestedArray(AddressDTO::class)]
+        public readonly array $addresses = [],
+
+        #[Collection(LineItemDTO::class)]
+        public readonly DtoCollection $items,
+    ) {}
+}
 ```
 
 ## API Quick Reference
