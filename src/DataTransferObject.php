@@ -50,10 +50,10 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject;
 abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSerializable, ValidatableDTO
 {
     /** @var array<string, array<string, mixed>> Cache for reflection metadata per class */
-    private static array $_metadataCache = [];
+    private static array $_zbMetadataCache = [];
 
     /** @var array<string, float> Cache creation timestamps per class */
-    private static array $_metadataCacheTimestamps = [];
+    private static array $_zbMetadataCacheTimestamps = [];
 
     /**
      * TTL in seconds for metadata cache in local/testing environments.
@@ -62,7 +62,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * this TTL is automatically invalidated on next access.
      * Set to 0 to disable TTL-based invalidation.
      */
-    private static float $_metadataCacheTtl = 0.0;
+    private static float $_zbMetadataCacheTtl = 0.0;
 
     /**
      * Set the TTL for metadata cache entries.
@@ -74,7 +74,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      */
     public static function setMetadataCacheTtl(float $seconds): void
     {
-        self::$_metadataCacheTtl = $seconds;
+        self::$_zbMetadataCacheTtl = $seconds;
     }
 
     /**
@@ -90,11 +90,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     public static function flushMetadataCache(?string $class = null): void
     {
         if ($class !== null) {
-            unset(self::$_metadataCache[$class]);
-            unset(self::$_metadataCacheTimestamps[$class]);
+            unset(self::$_zbMetadataCache[$class]);
+            unset(self::$_zbMetadataCacheTimestamps[$class]);
         } else {
-            self::$_metadataCache = [];
-            self::$_metadataCacheTimestamps = [];
+            self::$_zbMetadataCache = [];
+            self::$_zbMetadataCacheTimestamps = [];
         }
     }
 
@@ -645,21 +645,21 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         $class = static::class;
 
         // TTL-based invalidation for dev/testing environments (#3)
-        if (self::$_metadataCacheTtl > 0.0 && isset(self::$_metadataCacheTimestamps[$class])) {
-            $age = microtime(true) - self::$_metadataCacheTimestamps[$class];
-            if ($age >= self::$_metadataCacheTtl) {
-                unset(self::$_metadataCache[$class]);
-                unset(self::$_metadataCacheTimestamps[$class]);
+        if (self::$_zbMetadataCacheTtl > 0.0 && isset(self::$_zbMetadataCacheTimestamps[$class])) {
+            $age = microtime(true) - self::$_zbMetadataCacheTimestamps[$class];
+            if ($age >= self::$_zbMetadataCacheTtl) {
+                unset(self::$_zbMetadataCache[$class]);
+                unset(self::$_zbMetadataCacheTimestamps[$class]);
             }
         }
 
-        if (! isset(self::$_metadataCache[$class])) {
-            self::$_metadataCache[$class] = DtoMetadataResolver::resolve($class);
-            self::$_metadataCacheTimestamps[$class] = microtime(true);
+        if (! isset(self::$_zbMetadataCache[$class])) {
+            self::$_zbMetadataCache[$class] = DtoMetadataResolver::resolve($class);
+            self::$_zbMetadataCacheTimestamps[$class] = microtime(true);
         }
 
         /** @var DtoResolvedMetadata $metadata */
-        $metadata = self::$_metadataCache[$class];
+        $metadata = self::$_zbMetadataCache[$class];
 
         return $metadata;
     }
