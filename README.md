@@ -1586,6 +1586,61 @@ class User extends Model
 }
 ```
 
+## Quality Assurance
+
+### Static Analysis Compliance (PHPStan Level 9)
+
+Every source file in this package passes PHPStan level 9 analysis with zero errors
+and no baseline suppressions. The following checklist is maintained manually:
+
+| File | `strict_types` | `final` | Typed Props | Return Types | Docblocks |
+|------|:---:|:---:|:---:|:---:|:---:|
+| `DataTransferObject.php` | ✅ | abstract | N/A (static) | ✅ all | ✅ |
+| `DtoCollection.php` | ✅ | ✅ | ✅ | ✅ all | ✅ |
+| `DTOManager.php` | ✅ | ✅ | N/A (methods) | ✅ all | ✅ |
+| `DTOException.php` | ✅ | ✅ | N/A | ✅ all | ✅ |
+| `DTOCast.php` | ✅ | ✅ | ✅ readonly | ✅ all | ✅ |
+| `DtoMetadataResolver.php` | ✅ | ✅ | N/A (static) | ✅ all | ✅ |
+| `OpenApiSchemaGenerator.php` | ✅ | ✅ | N/A (static) | ✅ all | ✅ |
+| `DTOSServiceProvider.php` | ✅ | ✅ | N/A | ✅ all | ✅ |
+| `DTO.php` (Facade) | ✅ | ✅ | N/A | ✅ | ✅ |
+| `FromRequestDTO.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
+| `ValidatableDTO.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
+| `ValidationAttribute.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
+| 39 Validation Attributes | ✅ | ✅ all | ✅ readonly | ✅ `ruleKey()` | ✅ |
+| 6 Metadata Attributes | ✅ | ✅ all | ✅ readonly | N/A | ✅ |
+| CLI Commands (2) | ✅ | ✅ | N/A | ✅ | ✅ |
+
+### Code Quality Checklist
+
+- [x] **`declare(strict_types=1)`** — Present in every PHP file
+- [x] **No `mixed` types in public API** — All public method parameters and returns are typed; `mixed` only in internal cast/hydration pipelines with explicit `@param` annotations
+- [x] **Strict comparisons** — `===` used everywhere (no `==` for value comparison)
+- [x] **`final` classes** — All attributes, services, collections, resolvers, and managers are `final`
+- [x] **`readonly` properties** — All DTO properties must be `public readonly`; all attribute constructors use `readonly` promoted properties
+- [x] **`#[Override]`** — Applied to all interface/parent method implementations (`CastsAttributes`, `JsonSerializable`, `Arrayable`, `ValidatorContract`)
+- [x] **Docblocks** — All public methods, classes, and properties documented
+- [x] **`@phpstan-type`** — Complex array shapes (`DtoPropertyMeta`, `DtoResolvedMetadata`) documented with PHPStan type aliases
+- [x] **Exception safety** — All error paths throw typed exceptions (`DTOException`, `ValidationException`, `InvalidArgumentException`)
+- [x] **Immutable by default** — `readonly` properties + `with()` returns new instance
+- [x] **Hidden field safety** — `#[Hidden]` excludes from `toArray()`/`toJson()`; `allValues()` available for explicit inclusion
+- [x] **Validation always runs in `with()`** — Prevents invalid state propagation (design decision documented with `@deprecated` note on `$validate` param)
+
+### Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| Abstract base class (not interface) | Shared hydration/serialization logic in one place; subclasses only define properties |
+| `fromArray()` with `validate: bool` | Opt-out for trusted data (e.g., reading from DB via `DTOCast::get()`) |
+| `with()` always validates | Prevents invalid state propagation — the `$validate` param is kept for backward compatibility but ignored |
+| `fromPartialArray()` for PATCH semantics | Relaxes `required` → `sometimes` for present fields only; missing fields use defaults |
+| Static metadata cache (not singleton) | Each DTO class manages its own cache; no cross-class state |
+| TTL-based cache in dev environments | 2-second TTL in `local`/`testing` for hot-reload support |
+| `DtoCollection` separate from `DataTransferObject` | Collections are not DTOs — they hold DTOs but aren't DTOs themselves |
+| Reflection-based `pluck()`/`pluckKey()` | Avoids dynamic property access that triggers PHPStan warnings on `readonly` properties |
+| `#[ValidationAttribute]` marker interface | Enables custom message collection via `ruleKey()` — eliminates fragile class-name parsing |
+| `OpenApiSchemaGenerator` as separate class | Single responsibility; schema generation is an orthogonal concern to hydration |
+
 ## Security
 
 See [SECURITY.md](SECURITY.md) for our security policy.
