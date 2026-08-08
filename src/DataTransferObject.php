@@ -757,8 +757,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             }
 
             $primitive = $value->toPrimitive();
+            $result = is_scalar($primitive) ? $primitive : $value->toArray();
 
-            return is_scalar($primitive) ? $primitive : $value->toArray();
+            return $result;
         }
 
         if ($value instanceof \BackedEnum) {
