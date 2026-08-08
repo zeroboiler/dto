@@ -41,7 +41,7 @@ final class MakeDtoTestCommand extends Command
         }
 
         $shortName = class_basename($dtoClass);
-        $defaultDir = base_path('tests/Unit/DTO');
+        $defaultDir = \function_exists('base_path') ? base_path('tests/Unit/DTO') : getcwd().'/tests/Unit/DTO';
         /** @var string|null $optDir */
         $optDir = $this->option('dir');
         $dir = $optDir ?? $defaultDir;
@@ -132,7 +132,8 @@ describe('{$shortName}', function () {
 PHP;
 
         file_put_contents($path, $content);
-        $relative = str_replace(base_path().'/', '', $path);
+        $basePath = \function_exists('base_path') ? base_path().'/' : getcwd().'/';
+        $relative = str_replace($basePath, '', $path);
         $this->info("Generated: {$relative}");
 
         return self::SUCCESS;

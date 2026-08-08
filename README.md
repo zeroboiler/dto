@@ -1421,11 +1421,20 @@ The test suite includes **66+ test files** covering:
 | `array_is_list` | `DataTransferObject::fromJson()` | Sequential array detection |
 | `array_any` | `OpenApiSchemaGenerator::hasAttribute()` | Predicate-based array search |
 
-**Laravel Compatibility:**
+## Laravel Compatibility
 
 The package uses only stable Laravel contracts (`CastsAttributes`, `ValidationRule`,
 `ServiceProvider`, `Facade`, `Validator`). No bleeding-edge or internal APIs are
 used, ensuring forward compatibility with future Laravel releases.
+
+| Laravel API | Usage | Contract |
+|-------------|-------|----------|
+| `CastsAttributes` | `DTOCast` — Eloquent get/set/serialize | `illuminate/contracts` |
+| `Validator` | `Validator::make()` — attribute-derived rules | `illuminate/validation` |
+| `ValidationRule` | Not used (DTO uses `Validator` facade directly) | `illuminate/contracts` |
+| `ServiceProvider` | `DTOSServiceProvider` — auto-discovery | `illuminate/support` |
+| `Facade` | `DTO` facade — runtime access | `illuminate/support` |
+| `Request` | `FromRequestDTO` contract | `illuminate/http` |
 
 ## License
 
