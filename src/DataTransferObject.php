@@ -397,9 +397,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      */
     public function toJson(int $options = 0): string
     {
-        $json = json_encode($this->jsonSerialize(), $options);
-
-        return $json === false ? '' : $json;
+        try {
+            return json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return '';
+        }
     }
 
     /**

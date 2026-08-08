@@ -109,7 +109,7 @@ final class OpenApiSchemaGenerator
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
-            return ['type' => 'object', 'properties' => new \stdClass];
+            return ['type' => 'object', 'properties' => []];
         }
 
         $properties = [];
