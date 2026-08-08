@@ -55,7 +55,17 @@ final class DTOCast implements CastsAttributes
             return null;
         }
 
-        $data = is_string($value) ? json_decode($value, true) : $value;
+        if (is_string($value)) {
+            try {
+                /** @var mixed $data */
+                $data = json_decode($value, true, 512, JSON_THROW_ON_ERROR | JSON_OBJECT_AS_ARRAY);
+            } catch (\JsonException) {
+                return null;
+            }
+        } else {
+            $data = $value;
+        }
+
         if (! is_array($data)) {
             return null;
         }
@@ -84,7 +94,11 @@ final class DTOCast implements CastsAttributes
         }
 
         if ($value instanceof DataTransferObject) {
-            return json_encode($value->toArray()) ?: '';
+            try {
+                return json_encode($value->toArray(), JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                return '';
+            }
         }
 
         if (is_array($value)) {
@@ -95,7 +109,11 @@ final class DTOCast implements CastsAttributes
             // (applies defaults, casts, etc.) and optionally validate (#8).
             $dto = $dtoClass::fromArray($value, validate: $this->validate);
 
-            return json_encode($dto->toArray()) ?: '';
+            try {
+                return json_encode($dto->toArray(), JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                return '';
+            }
         }
 
         // Reject unexpected types to prevent silent data corruption (#8)
