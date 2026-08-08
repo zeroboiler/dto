@@ -143,6 +143,8 @@ $col->pluck('email');         // ['a@b.com', 'c@d.com']
 $col->pluckKey('email', 'name'); // ['a@b.com' => 'Alice', ...]
 $col->map(fn($d) => $d->name);    // ['Alice', 'Charlie']
 $col->filter(fn($d) => $d->age > 18);
+$col->append($dto3);            // new collection with dto3 added (immutable)
+$col->merge($otherCollection);  // new collection combining both (immutable)
 $col->count(); $col->isEmpty(); $col->first(); $col->last();
 
 // ── Facade ─────────────────────────────────────────────────
@@ -932,7 +934,9 @@ class OrderDTO extends DataTransferObject
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `::make(array)` | `self` | Static factory constructor |
-| `->push(DataTransferObject)` | `self` | Append DTO (fluent) |
+| `->push(DataTransferObject)` | `self` | Append DTO in place (fluent) |
+| `->append(DataTransferObject)` | `self` | Return new collection with added DTO (immutable) |
+| `->merge(self)` | `self` | Return new collection combining both collections (immutable) |
 | `->first()` | `?DataTransferObject` | First item or null |
 | `->last()` | `?DataTransferObject` | Last item or null |
 | `->map(callable)` | `array` | Map over items (returns plain array) |

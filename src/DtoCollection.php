@@ -285,6 +285,41 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
+     * Append a DTO to the collection and return a new collection.
+     *
+     * Unlike {@see push()} which mutates in place, this returns a new
+     * DtoCollection instance, enabling fluent/immutable chaining.
+     *
+     * @param  DataTransferObject  $dto
+     * @return self
+     *
+     * @phpstan-return DtoCollection<DataTransferObject>
+     */
+    public function append(DataTransferObject $dto): self
+    {
+        $clone = clone $this;
+        $clone->items[] = $dto;
+
+        return $clone;
+    }
+
+    /**
+     * Merge another DtoCollection's items into a new collection.
+     *
+     * Returns a new collection containing all items from both collections.
+     * Neither original collection is mutated.
+     *
+     * @param  self  $other  The collection to merge
+     * @return self
+     *
+     * @phpstan-return DtoCollection<DataTransferObject>
+     */
+    public function merge(self $other): self
+    {
+        return new self([...$this->items, ...$other->items]);
+    }
+
+    /**
      * Check if the collection is empty.
      */
     public function isEmpty(): bool
