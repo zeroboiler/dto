@@ -1129,6 +1129,45 @@ A: Yes. Union types (e.g., `string|int`) are supported for hydration. For OpenAP
 A complete request lifecycle showing how DTOs integrate with controllers,
 services, and enums:
 
+### DTO with Enum Property
+
+When a DTO property is typed as a BackedEnum, ZeroBoiler DTO auto-hydrates
+and auto-serializes it using the backed value:
+
+```php
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DataTransferObject;
+use App\Enums\UserStatus;
+
+class UpdateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $name,
+
+        #[Required]
+        public readonly UserStatus $status,  // BackedEnum property
+    ) {}
+}
+
+// From request (auto-validates enum value)
+$dto = UpdateUserDTO::fromArray([
+    'name' => 'Alice',
+    'status' => 'active',   // string → UserStatus::ACTIVE
+]);
+
+$dto->status->label();      // 'Active'
+$dto->status->color();      // 'success'
+$dto->toArray();            // ['name' => 'Alice', 'status' => 'active']
+$dto->status->value;        // 'active' (string backed)
+
+// Immutable update with enum
+$updated = $dto->with(['status' => 'banned']);
+$updated->status->is(UserStatus::BANNED);  // true
+```
+
+### Complete Controller Example
+
 ```php
 // app/DTOs/UpdateProfileDTO.php
 use ZeroBoiler\DTO\Attributes\Email;

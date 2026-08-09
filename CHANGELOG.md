@@ -32,3 +32,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Reflection-based property access in `DtoCollection` for PHPStan safety
 
 [1.1.0]: https://github.com/zeroboiler/dto/releases/tag/v1.1.0
+
+## [Unreleased]
+
+### Improved
+- `OpenApiSchemaGenerator::componentName()` now uses string parsing instead of reflection for extracting short class names
+- `RequiredWith*` attribute docblocks now document the `string|array` parameter acceptance
+- Better `DefaultValue` handling in `fromPartialArray()` — `DefaultValue` attribute takes priority over PHP constructor defaults
