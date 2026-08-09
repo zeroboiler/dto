@@ -18,7 +18,9 @@ use ZeroBoiler\DTO\DataTransferObject;
  * This contract makes the guarantee explicit and discoverable,
  * and adds {@see rulesFor()} for action-scoped rule sets.
  *
- * @see DataTransferObject
+ * @see DataTransferObject::rules() For attribute-based rule resolution
+ * @see DataTransferObject::rulesFor() For action-scoped overrides
+ * @see DataTransferObject::validateArray() For running validation
  */
 interface ValidatableDTO
 {

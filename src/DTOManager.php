@@ -23,7 +23,7 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  *
  * @see \ZeroBoiler\DTO\Facades\DTO
  */
-final class DTOManager
+final readonly class DTOManager
 {
     /**
      * Validate data against a DTO class.

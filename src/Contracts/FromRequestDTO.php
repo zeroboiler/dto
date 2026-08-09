@@ -17,7 +17,8 @@ use ZeroBoiler\DTO\DataTransferObject;
  * ResourceController calls `$dtoClass::fromRequest($request)`
  * to hydrate DTOs. This contract makes that requirement explicit.
  *
- * @see DataTransferObject
+ * @see DataTransferObject::fromRequest() For the default implementation
+ * @see DataTransferObject::fromPartialRequest() For PATCH semantics
  */
 interface FromRequestDTO
 {
