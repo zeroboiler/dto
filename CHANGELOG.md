@@ -2,6 +2,11 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `DTOFinalProductionAuditV2Test` — 45+ production readiness tests covering: strict_types audit, fromJson error cases, MapFrom resolution, Hidden/DefaultValue/Cast behavior, only/except/equals/isEmpty/toJson/jsonSerialize, DtoCollection (make/pluck/pluckKey/filter/append/merge/first/last/toArray/array_access), nested DTO hydration and serialization, with() immutable updates, fromPartialArray, DTOException factory methods, metadata cache lifecycle, rules/rulesFor contract
+
 ## [1.1.0] - 2025-08-08
 
 ### Added
