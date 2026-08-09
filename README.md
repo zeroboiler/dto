@@ -60,6 +60,11 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [From Form Requests](#from-form-requests)
   - [From Manual Array Casting](#from-manual-array-casting)
   - [From Eloquent Accessors/Casts](#from-eloquent-accessorscasts)
+- [Cross-Package Integration](#cross-package-integration)
+  - [Using Enum Properties in DTOs](#using-enum-properties-in-dtos)
+  - [Enum Roundtrip in with()](#enum-roundtrip-in-with)
+  - [Using Enum Metadata in Controllers](#using-enum-metadata-in-controllers)
+  - [Eloquent Model with Both Casts](#eloquent-model-with-both-casts)
 
 ## Installation
 
@@ -1825,6 +1830,102 @@ CreateOrderDTO::rules();
 ```
 
 No service provider registration, no configuration files — it just works.
+
+## Cross-Package Integration
+
+ZeroBoiler DTO integrates seamlessly with [ZeroBoiler Enums](https://github.com/zeroboiler/enums) for
+end-to-end type safety. BackedEnum properties are auto-hydrated and auto-serialized.
+
+### Using Enum Properties in DTOs
+
+```php
+use ZeroBoiler\Enums\Concerns\HasEnumMetadata;
+use ZeroBoiler\Enums\Attributes\EnumColor;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DataTransferObject;
+
+#[EnumColor(success: ['active'], danger: ['banned'])]
+enum UserStatus: string
+{
+    use HasEnumMetadata;
+    case ACTIVE = 'active';
+    case BANNED = 'banned';
+}
+
+class UpdateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $name,
+
+        #[Required]
+        public readonly UserStatus $status,
+    ) {}
+}
+
+// String → BackedEnum (auto-hydrated via castValueToEnum)
+$dto = UpdateUserDTO::fromArray(['name' => 'Alice', 'status' => 'active']);
+$dto->status;            // UserStatus::ACTIVE
+$dto->status->label();   // 'Active'
+$dto->status->color();   // 'success'
+
+// BackedEnum → string (auto-serialized via normalizeScalar)
+$dto->toArray();
+// ['name' => 'Alice', 'status' => 'active']
+
+// Immutable update with enum
+$updated = $dto->with(['status' => 'banned']);
+$updated->status->is(UserStatus::BANNED);  // true
+```
+
+### Enum Roundtrip in with()
+
+The `with()` method correctly handles enum roundtrips:
+- `toArray()` serializes enums to their **backed value** (string/int)
+- `fromArray()` reconstructs enum instances from backed values
+- This ensures `$dto->with(['status' => 'active'])` works identically to direct construction
+
+### Using Enum Metadata in Controllers
+
+```php
+class UserController extends Controller
+{
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $dto = UpdateUserDTO::fromRequest($request);
+
+        // Enum comparison + metadata — zero magic strings
+        if ($dto->status->is(UserStatus::BANNED)) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        $user->update($dto->toArray());
+
+        return response()->json([
+            'user'      => $dto->toArray(),
+            'statuses'  => UserStatus::forSelect(),
+        ]);
+    }
+}
+```
+
+### Eloquent Model with Both Casts
+
+```php
+class User extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'status'  => UserStatus::class,     // ZeroBoiler Enum cast
+            'profile' => UpdateUserDTO::class,   // ZeroBoiler DTO cast
+        ];
+    }
+}
+```
+
+Both casts work independently: `status` serializes to a scalar (string/int),
+while `profile` serializes to/from JSON.
 
 ## Security
 
