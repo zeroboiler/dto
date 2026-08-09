@@ -1738,6 +1738,94 @@ and no baseline suppressions. The following checklist is maintained manually:
 | `#[ValidationAttribute]` marker interface | Enables custom message collection via `ruleKey()` — eliminates fragile class-name parsing |
 | `OpenApiSchemaGenerator` as separate class | Single responsibility; schema generation is an orthogonal concern to hydration |
 
+## Type Safety & PHPStan Level 9
+
+This package is designed for **PHPStan level 9** compliance out of the box.
+
+### What This Means
+
+| Guarantee | Implementation |
+|-----------|---------------|
+| **No `mixed` in public API** | All public method parameters and returns are explicitly typed; `mixed` only in internal cast/hydration pipelines |
+| **No dynamic property access** | `DtoCollection::pluck()`/`pluckKey()` use `ReflectionProperty` to read `readonly` properties |
+| **Strict identity comparisons** | `===` used everywhere — no loose `==` for value comparison |
+| **Typed array shapes** | `@phpstan-type` aliases for `DtoPropertyMeta` and `DtoResolvedMetadata` |
+| **`#[Override]` on all overrides** | `CastsAttributes`, `JsonSerializable`, `Arrayable`, `ValidatorContract` methods annotated |
+| **Final classes throughout** | All attributes, resolvers, managers, collections, and exceptions are `final` |
+| **`readonly` promoted properties** | All DTO properties must be `public readonly`; all attribute constructors use `readonly` |
+| **Immutable by default** | `readonly` language keyword + `with()` returns new instance |
+| **Validation always runs in `with()`** | Prevents invalid state propagation — `$validate` param kept for backward compat |
+
+### Running PHPStan
+
+```bash
+vendor/bin/phpstan analyse        # uses phpstan.neon (level 9)
+vendor/bin/phpstan analyse src/  # explicit path
+```
+
+The `phpstan.neon` configuration:
+- Level 9 (maximum strictness)
+- PHP 8.5 target version
+- Larastan bootstrap enabled
+- Tests excluded from analysis
+
+## Quick Start Integration
+
+Add ZeroBoiler DTO to an existing Laravel project in three steps:
+
+### Step 1: Install
+
+```bash
+composer require zeroboiler/dto
+```
+
+### Step 2: Create a DTO
+
+```php
+// app/DTOs/CreateOrderDTO.php
+use ZeroBoiler\DTO\Attributes\{Email, Hidden, Max, Min, Required};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class CreateOrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $customerEmail,
+
+        #[Required, Min(1), Max(100)]
+        public readonly int $quantity,
+
+        #[Hidden]
+        public readonly ?string $internalNote = null,
+    ) {}
+}
+```
+
+### Step 3: Use Everywhere
+
+```php
+// In controllers
+$dto = CreateOrderDTO::fromRequest($request);
+// Auto-validates: email required & valid, quantity 1-100
+
+// In service classes
+$dto = CreateOrderDTO::fromArray([
+    'customerEmail' => 'buyer@example.com',
+    'quantity' => 5,
+]);
+$dto->customerEmail; // 'buyer@example.com'
+$dto->toArray();     // ['customerEmail' => '...', 'quantity' => 5] — hidden excluded
+
+// In Eloquent models
+protected $casts = ['payload' => CreateOrderDTO::class];
+
+// In Form Requests (reuse validation rules)
+CreateOrderDTO::rules();
+// ['customerEmail' => ['required', 'email'], 'quantity' => ['required', 'min:1', 'max:100']]
+```
+
+No service provider registration, no configuration files — it just works.
+
 ## Security
 
 See [SECURITY.md](SECURITY.md) for our security policy.
