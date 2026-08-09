@@ -14,6 +14,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 /**
  * Require this field when any of the given fields are present.
  *
+ * Accepts a single field name or an array of field names:
+ *
+ *   #[RequiredWith('email')]
  *   #[RequiredWith(['email', 'phone'])]
  *   public readonly ?string $username;
  */

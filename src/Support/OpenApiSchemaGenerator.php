@@ -281,14 +281,17 @@ final class OpenApiSchemaGenerator
     /**
      * Generate a component schema name from a DTO class name.
      *
+     * Extracts the short class name (without namespace) for use as
+     * an OpenAPI component schema key. Uses string parsing instead
+     * of reflection to avoid unnecessary class loading.
+     *
      * @param  class-string  $className
      */
     private static function componentName(string $className): string
     {
-        // Convert PascalCase to PascalCase (keep as-is for OpenAPI component names)
-        $reflection = new ReflectionClass($className);
+        $separator = strrpos($className, '\');
 
-        return $reflection->getShortName();
+        return $separator === false ? $className : substr($className, $separator + 1);
     }
 
     /**
