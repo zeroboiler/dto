@@ -39,3 +39,4 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - `OpenApiSchemaGenerator::componentName()` now uses string parsing instead of reflection for extracting short class names
 - `RequiredWith*` attribute docblocks now document the `string|array` parameter acceptance
 - Better `DefaultValue` handling in `fromPartialArray()` — `DefaultValue` attribute takes priority over PHP constructor defaults
+- `DtoHydrationPipelineContractTest` — comprehensive contract tests for hydration pipeline (MapFrom, Cast, DefaultValue, Hidden), immutable updates, equality, selective output, fromJson, validation rules, collection immutability, and metadata cache lifecycle
