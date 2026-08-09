@@ -52,6 +52,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Bypass Validation (Advanced)](#bypass-validation-advanced)
   - [Custom Cast Types](#custom-cast-types)
 - [Testing](#testing)
+- [Test Fixtures](#test-fixtures)
 - [Full-Stack Example](#full-stack-example)
 - [Performance Considerations](#performance-considerations)
 - [Contributing](#contributing)
@@ -1353,6 +1354,58 @@ src/
 ├── DtoCollection.php      — Type-safe collection of DTO instances
 ├── DTOManager.php         — Runtime DTO helper (facade-backed)
 └── DTOSServiceProvider.php — Auto-discovery service provider
+```
+
+## Test Fixtures
+
+The test suite uses a set of representative DTO fixtures covering all supported
+features and edge cases:
+
+| Fixture | Features | Tests |
+|---------|----------|-------|
+| `CreateUserDTO` | `Required`, `Email`, `Hidden`, `Min`, `Max` | Basic validation, hidden fields, serialization |
+| `AddressDTO` | `Required`, `Pattern`, `Min`, nested in OrderDTO | Nested DTO hydration, regex validation |
+| `OrderDTO` | `Required`, nested `AddressDTO`, `NestedArray` | Nested DTO auto-hydration, recursive `toArray()` |
+| `OrderItemDTO` | `Required`, `Min`, used with `Collection` | DtoCollection element type |
+| `ProductDTO` | `Required`, `Between`, `Integer`, `Min` | Numeric constraints, type inference |
+| `ActionScopedDTO` | `Required`, `Email`, `Min`, `DefaultValue`, `Nullable` + `rulesFor()` | Action-scoped validation (create/update) |
+| `MixedAttributesDTO` | `Required`, `Min`, `Max`, `Pattern`, `MapFrom`, `Cast`, `DefaultValue`, `Hidden`, `array`, `bool` | Mixed attribute types integration |
+| `MinimalDTO` | `Required` only | Edge case: simplest possible DTO |
+| `EmptyDTO` | No properties | Edge case: empty DTO |
+| `UnionTypeDTO` | `Required`, union type `int|string` | Union type support, OpenAPI `oneOf` |
+| `ValidationTestDTO` | `Required`, `Max`, `Email` | Validation rule generation |
+| `DeepNestedDTO` | Multi-level nesting | Deep nesting edge cases |
+| `DateCastDTO` | `Cast('date')`, `DateTime` | Date/datetime casting |
+| `DateTimeCastDTO` | `Cast('datetime')` | Datetime casting variant |
+| `ArrayCastDTO` | `Cast('array')`, `Json` | Array/JSON cast edge cases |
+| `ScalarConstraintsDTO` | `Integer`, `Boolean`, `Numeric`, `Min`, `Max` | Scalar type constraints |
+| `MultiConstraintDTO` | `Required`, `Email`, `Min`, `Max`, `Pattern` | Multiple constraints per field |
+| `ConstraintCompositeDTO` | `Distinct`, `ArrayRule(min, max)`, `In` | Composite/array constraints |
+| `OpenApiValidationDTO` | `Required`, `Email`, `Max`, `Pattern`, `Between` | OpenAPI schema generation |
+| `RegistrationDTO` | `Required`, `Email`, `Min`, `Max`, `Confirmed`, `Accepted`, `Same` | Registration flow validation |
+| `TaskListDTO` | `Required`, `ArrayRule`, `Collection` | Array + collection integration |
+| `VoUserDTO` | ValueObject properties (`Email`, `Url`, `Money`) | ValueObject auto-instantiation and serialization |
+| `WithBypassDTO` | `validate: false` usage | Validation bypass paths |
+
+```php
+// Example: MixedAttributesDTO exercises the full attribute surface
+use ZeroBoiler\DTO\Tests\Fixtures\MixedAttributesDTO;
+
+$dto = MixedAttributesDTO::fromArray([
+    'username' => 'alice',         // Required, Min(3), Max(100)
+    'hexCode' => 'a1b2c3',        // Required, Pattern('/^[a-f0-9]{6}$/')
+    'user_email' => 'a@b.com',    // MapFrom('user_email') → $email
+    'age' => '25',                // Cast('integer') → int
+    // 'role' omitted → DefaultValue('user')
+    'token' => 'secret',         // Hidden — excluded from toArray()
+    'isActive' => '1',            // bool, CastToBool
+    'tags' => ['php', 'laravel'], // array
+]);
+
+$dto->email;    // 'a@b.com'
+$dto->age;      // 25 (int)
+$dto->role;     // 'user'
+$dto->toArray(); // token excluded
 ```
 
 ## Testing
