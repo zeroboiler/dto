@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace ZeroBoiler\DTO\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use ZeroBoiler\DTO\DataTransferObject;
 
@@ -44,8 +43,10 @@ final class DTOCast implements CastsAttributes
     ) {}
 
     /**
-     * @param  Model  $model
-     * @param  array<string, mixed>  $attributes
+     * @param  object  $model  The Eloquent model instance
+     * @param  string  $key  The attribute name being cast
+     * @param  mixed  $value  The raw value from the database (JSON string or array)
+     * @param  array<string, mixed>  $attributes  All model attributes
      * @return T|null
      */
     #[\Override]
@@ -78,9 +79,10 @@ final class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  Model  $model
-     * @param  T|array<string, mixed>|null  $value
-     * @param  array<string, mixed>  $attributes
+     * @param  object  $model  The Eloquent model instance
+     * @param  string  $key  The attribute name being cast
+     * @param  DataTransferObject|array<string, mixed>|null  $value  The DTO, array, or null to store
+     * @param  array<string, mixed>  $attributes  All model attributes
      * @return array<string, mixed>|string|null
      *
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
@@ -123,9 +125,10 @@ final class DTOCast implements CastsAttributes
     }
 
     /**
-     * @param  Model  $model
-     * @param  T|null  $value
-     * @param  array<string, mixed>  $attributes
+     * @param  object  $model  The Eloquent model instance
+     * @param  string  $key  The attribute name being cast
+     * @param  DataTransferObject|null  $value  The DTO instance or null
+     * @param  array<string, mixed>  $attributes  All model attributes
      * @return array<string, mixed>|null
      */
     #[\Override]

@@ -116,9 +116,8 @@ final class DtoMetadataResolver
      * (ValueObject, BackedEnum, nested DTO), infers base validation rules
      * from PHP types, and collects validation attribute rules.
      *
-     * @param  class-string  $class
-     * @return DtoResolvedMetadata
-     * @phpstan-return DtoResolvedMetadata
+     * @param  class-string  $class  The DTO class to resolve metadata for
+     * @return DtoResolvedMetadata Associative array with properties, rules, and messages
      *
      * @throws \ReflectionException If the class does not exist
      */
