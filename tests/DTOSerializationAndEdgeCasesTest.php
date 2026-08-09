@@ -6,20 +6,8 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Attributes\Boolean;
-use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\DefaultValue;
-use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\MapFrom;
-use ZeroBoiler\DTO\Attributes\Max;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Nullable;
-use ZeroBoiler\DTO\Attributes\Required;
-use ZeroBoiler\DTO\Attributes\Uuid;
 use ZeroBoiler\DTO\DataTransferObject;
-use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Exceptions\DTOException;
-use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\OrderItemDTO;

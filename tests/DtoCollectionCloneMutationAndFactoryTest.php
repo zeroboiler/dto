@@ -7,9 +7,7 @@
 declare(strict_types=1);
 
 use ZeroBoiler\DTO\DtoCollection;
-use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 
 describe('DtoCollection clone isolation', function (): void {
     it('append returns a new collection without modifying original', function (): void {
