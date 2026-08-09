@@ -24,7 +24,9 @@ final class Boolean implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('boolean') */
+    /**
+     * @return string The Laravel validation rule key ('boolean')
+     */
     public function ruleKey(): string
     {
         return 'boolean';

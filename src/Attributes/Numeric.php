@@ -24,7 +24,9 @@ final class Numeric implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('numeric') */
+    /**
+     * @return string The Laravel validation rule key ('numeric')
+     */
     public function ruleKey(): string
     {
         return 'numeric';

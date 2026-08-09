@@ -24,7 +24,9 @@ final class Sometimes implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('sometimes') */
+    /**
+     * @return string The Laravel validation rule key ('sometimes')
+     */
     public function ruleKey(): string
     {
         return 'sometimes';

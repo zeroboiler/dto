@@ -24,7 +24,9 @@ final class Email implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('email') */
+    /**
+     * @return string The Laravel validation rule key ('email')
+     */
     public function ruleKey(): string
     {
         return 'email';

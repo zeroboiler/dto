@@ -24,7 +24,9 @@ final class Nullable implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('nullable') */
+    /**
+     * @return string The Laravel validation rule key ('nullable')
+     */
     public function ruleKey(): string
     {
         return 'nullable';
