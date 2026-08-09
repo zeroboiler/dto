@@ -161,7 +161,10 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
-     * Push a DTO onto the end of the collection.
+     * Push a DTO onto the end of the collection (mutates in-place).
+     *
+     * Unlike {@see append()} which returns a new immutable collection,
+     * push() modifies the current instance and returns it for chaining.
      *
      * @param  T  $dto
      *

@@ -149,6 +149,7 @@ $col->map(fn($d) => $d->name);    // ['Alice', 'Charlie']
 $col->filter(fn($d) => $d->age > 18);
 $col->append($dto3);            // new collection with dto3 added (immutable)
 $col->merge($otherCollection);  // new collection combining both (immutable)
+$col->push($dto3);             // mutates in-place, returns $col
 $col->count(); $col->isEmpty(); $col->first(); $col->last();
 
 // ── Facade ─────────────────────────────────────────────────
@@ -477,7 +478,11 @@ $collection->isEmpty();     // false
 $collection->isNotEmpty();  // true
 $collection->first();       // $dto1
 $collection->last();        // $dto3
-$collection->push($dto4);   // fluent, appends to end
+$collection->push($dto4);   // mutates in-place, returns $collection
+
+// ── Immutable alternatives ───────────────────────────────────
+$newCol = $collection->append($dto4);  // returns NEW collection (immutable)
+$newCol = $collection->merge($other);  // returns NEW collection combining both
 ```
 
 ### Partial Updates (PATCH)
