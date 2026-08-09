@@ -122,7 +122,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
 
             // Only apply default when the key is entirely absent from the data.
             // Explicit null or empty string should be respected as intentional values (#678).
-            if (! $hasKey && $prop['has_default']) {
+            if (! $hasKey && $prop['has_default'] === true) {
                 $value = $prop['default'];
             }
 
@@ -163,7 +163,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             if ($hasKey) {
                 $value = Arr::get($data, $sourceKey);
                 $args[$name] = self::castAndHydrateValue($value, $prop, $name);
-            } elseif ($prop['has_default']) {
+            } elseif ($prop['has_default'] === true) {
                 // Missing field: use default if available, otherwise type-appropriate empty value
                 $args[$name] = $prop['default'];
             } else {
