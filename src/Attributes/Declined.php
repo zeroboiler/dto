@@ -21,11 +21,12 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Declined implements ValidationAttribute
 {
     public function __construct(
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('declined') */
+    /**
+     * @return string The Laravel validation rule key ('declined')
+     */
     public function ruleKey(): string
     {
         return 'declined';

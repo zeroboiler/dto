@@ -21,7 +21,6 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Prohibited implements ValidationAttribute
 {
     public function __construct(
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 

@@ -37,7 +37,9 @@ final class RequiredWithAll implements ValidationAttribute
         $this->fields = is_array($fields) ? $fields : [$fields];
     }
 
-    /** @return string The Laravel validation rule key ('required_with_all') */
+    /**
+     * @return string The Laravel validation rule key ('required_with_all')
+     */
     public function ruleKey(): string
     {
         return 'required_with_all';

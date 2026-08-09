@@ -31,7 +31,9 @@ final class RequiredIf implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('required_if') */
+    /**
+     * @return string The Laravel validation rule key ('required_if')
+     */
     public function ruleKey(): string
     {
         return 'required_if';

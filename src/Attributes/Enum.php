@@ -32,7 +32,9 @@ final class Enum implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('enum') */
+    /**
+     * @return string The Laravel validation rule key ('enum')
+     */
     public function ruleKey(): string
     {
         return 'enum';

@@ -21,11 +21,12 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Uuid implements ValidationAttribute
 {
     public function __construct(
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('uuid') */
+    /**
+     * @return string The Laravel validation rule key ('uuid')
+     */
     public function ruleKey(): string
     {
         return 'uuid';

@@ -24,15 +24,14 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Between implements ValidationAttribute
 {
     public function __construct(
-        /** @param int|float $min Minimum value */
         public readonly int|float $min,
-        /** @param int|float $max Maximum value */
         public readonly int|float $max,
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('between') */
+    /**
+     * @return string The Laravel validation rule key ('between')
+     */
     public function ruleKey(): string
     {
         return 'between';

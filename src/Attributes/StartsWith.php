@@ -32,7 +32,9 @@ final class StartsWith implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('starts_with') */
+    /**
+     * @return string The Laravel validation rule key ('starts_with')
+     */
     public function ruleKey(): string
     {
         return 'starts_with';

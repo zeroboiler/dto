@@ -21,13 +21,13 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Different implements ValidationAttribute
 {
     public function __construct(
-        /** @param string $field The field name to compare against */
         public readonly string $field,
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('different') */
+    /**
+     * @return string The Laravel validation rule key ('different')
+     */
     public function ruleKey(): string
     {
         return 'different';

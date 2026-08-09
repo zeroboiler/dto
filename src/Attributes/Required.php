@@ -34,7 +34,9 @@ final class Required implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('required') */
+    /**
+     * @return string The Laravel validation rule key ('required')
+     */
     public function ruleKey(): string
     {
         return 'required';

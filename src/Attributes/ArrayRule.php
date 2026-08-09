@@ -24,15 +24,14 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class ArrayRule implements ValidationAttribute
 {
     public function __construct(
-        /** @param int|null $min Minimum item count */
         public readonly ?int $min = null,
-        /** @param int|null $max Maximum item count */
         public readonly ?int $max = null,
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('array') */
+    /**
+     * @return string The Laravel validation rule key ('array')
+     */
     public function ruleKey(): string
     {
         return 'array';

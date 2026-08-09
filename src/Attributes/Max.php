@@ -21,13 +21,13 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class Max implements ValidationAttribute
 {
     public function __construct(
-        /** @param int|float $value Maximum value (numeric) or length (string) */
         public readonly int|float $value,
-        /** @param string|null $message Custom validation message */
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('max') */
+    /**
+     * @return string The Laravel validation rule key ('max')
+     */
     public function ruleKey(): string
     {
         return 'max';

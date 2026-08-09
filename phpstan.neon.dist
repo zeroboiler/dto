@@ -7,6 +7,8 @@ parameters:
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    checkUnusedParameters: false
     universalObjectCratesClasses:
         - Illuminate\Database\Eloquent\Model
         - Illuminate\Support\Collection

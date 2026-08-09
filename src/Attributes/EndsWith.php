@@ -29,7 +29,9 @@ final class EndsWith implements ValidationAttribute
         public readonly ?string $message = null,
     ) {}
 
-    /** @return string The Laravel validation rule key ('ends_with') */
+    /**
+     * @return string The Laravel validation rule key ('ends_with')
+     */
     public function ruleKey(): string
     {
         return 'ends_with';
