@@ -20,6 +20,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Sometimes implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute validation should only run if the field is present.'
+     */
     public function __construct(
         public readonly ?string $message = null,
     ) {}

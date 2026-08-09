@@ -20,6 +20,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Pattern implements ValidationAttribute
 {
+    /**
+     * @param  string  $regex  The regular expression pattern (with delimiters, e.g. '/^[A-Z]{3}$/')
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute format is invalid.'
+     */
     public function __construct(
         public readonly string $regex,
         public readonly ?string $message = null,

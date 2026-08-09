@@ -23,6 +23,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Size implements ValidationAttribute
 {
+    /**
+     * @param  int  $value  The exact size: length for strings, count for arrays, or value for numbers
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must be :size characters.'
+     */
     public function __construct(
         public readonly int $value,
         public readonly ?string $message = null,

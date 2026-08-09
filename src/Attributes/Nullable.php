@@ -20,6 +20,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Nullable implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute may be null.'
+     */
     public function __construct(
         public readonly ?string $message = null,
     ) {}

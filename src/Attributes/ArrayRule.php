@@ -23,6 +23,12 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class ArrayRule implements ValidationAttribute
 {
+    /**
+     * @param  int|null  $min  Minimum number of elements (null = no minimum)
+     * @param  int|null  $max  Maximum number of elements (null = no maximum)
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must have between :min and :max items.'
+     */
     public function __construct(
         public readonly ?int $min = null,
         public readonly ?int $max = null,

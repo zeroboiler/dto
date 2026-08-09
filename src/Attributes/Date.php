@@ -23,6 +23,12 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Date implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $format  Optional date format string (e.g. 'Y-m-d', 'd/m/Y').
+     *                              When null, validates as a generic date.
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute is not a valid date.'
+     */
     public function __construct(
         public readonly ?string $format = null,
         public readonly ?string $message = null,

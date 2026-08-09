@@ -20,6 +20,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Distinct implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute field has duplicate values.'
+     */
     public function __construct(
         public readonly ?string $message = null,
     ) {}

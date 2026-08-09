@@ -20,6 +20,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Same implements ValidationAttribute
 {
+    /**
+     * @param  string  $field  The name of the other field that this field must match
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute and :other must match.'
+     */
     public function __construct(
         public readonly string $field,
         public readonly ?string $message = null,

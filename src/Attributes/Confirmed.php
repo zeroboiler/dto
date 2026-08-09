@@ -22,6 +22,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Confirmed implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute confirmation does not match.'
+     */
     public function __construct(
         public readonly ?string $message = null,
     ) {}

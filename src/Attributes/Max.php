@@ -20,6 +20,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Max implements ValidationAttribute
 {
+    /**
+     * @param  int|float  $value  Maximum value (numeric) or length (string)
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must not be greater than :max characters.'
+     */
     public function __construct(
         public readonly int|float $value,
         public readonly ?string $message = null,

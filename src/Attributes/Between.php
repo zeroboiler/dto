@@ -23,6 +23,12 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Between implements ValidationAttribute
 {
+    /**
+     * @param  int|float  $min  Minimum bound (inclusive)
+     * @param  int|float  $max  Maximum bound (inclusive)
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must be between :min and :max.'
+     */
     public function __construct(
         public readonly int|float $min,
         public readonly int|float $max,

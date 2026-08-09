@@ -20,6 +20,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Uuid implements ValidationAttribute
 {
+    /**
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must be a valid UUID.'
+     */
     public function __construct(
         public readonly ?string $message = null,
     ) {}
