@@ -20,6 +20,11 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Min implements ValidationAttribute
 {
+    /**
+     * @param  int|float  $value  Minimum value (numeric) or length (string)
+     * @param  string|null  $message  Custom validation message (optional).
+     *                              Format: 'The :attribute must be at least :min characters.'
+     */
     public function __construct(
         public readonly int|float $value,
         public readonly ?string $message = null,
