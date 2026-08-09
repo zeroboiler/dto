@@ -10,14 +10,10 @@ use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\ArrayCastDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\DateCastDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\DeepNestedDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\OrderDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\OrderItemDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\RegistrationDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\ValidationTestDTO;
 use ZeroBoiler\DTO\DtoCollection;
 
 describe('DTO: fromJson edge cases', function (): void {
