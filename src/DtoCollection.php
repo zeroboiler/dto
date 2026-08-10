@@ -19,6 +19,10 @@ use Traversable;
  *
  * Wraps an array of DTOs and provides type-safe access,
  * JSON serialization, and array-like convenience methods.
+ * Implements ArrayAccess for `$collection[0]` syntax,
+ * Countable for `count($collection)`, IteratorAggregate for
+ * `foreach ($collection as $dto)`, and JsonSerializable for
+ * `json_encode($collection)`.
  *
  * @template T of DataTransferObject
  *
@@ -95,6 +99,10 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
+     * Get an iterator for the collection items.
+     *
+     * Enables foreach traversal: `foreach ($collection as $dto) { ... }`
+     *
      * @return Traversable<int, T>
      */
     #[\Override]
@@ -105,12 +113,24 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         }
     }
 
+    /**
+     * Check if an item exists at the given offset.
+     *
+     * @param  mixed  $offset  The index to check (0-based)
+     * @return bool True if the offset exists in the collection
+     */
     #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->items[$offset]);
     }
 
+    /**
+     * Get the item at the given offset, or null if the offset doesn't exist.
+     *
+     * @param  mixed  $offset  The index to retrieve (0-based)
+     * @return T|null The DTO instance at the offset, or null
+     */
     #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
@@ -139,6 +159,14 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         }
     }
 
+    /**
+     * Remove an item at the given offset and re-index the collection.
+     *
+     * After unsetting, the internal array is re-indexed with array_values()
+     * to prevent gaps that would break last(), map(), and count() consistency.
+     *
+     * @param  mixed  $offset  The index to remove (0-based)
+     */
     #[\Override]
     public function offsetUnset(mixed $offset): void
     {
@@ -147,6 +175,14 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         $this->items = array_values($this->items);
     }
 
+    /**
+     * Serialize the collection to a JSON-serializable value.
+     *
+     * Each DTO is serialized via toArray(), producing an array of associative arrays.
+     * Used by json_encode($collection).
+     *
+     * @return array<int, array<string, mixed>>
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {
