@@ -195,7 +195,7 @@ final class DtoMetadataResolver
      *
      * @param  ReflectionProperty  $propReflection  The property to inspect
      * @param  array<string, mixed>  $propMeta  Property metadata (modified by reference)
-     * @param  list<string|EnumRule>  $propRules  Accumulated validation rules (modified by reference)
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules  Accumulated validation rules (modified by reference)
      * @param  array<string, string>  $messages  Custom validation messages (modified by reference)
      * @param  array<string, array<int, mixed>>  $extraRules  Wildcard rules for array elements (modified by reference)
      * @param  string  $name  Property name for rule key generation
@@ -229,7 +229,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string|EnumRule>  $propRules
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
      */
     private static function applyValidationAttribute(object $instance, array &$propRules): void
     {
@@ -276,7 +276,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string|EnumRule>  $propRules
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
      */
     private static function applyRequiredIfRule(RequiredIf $instance, array &$propRules): void
     {
@@ -288,7 +288,7 @@ final class DtoMetadataResolver
     }
 
     /**
-     * @param  list<string|EnumRule>  $propRules
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
      */
     private static function applyRequiredUnlessRule(RequiredUnless $instance, array &$propRules): void
     {
@@ -302,7 +302,7 @@ final class DtoMetadataResolver
     /**
      * Apply array validation rule with optional min/max count.
      *
-     * @param  list<string|EnumRule>  $propRules
+     * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
      */
     private static function applyArrayRule(ArrayRule $instance, array &$propRules): void
     {
