@@ -1,11 +1,9 @@
 parameters:
     level: 9
+    phpVersion: 8.5
     paths:
         - src
-    bootstrapFiles:
-        - vendor/autoload.php
+    bootstrapFiles: []
+    checkMissingIterableValueType: false
     reportUnmatchedIgnoredErrors: false
-    treatPhpDocTypesAsCertain: false
-    universalObjectCratesClasses:
-        - Illuminate\Database\Eloquent\Model
-        - Illuminate\Support\Collection
+    ignoreErrors: []
