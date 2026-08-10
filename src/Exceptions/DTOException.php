@@ -10,6 +10,16 @@ namespace ZeroBoiler\DTO\Exceptions;
 
 use Exception;
 
+/**
+ * Exception thrown for DTO-related errors during casting, hydration, and serialization.
+ *
+ * Provides named constructors for common failure modes:
+ * - {@see invalidCast()} — when a property value cannot be cast to the target type
+ * - {@see invalidJson()} — when a JSON string cannot be decoded into an array
+ *
+ * @see \ZeroBoiler\DTO\DataTransferObject For the base DTO class that throws this exception
+ * @see \ZeroBoiler\DTO\Casts\DTOCast For the Eloquent cast that may throw this exception
+ */
 final class DTOException extends Exception
 {
     /**
