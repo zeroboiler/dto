@@ -6,6 +6,14 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ### Added
 - `DTOFinalProductionAuditV2Test` — 45+ production readiness tests covering: strict_types audit, fromJson error cases, MapFrom resolution, Hidden/DefaultValue/Cast behavior, only/except/equals/isEmpty/toJson/jsonSerialize, DtoCollection (make/pluck/pluckKey/filter/append/merge/first/last/toArray/array_access), nested DTO hydration and serialization, with() immutable updates, fromPartialArray, DTOException factory methods, metadata cache lifecycle, rules/rulesFor contract
+- `composer.json` now includes `support` field with issue tracker and source URLs
+
+### Improved
+- `OpenApiSchemaGenerator::componentName()` now uses string parsing instead of reflection for extracting short class names
+- `RequiredWith*` attribute docblocks now document the `string|array` parameter acceptance
+- Better `DefaultValue` handling in `fromPartialArray()` — `DefaultValue` attribute takes priority over PHP constructor defaults
+- `DtoHydrationPipelineContractTest` — comprehensive contract tests for hydration pipeline (MapFrom, Cast, DefaultValue, Hidden), immutable updates, equality, selective output, fromJson, validation rules, collection immutability, and metadata cache lifecycle
+- CHANGELOG.md deduplicated — merged scattered `[Unreleased]` sections into single coherent entry
 
 ## [1.1.0] - 2025-08-08
 
@@ -37,11 +45,3 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Reflection-based property access in `DtoCollection` for PHPStan safety
 
 [1.1.0]: https://github.com/zeroboiler/dto/releases/tag/v1.1.0
-
-## [Unreleased]
-
-### Improved
-- `OpenApiSchemaGenerator::componentName()` now uses string parsing instead of reflection for extracting short class names
-- `RequiredWith*` attribute docblocks now document the `string|array` parameter acceptance
-- Better `DefaultValue` handling in `fromPartialArray()` — `DefaultValue` attribute takes priority over PHP constructor defaults
-- `DtoHydrationPipelineContractTest` — comprehensive contract tests for hydration pipeline (MapFrom, Cast, DefaultValue, Hidden), immutable updates, equality, selective output, fromJson, validation rules, collection immutability, and metadata cache lifecycle

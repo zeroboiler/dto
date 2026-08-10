@@ -6,6 +6,10 @@
     "version": "1.1.0",
     "keywords": ["laravel", "dto", "data-transfer-object", "validation", "attributes", "openapi", "zeroboiler"],
     "homepage": "https://github.com/zeroboiler/dto",
+    "support": {
+        "issues": "https://github.com/zeroboiler/dto/issues",
+        "source": "https://github.com/zeroboiler/dto"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
