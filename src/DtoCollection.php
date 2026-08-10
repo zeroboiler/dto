@@ -83,6 +83,11 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         return $this->items;
     }
 
+    /**
+     * Count the number of DTOs in the collection.
+     *
+     * @return int The number of items
+     */
     #[\Override]
     public function count(): int
     {
@@ -324,6 +329,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
     /**
      * Check if the collection is empty.
+     *
+     * @return bool True when the collection contains no items
      */
     public function isEmpty(): bool
     {
@@ -332,6 +339,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
     /**
      * Check if the collection is not empty.
+     *
+     * @return bool True when the collection contains at least one item
      */
     public function isNotEmpty(): bool
     {
