@@ -647,8 +647,14 @@ protected function casts(): array
 ### CLI Commands
 
 ```bash
+# Generate Pest tests for a DTO class
 php artisan zeroboiler:dto-test "App\DTO\CreateUserDTO"
+php artisan zeroboiler:dto-test "App\DTO\CreateUserDTO" --dir=tests/Unit/DTO
+
+# Generate OpenAPI schema for a DTO class
 php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --json
+php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --output=schemas/
+php artisan zeroboiler:dto-schema "App\DTO\CreateUserDTO" --with-components --json
 ```
 
 ### DTO Facade / Manager
