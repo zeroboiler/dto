@@ -859,8 +859,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             return $value;
         }
 
-        if (is_int($value) || is_float($value)) {
-            return $value !== 0 && $value !== 0.0;
+        if (is_int($value)) {
+            return $value !== 0;
+        }
+
+        if (is_float($value)) {
+            return $value !== 0.0;
         }
 
         if (is_string($value)) {
