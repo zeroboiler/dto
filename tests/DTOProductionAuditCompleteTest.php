@@ -282,25 +282,26 @@ describe('DTO Production Readiness — Full Audit', function () {
     // ── EmptyDTO Edge Case ─────────────────────────────────────────────
 
     describe('EmptyDTO', function () {
-        it('returns empty array from toArray', function () {
+        it('returns only nullable defaults from toArray', function () {
             $dto = EmptyDTO::fromArray([]);
 
-            expect($dto->toArray())->toBe([]);
+            // EmptyDTO has nullable properties with defaults — toArray includes them as null
+            expect($dto->toArray())->toBe(['foo' => null, 'bar' => null]);
         });
 
-        it('returns empty JSON', function () {
+        it('returns valid JSON', function () {
             $dto = EmptyDTO::fromArray([]);
 
-            expect($dto->toJson())->toBe('{}');
+            expect($dto->toJson())->toBe('{"foo":null,"bar":null}');
         });
 
-        it('isEmpty returns true', function () {
+        it('isEmpty returns true for all-null nullable properties', function () {
             $dto = EmptyDTO::fromArray([]);
 
             expect($dto->isEmpty())->toBeTrue();
         });
 
-        it('rules returns empty array', function () {
+        it('rules returns empty array (no Required attributes)', function () {
             expect(EmptyDTO::rules())->toBe([]);
         });
     });
