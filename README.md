@@ -65,6 +65,10 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Enum Roundtrip in with()](#enum-roundtrip-in-with)
   - [Using Enum Metadata in Controllers](#using-enum-metadata-in-controllers)
   - [Eloquent Model with Both Casts](#eloquent-model-with-both-casts)
+- [Source Code Audit — Attribute Contract Compliance](#source-code-audit--attribute-contract-compliance)
+  - [Validation Attributes (39 total)](#validation-attributes-39-total)
+  - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
+  - [Service & Infrastructure Classes](#service--infrastructure-classes)
 
 ## Installation
 
@@ -1748,6 +1752,85 @@ and no baseline suppressions. The following checklist is maintained manually:
 | Reflection-based `pluck()`/`pluckKey()` | Avoids dynamic property access that triggers PHPStan warnings on `readonly` properties |
 | `#[ValidationAttribute]` marker interface | Enables custom message collection via `ruleKey()` — eliminates fragile class-name parsing |
 | `OpenApiSchemaGenerator` as separate class | Single responsibility; schema generation is an orthogonal concern to hydration |
+
+## Source Code Audit — Attribute Contract Compliance
+
+### Validation Attributes (39 total)
+
+All validation attributes are `final`, implement `ValidationAttribute`, and have
+`#[Attribute(Attribute::TARGET_PROPERTY)]` targeting. Every attribute has
+an optional `?string $message` constructor parameter for custom Laravel
+error messages and implements `ruleKey()`.
+
+| Attribute | `final` | `ValidationAttribute` | Rule Generated | Constructor Params |
+|-----------|:-------:|:---------------------:|---------------|-------------------|
+| `Required` | ✅ | ✅ | `required` | `?string $message` |
+| `Email` | ✅ | ✅ | `email` | `?string $message` |
+| `Max` | ✅ | ✅ | `max:N` | `int\|float $value`, `?string $message` |
+| `Min` | ✅ | ✅ | `min:N` | `int\|float $value`, `?string $message` |
+| `Url` | ✅ | ✅ | `url` | `?string $message` |
+| `Uuid` | ✅ | ✅ | `uuid` | `?string $message` |
+| `Pattern` | ✅ | ✅ | `regex:...` | `string $regex`, `?string $message` |
+| `In` | ✅ | ✅ | `in:a,b` | `array $values`, `?string $message` |
+| `Enum` | ✅ | ✅ | Laravel `Enum` rule | `string $enumClass`, `?string $message` |
+| `Integer` | ✅ | ✅ | `integer` | `?string $message` |
+| `Numeric` | ✅ | ✅ | `numeric` | `?string $message` |
+| `Boolean` | ✅ | ✅ | `boolean` | `?string $message` |
+| `Date` | ✅ | ✅ | `date` / `date_format:F` | `?string $format`, `?string $message` |
+| `StartsWith` | ✅ | ✅ | `starts_with:...` | `string\|array $prefix`, `?string $message` |
+| `EndsWith` | ✅ | ✅ | `ends_with:...` | `string\|array $suffix`, `?string $message` |
+| `Between` | ✅ | ✅ | `between:N,M` | `int\|float $min`, `int\|float $max`, `?string $message` |
+| `Size` | ✅ | ✅ | `size:N` | `int\|float $value`, `?string $message` |
+| `ArrayRule` | ✅ | ✅ | `array` (+ min/max) | `?int $min`, `?int $max`, `?string $message` |
+| `Json` | ✅ | ✅ | `json` | `?string $message` |
+| `Accepted` | ✅ | ✅ | `accepted` | `?string $message` |
+| `Declined` | ✅ | ✅ | `declined` | `?string $message` |
+| `Confirmed` | ✅ | ✅ | `confirmed` | `?string $message` |
+| `Distinct` | ✅ | ✅ | `distinct` | `?string $message` |
+| `Prohibited` | ✅ | ✅ | `prohibited` | `?string $message` |
+| `Present` | ✅ | ✅ | `present` | `?string $message` |
+| `Sometimes` | ✅ | ✅ | `sometimes` | `?string $message` |
+| `Nullable` | ✅ | ✅ | `nullable` | `?string $message` |
+| `Same` | ✅ | ✅ | `same:field` | `string $field`, `?string $message` |
+| `Different` | ✅ | ✅ | `different:field` | `string $field`, `?string $message` |
+| `RequiredIf` | ✅ | ✅ | `required_if:...` | `string $field`, `mixed $value`, `?string $message` |
+| `RequiredUnless` | ✅ | ✅ | `required_unless:...` | `string $field`, `mixed $value`, `?string $message` |
+| `RequiredWith` | ✅ | ✅ | `required_with:...` | `list<string> $fields`, `?string $message` |
+| `RequiredWithAll` | ✅ | ✅ | `required_with_all:...` | `list<string> $fields`, `?string $message` |
+| `RequiredWithout` | ✅ | ✅ | `required_without:...` | `list<string> $fields`, `?string $message` |
+| `RequiredWithoutAll` | ✅ | ✅ | `required_without_all:...` | `list<string> $fields`, `?string $message` |
+
+### Metadata Attributes (6 total)
+
+Metadata attributes provide hydration and serialization behavior, not validation:
+
+| Attribute | `final` | `readonly` | Target | Purpose |
+|-----------|:-------:|:----------:|--------|---------|
+| `Cast` | ✅ | ✅ | `TARGET_PROPERTY` | Type casting during hydration |
+| `MapFrom` | ✅ | ✅ | `TARGET_PROPERTY` | Source key aliasing (supports dot notation) |
+| `Hidden` | ✅ | — (no props) | `TARGET_PROPERTY` | Exclude from `toArray()`/`toJson()` |
+| `DefaultValue` | ✅ | ✅ | `TARGET_PROPERTY \| TARGET_PARAMETER` | Default when source key is absent |
+| `NestedArray` | ✅ | ✅ | `TARGET_PROPERTY` | Array of nested DTO instances |
+| `Collection` | ✅ | ✅ | `TARGET_PROPERTY` | DtoCollection of DTO instances |
+
+### Service & Infrastructure Classes
+
+| Class | Type | `final` | `readonly` | Key Methods |
+|-------|------|:-------:|:----------:|-------------|
+| `DataTransferObject` | `abstract class` | — | — (static cache) | `fromArray()`, `fromRequest()`, `fromJson()`, `fromPartialArray()`, `toArray()`, `toJson()`, `only()`, `except()`, `with()`, `equals()`, `isEmpty()`, `rules()`, `rulesFor()`, `validateArray()`, `validatePartialArray()`, `flushMetadataCache()`, `setMetadataCacheTtl()` |
+| `DtoCollection` | `final class` | ✅ | — | `make()`, `push()`, `append()`, `merge()`, `first()`, `last()`, `map()`, `filter()`, `pluck()`, `pluckKey()`, `items()`, `toArray()`, `allValues()`, `count()`, `isEmpty()`, `isNotEmpty()`, `offsetExists/Get/Set/Unset()`, `getIterator()`, `jsonSerialize()` |
+| `DTOManager` | `final readonly class` | ✅ | ✅ | `validate()`, `make()`, `makeFromJson()`, `schema()` |
+| `DTOCast` | `final class` | ✅ | ✅ | `get()`, `set()`, `serialize()` |
+| `DTOException` | `final class` | ✅ | — | `invalidCast()`, `invalidJson()` |
+| `DTO` (Facade) | `final class` | ✅ | — | `getFacadeAccessor()` |
+| `DTOSServiceProvider` | `final class` | ✅ | — | `register()`, `boot()` |
+| `FromRequestDTO` | `interface` | — | — | `fromRequest()` |
+| `ValidatableDTO` | `interface` | — | — | `rules()`, `rulesFor()` |
+| `ValidationAttribute` | `interface` | — | — | `ruleKey()` |
+| `DtoMetadataResolver` | `final class` | ✅ | — (static) | `resolve()`, `inferBaseRules()`, `detectValueObjectClass()`, `detectEnumClass()`, `detectDtoClass()` |
+| `OpenApiSchemaGenerator` | `final class` | ✅ | — (static) | `generate()`, `generateWithComponents()` |
+| `MakeDtoTestCommand` | `final class` | ✅ | — | `handle()`, `generateFakeData()` |
+| `MakeDtoSchemaCommand` | `final class` | ✅ | — | `handle()` |
 
 ## Type Safety & PHPStan Level 9
 
