@@ -305,25 +305,93 @@ final class OpenApiSchemaGenerator
         foreach ($prop->getAttributes() as $attr) {
             $instance = $attr->newInstance();
 
-            match (true) {
-                $instance instanceof Email => $propSchema['format'] = 'email',
-                $instance instanceof Url => $propSchema['format'] = 'uri',
-                $instance instanceof Uuid => $propSchema['format'] = 'uuid',
-                $instance instanceof Pattern => $propSchema['pattern'] = self::stripRegexDelimiters($instance->regex),
-                $instance instanceof Integer => $propSchema['type'] = 'integer',
-                $instance instanceof Numeric => $propSchema['type'] = 'number',
-                $instance instanceof Boolean => $propSchema['type'] = 'boolean',
-                $instance instanceof Date => $propSchema['format'] = 'date',
-                $instance instanceof In => $propSchema['enum'] = $instance->values,
-                $instance instanceof EnumAttribute => $propSchema = self::applyEnumSchema($instance, $propSchema),
-                $instance instanceof Max => $propSchema = self::applyMaxConstraint($instance->value, $propSchema),
-                $instance instanceof Min => $propSchema = self::applyMinConstraint($instance->value, $propSchema),
-                $instance instanceof Between => $propSchema = self::applyBetweenConstraint($instance, $propSchema),
-                $instance instanceof StartsWith => $propSchema = self::applyStartsWithPattern($instance, $propSchema),
-                $instance instanceof EndsWith => $propSchema = self::applyEndsWithPattern($instance, $propSchema),
-                default => null,
+            $propSchema = match (true) {
+                $instance instanceof Email => self::applyFormat($propSchema, 'email'),
+                $instance instanceof Url => self::applyFormat($propSchema, 'uri'),
+                $instance instanceof Uuid => self::applyFormat($propSchema, 'uuid'),
+                $instance instanceof Pattern => self::applyPatternAttribute($propSchema, $instance->regex),
+                $instance instanceof Integer => self::applyTypeOverride($propSchema, 'integer'),
+                $instance instanceof Numeric => self::applyTypeOverride($propSchema, 'number'),
+                $instance instanceof Boolean => self::applyTypeOverride($propSchema, 'boolean'),
+                $instance instanceof Date => self::applyDateFormat($propSchema, $instance->format),
+                $instance instanceof In => self::applyInConstraint($propSchema, $instance->values),
+                $instance instanceof EnumAttribute => self::applyEnumSchema($instance, $propSchema),
+                $instance instanceof Max => self::applyMaxConstraint($instance->value, $propSchema),
+                $instance instanceof Min => self::applyMinConstraint($instance->value, $propSchema),
+                $instance instanceof Between => self::applyBetweenConstraint($instance, $propSchema),
+                $instance instanceof StartsWith => self::applyStartsWithPattern($instance, $propSchema),
+                $instance instanceof EndsWith => self::applyEndsWithPattern($instance, $propSchema),
+                default => $propSchema,
             };
         }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a format constraint to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyFormat(array $propSchema, string $format): array
+    {
+        $propSchema['format'] = $format;
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a type override to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyTypeOverride(array $propSchema, string $type): array
+    {
+        $propSchema['type'] = $type;
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a date format constraint to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyDateFormat(array $propSchema, ?string $format): array
+    {
+        $propSchema['format'] = 'date';
+        if ($format !== null) {
+            $propSchema['pattern'] = $format;
+        }
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply a regex pattern constraint to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyPatternAttribute(array $propSchema, string $regex): array
+    {
+        $propSchema['pattern'] = self::stripRegexDelimiters($regex);
+
+        return $propSchema;
+    }
+
+    /**
+     * Apply an enum constraint to the property schema.
+     *
+     * @param  array<string, mixed>  $propSchema
+     * @return array<string, mixed>
+     */
+    private static function applyInConstraint(array $propSchema, array $values): array
+    {
+        $propSchema['enum'] = $values;
 
         return $propSchema;
     }
@@ -472,6 +540,9 @@ final class OpenApiSchemaGenerator
     /**
      * Apply enum constraints to the property schema.
      *
+     * Uses reflection on the enum's backing type to determine the OpenAPI
+     * type instead of inspecting runtime values, ensuring PHPStan L9 safety.
+     *
      * @param  array<string, mixed>  $propSchema
      * @return array<string, mixed>
      */
@@ -495,11 +566,11 @@ final class OpenApiSchemaGenerator
 
         $propSchema['enum'] = $values;
 
-        // Infer type from first enum value (strict type check)
-        if ($values !== []) {
-            $first = $values[0];
+        // Infer OpenAPI type from the enum's backing type (not runtime values)
+        $backingType = (new \ReflectionEnum($enumClass))->getBackingType();
 
-            $propSchema['type'] = is_int($first) ? 'integer' : 'string';
+        if ($backingType !== null) {
+            $propSchema['type'] = $backingType->getName() === 'int' ? 'integer' : 'string';
         }
 
         return $propSchema;
