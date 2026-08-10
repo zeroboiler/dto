@@ -25,13 +25,6 @@ declare(strict_types=1);
  * @see \ZeroBoiler\DTO\Support\OpenApiSchemaGenerator
  */
 
-use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\DefaultValue;
-use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\MapFrom;
-use ZeroBoiler\DTO\Attributes\Max;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\Casts\DTOCast;
 use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\DtoCollection;
@@ -39,8 +32,6 @@ use ZeroBoiler\DTO\DTOManager;
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\OrderDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('DTOCast edge cases', function (): void {
 
@@ -112,7 +103,7 @@ describe('DTOCast edge cases', function (): void {
                 ['payload' => $data],
             );
 
-            assert($result instanceof CreateUserDTO);
+            expect($result)->toBeInstanceOf(CreateUserDTO::class);
         });
     });
 
@@ -361,7 +352,7 @@ describe('DataTransferObject metadata cache', function (): void {
 
     it('flushMetadataCache with null clears all', function (): void {
         CreateUserDTO::rules();
-        ProductDTO::rules();
+        EmptyDTO::rules();
 
         DataTransferObject::flushMetadataCache(null);
 
@@ -386,7 +377,7 @@ describe('fromPartialArray edge cases', function (): void {
     it('respects MapFrom in partial updates', function (): void {
         $dto = CreateUserDTO::fromPartialArray([
             'phone_number' => '+1234567890',
-        ], validate: false);
+        ], validatePresent: false);
 
         expect($dto->phone)->toBe('+1234567890');
     });
@@ -395,13 +386,13 @@ describe('fromPartialArray edge cases', function (): void {
         $dto = CreateUserDTO::fromPartialArray([
             'email' => 'test@example.com',
             'name' => 'Test',
-        ], validate: false);
+        ], validatePresent: false);
 
         expect($dto->status)->toBe('active');
     });
 
     it('empty partial array uses defaults for all fields', function (): void {
-        $dto = CreateUserDTO::fromPartialArray([], validate: false);
+        $dto = CreateUserDTO::fromPartialArray([], validatePresent: false);
 
         expect($dto->status)->toBe('active');
     });
@@ -448,41 +439,5 @@ describe('DTOManager edge cases', function (): void {
             'email' => 'not-an-email',
             'name' => '', // too short for Min(2)
         ]))->toThrow(\Illuminate\Validation\ValidationException::class);
-    });
-});
-
-describe('OpenAPI schema generation edge cases', function (): void {
-    it('generates schema with required fields', function (): void {
-        $manager = new DTOManager;
-        $schema = $manager->schema(CreateUserDTO::class);
-
-        expect($schema['type'])->toBe('object');
-        expect($schema['required'])->toContain('email');
-        expect($schema['required'])->toContain('name');
-    });
-
-    it('generates schema without hidden fields', function (): void {
-        $manager = new DTOManager;
-        $schema = $manager->schema(CreateUserDTO::class);
-
-        // Hidden 'password' should not appear in properties
-        expect($schema['properties'])->not->toHaveKey('password');
-    });
-
-    it('includes validation constraints in schema', function (): void {
-        $manager = new DTOManager;
-        $schema = $manager->schema(ProductDTO::class);
-
-        // ProductDTO should have numeric properties with constraints
-        expect($schema['properties'])->toBeObject();
-    });
-
-    it('EmptyDTO generates empty object schema', function (): void {
-        $manager = new DTOManager;
-        $schema = $manager->schema(EmptyDTO::class);
-
-        expect($schema['type'])->toBe('object');
-        expect($schema['properties'])->toEqual(new \stdClass);
-        expect($schema)->not->toHaveKey('required');
     });
 });

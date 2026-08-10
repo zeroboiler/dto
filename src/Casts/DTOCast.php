@@ -131,7 +131,6 @@ final class DTOCast implements CastsAttributes
      * @param  array<string, mixed>  $attributes  All model attributes
      * @return array<string, mixed>|null
      */
-    #[\Override]
     public function serialize(object $model, string $key, $value, array $attributes)
     {
         return $value?->toArray();
