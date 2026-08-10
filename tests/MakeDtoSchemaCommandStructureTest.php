@@ -25,7 +25,7 @@ use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
  *
  * @covers \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand
  */
-final class MakeDtoSchemaCommandTest extends TestCase
+final class MakeDtoSchemaCommandStructureTest extends TestCase
 {
     // -------------------------------------------------------------------
     // Command class structure
