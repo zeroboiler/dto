@@ -41,4 +41,3 @@ final class NestedArray implements ValidationAttribute
         return 'array';
     }
 }
-
