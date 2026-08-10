@@ -1,77 +1,99 @@
 # Contributing to ZeroBoiler DTO
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to this package.
+Thank you for your interest in contributing! This guide covers the development workflow.
+
+## Requirements
+
+- **PHP 8.5+**
+- **Composer** for dependency management
+- **Laravel 13+** (for integration testing)
+- **zeroboiler/value-objects** (installed automatically as a dependency)
 
 ## Development Setup
 
 ```bash
-# Clone the repository
 git clone git@github.com:zeroboiler/dto.git
 cd dto
-
-# Install dependencies
 composer install
-
-# Run tests
-composer test
-
-# Run static analysis (PHPStan level 9)
-composer analyse
-
-# Run code style fixer
-composer lint
-
-# Run all CI checks
-composer ci
 ```
 
-## Code Standards
+## Code Quality
 
-- **PHP 8.5+** — All code must target PHP 8.5 or later
-- **Strict types** — Every PHP file must have `declare(strict_types=1)`
-- **PHPStan Level 9** — All code must pass PHPStan level 9 analysis with zero errors
-- **Final classes** — All attributes, services, collections, resolvers, and managers must be `final`
-- **Readonly properties** — All DTO properties must be `public readonly`; all attribute constructor parameters must be `readonly`
-- **`#[Override]`** — Applied to all interface/parent method implementations (`CastsAttributes`, `JsonSerializable`, `Arrayable`, `ValidatorContract`)
-- **Docblocks** — All public methods, classes, and properties must have docblocks
-- **No `mixed` types in public API** — `mixed` is only acceptable in internal cast/hydration pipelines with explicit `@param` annotations
+All contributions must pass the full CI pipeline:
 
-## Pull Request Process
+```bash
+# Run all quality checks at once
+composer ci
 
-1. Create a feature branch from `main` (`feat/your-feature`)
-2. Write/update tests for your changes
-3. Ensure all CI checks pass (`composer ci`)
-4. Submit a PR with a clear description of the change
-5. PRs require at least one approval before merge
+# Or individually:
+composer test       # Pest test suite
+composer analyse     # PHPStan level 9 (zero errors, no baseline)
+composer lint        # Laravel Pint (PSR-12)
+composer rector      # Rector (automated refactoring)
+```
+
+### PHPStan Level 9
+
+This package targets **PHPStan level 9 with zero ignored errors**. All code must:
+- Use `declare(strict_types=1)` in every file
+- Declare return types on all methods
+- Use typed properties (no `mixed` without explicit annotation)
+- Use strict comparisons (`===`, `!==`)
+- Use `public readonly` properties in DTOs for language-level immutability
+
+### Code Style
+
+We follow **PSR-12** via Laravel Pint. Run `composer lint` before committing.
+
+## Architecture
+
+```
+src/
+├── Attributes/       — 40+ validation & metadata attributes (final, readonly)
+├── Casts/            — Eloquent cast (DTOCast)
+├── Console/Commands/ — Artisan commands (dto-test, dto-schema)
+├── Contracts/        — ValidatableDTO, FromRequestDTO, ValidationAttribute
+├── Exceptions/       — DTOException
+├── Facades/          — Laravel facade (DTO)
+├── Support/          — DtoMetadataResolver, OpenApiSchemaGenerator
+├── DataTransferObject.php — Abstract base class
+├── DtoCollection.php     — Type-safe collection wrapper
+├── DTOManager.php        — Runtime helper (facade-backed)
+└── DTOSServiceProvider.php — Auto-discovery
+```
 
 ## Commit Messages
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+We use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat: add fromPartialArray for PATCH semantics
-fix: resolve nested DTO hydration with null values
-refactor: simplify castValue type inference
-docs: update README with nested DTO example
-test: add edge case tests for DtoCollection immutability
+feat: add new validation attribute
+fix: resolve nested DTO hydration edge case
+refactor: improve DtoMetadataResolver type safety
+test: add collection helper edge case tests
+docs: update README with nested DTO examples
 ```
+
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Make changes with tests
+4. Ensure `composer ci` passes
+5. Open a pull request with a clear description
 
 ## Testing
 
-- Use [Pest](https://pestphp.com/) for all tests
-- Place fixtures in `tests/Fixtures/`
-- Tests must cover: happy path, edge cases, error paths, type safety, immutability
-- Generated test command output should be valid Pest syntax
-- Test both validated and unvalidated hydration paths
+Tests use [Pest](https://pestphp.com/). Test fixtures are in `tests/Fixtures/`.
 
-## Adding New Validation Attributes
+```bash
+# Run all tests
+composer test
 
-1. Create the attribute class in `src/Attributes/` implementing `ValidationAttribute`
-2. Implement `ruleKey()` to return the primary Laravel validation rule key
-3. Add the rule mapping in `DtoMetadataResolver::applyValidationAttribute()`
-4. Add OpenAPI schema enrichment in `OpenApiSchemaGenerator::applyValidationAttributes()`
-5. Add tests for the attribute (validation, OpenAPI schema, edge cases)
+# Run a specific test file
+vendor/bin/pest tests/DTOSerializationRoundtripTest.php
+```
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the proprietary license of this package.
+Proprietary — see LICENSE file.
