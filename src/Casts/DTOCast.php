@@ -126,12 +126,13 @@ final class DTOCast implements CastsAttributes
 
     /**
      * @param  object  $model  The Eloquent model instance
-     * @param  string  $key  The attribute name being cast
+     * @param  string  $key  The attribute name being serialized
      * @param  DataTransferObject|null  $value  The DTO instance or null
      * @param  array<string, mixed>  $attributes  All model attributes
      * @return array<string, mixed>|null
      */
-    public function serialize(object $model, string $key, $value, array $attributes)
+    #[\Override]
+    public function serialize(object $model, string $key, $value, array $attributes): array|string|null
     {
         return $value?->toArray();
     }
