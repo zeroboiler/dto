@@ -116,6 +116,11 @@ final class DtoMetadataResolver
      * (ValueObject, BackedEnum, nested DTO), infers base validation rules
      * from PHP types, and collects validation attribute rules.
      *
+     * The returned metadata structure:
+     * - `properties`: per-property metadata (map_from, cast, hidden, nullable, etc.)
+     * - `rules`: Laravel validation rules per property
+     * - `messages`: custom validation messages keyed as `"{field}.{rule}"`
+     *
      * @param  class-string  $class  The DTO class to resolve metadata for
      * @return DtoResolvedMetadata Associative array with properties, rules, and messages
      *

@@ -633,9 +633,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * Resolve metadata for this DTO class.
      *
-     * Uses static caching with optional TTL-based invalidation.
-     * Results are stored in per-class static properties, not in the
-     * singleton EnumCache (each DTO class manages its own cache).
+     * Uses per-class static caching with optional TTL-based invalidation.
+     * Each DTO class maintains its own cache entry (not a shared singleton),
+     * so flushing one class doesn't affect others.
+     *
+     * In local/testing environments, the service provider sets a short TTL (2s)
+     * so code changes are picked up automatically. In production, TTL is 0
+     * (caching disabled) — metadata is resolved once per request and reused.
      *
      * @return DtoResolvedMetadata
      * @phpstan-return DtoResolvedMetadata

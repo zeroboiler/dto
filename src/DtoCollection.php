@@ -138,8 +138,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
-     * @param  int|null  $offset
-     * @param  T  $value
+     * @param  mixed  $offset  The index to set (0-based). null appends to the end.
+     * @param  T  $value  The DTO instance to store
      *
      * @throws \InvalidArgumentException If value is not a DataTransferObject instance
      */
