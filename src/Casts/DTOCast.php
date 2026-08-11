@@ -125,13 +125,17 @@ final class DTOCast implements CastsAttributes
     }
 
     /**
+     * Serialize the DTO for JSON casting.
+     *
+     * Laravel calls this method when serializing model attributes to JSON.
+     * Not part of the CastsAttributes interface — Laravel detects it via method_exists().
+     *
      * @param  object  $model  The Eloquent model instance
      * @param  string  $key  The attribute name being serialized
      * @param  DataTransferObject|null  $value  The DTO instance or null
      * @param  array<string, mixed>  $attributes  All model attributes
      * @return array<string, mixed>|null
      */
-    #[\Override]
     public function serialize(object $model, string $key, mixed $value, array $attributes): array|string|null
     {
         return $value?->toArray();

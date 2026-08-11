@@ -2029,6 +2029,83 @@ class User extends Model
 Both casts work independently: `status` serializes to a scalar (string/int),
 while `profile` serializes to/from JSON.
 
+## Source Code Structure
+
+```
+src/
+├── Attributes/              # PHP 8 attribute classes for validation & metadata
+│   ├── Required.php         # → 'required' rule
+│   ├── Email.php            # → 'email' rule
+│   ├── Max.php              # → 'max:N' rule
+│   ├── Min.php              # → 'min:N' rule
+│   ├── Pattern.php          # → 'regex:...' rule
+│   ├── Url.php              # → 'url' rule
+│   ├── Uuid.php             # → 'uuid' rule
+│   ├── Integer.php          # → 'integer' rule
+│   ├── Numeric.php          # → 'numeric' rule
+│   ├── Boolean.php          # → 'boolean' rule
+│   ├── In.php               # → 'in:...' rule
+│   ├── Between.php          # → 'between:N,M' rule
+│   ├── Size.php             # → 'size:N' rule
+│   ├── ArrayRule.php        # → 'array' + optional min/max rules
+│   ├── Json.php             # → 'json' rule
+│   ├── Enum.php             # → Laravel Enum rule (auto-detected from type)
+│   ├── Cast.php             # Type casting (int, string, bool, array, date)
+│   ├── MapFrom.php          # Source key aliasing (supports dot notation)
+│   ├── Hidden.php           # Excludes property from toArray()/toJson()
+│   ├── DefaultValue.php     # Default value when source key is missing
+│   ├── Nullable.php         # → 'nullable' rule
+│   ├── NestedArray.php      # Array of nested DTO instances
+│   ├── Collection.php       # Type-safe DtoCollection of nested DTO instances
+│   ├── Confirmed.php        # → 'confirmed' rule
+│   ├── Declined.php         # → 'declined' rule
+│   ├── Accepted.php         # → 'accepted' rule
+│   ├── Prohibited.php       # → 'prohibited' rule
+│   ├── Present.php          # → 'present' rule
+│   ├── Sometimes.php        # → 'sometimes' rule
+│   ├── Distinct.php         # → 'distinct' rule (adds wildcard field.* rule)
+│   ├── Date.php             # → 'date' or 'date_format:...' rule
+│   ├── Same.php             # → 'same:field' rule
+│   ├── Different.php       # → 'different:field' rule
+│   ├── StartsWith.php       # → 'starts_with:...' rule
+│   ├── EndsWith.php         # → 'ends_with:...' rule
+│   ├── RequiredIf.php       # → 'required_if:...' conditional rule
+│   ├── RequiredUnless.php   # → 'required_unless:...' conditional rule
+│   ├── RequiredWith.php     # → 'required_with:...' conditional rule
+│   ├── RequiredWithAll.php  # → 'required_with_all:...' conditional rule
+│   ├── RequiredWithout.php  # → 'required_without:...' conditional rule
+│   └── RequiredWithoutAll.php # → 'required_without_all:...' conditional rule
+├── Casts/
+│   └── DTOCast.php          # Eloquent cast: DTO ↔ JSON column
+├── Console/Commands/
+│   ├── MakeDtoTestCommand.php   # artisan zeroboiler:dto-test
+│   └── MakeDtoSchemaCommand.php # artisan zeroboiler:dto-schema
+├── Contracts/
+│   ├── FromRequestDTO.php    # Interface: fromRequest() contract
+│   ├── ValidatableDTO.php   # Interface: rules() + rulesFor() contract
+│   └── ValidationAttribute.php # Interface: ruleKey() for message generation
+├── Exceptions/
+│   └── DTOException.php     # Named constructors: invalidCast(), invalidJson()
+├── Facades/
+│   └── DTO.php              # DTO facade (delegates to DTOManager)
+├── Support/
+│   ├── DtoMetadataResolver.php      # Reflection-based rule & metadata resolution
+│   └── OpenApiSchemaGenerator.php   # OpenAPI 3.0 schema from DTO definitions
+├── DataTransferObject.php    # Abstract base class (all public API)
+├── DtoCollection.php         # Type-safe array wrapper (pluck, map, filter, etc.)
+├── DTOManager.php            # Runtime helper (validate, make, makeFromJson, schema)
+└── DTOSServiceProvider.php   # Registers singleton, commands, cache listeners
+```
+
+**Key design decisions:**
+- `DataTransferObject` is `abstract` with static methods — subclass it, never instantiate directly
+- All properties must be `public readonly` in the constructor (immutability at language level)
+- Validation runs **before** hydration — invalid data is rejected early
+- `DtoCollection` wraps DTO instances with type-safe access (ArrayAccess + IteratorAggregate)
+- `DtoMetadataResolver` is a static-only class — resolution results are cached by the caller
+- All validation attributes implement `ValidationAttribute` with `ruleKey()` for message generation
+- `Hidden`, `MapFrom`, `Cast`, `DefaultValue` are metadata attributes (no validation rule generated)
+
 ## Security
 
 See [SECURITY.md](SECURITY.md) for our security policy.
