@@ -185,6 +185,7 @@ DTO::schema(UserDTO::class);
 // ── CLI ────────────────────────────────────────────────────
 php artisan zeroboiler:dto-test "App\DTOs\UserDTO"
 php artisan zeroboiler:dto-schema "App\DTOs\UserDTO" --json
+php artisan zeroboiler:dto-schema "App\DTOs\UserDTO" --with-components --json
 ```
 
 ## Quick Start
