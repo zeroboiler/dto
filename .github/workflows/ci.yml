@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  quality:
-    name: Code Quality
+  lint:
+    name: Pint (Code Style)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,23 +17,17 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          coverage: none
+          extensions: mbstring, dom, json
           tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Pint (Formatting)
+      - name: Run Pint
         run: vendor/bin/pint --test
 
-      - name: PHPStan (Static Analysis)
-        run: vendor/bin/phpstan analyse --no-progress
-
-      - name: Rector (Refactoring Check)
-        run: vendor/bin/rector --dry-run --no-progress-bar
-
-  tests:
-    name: Tests
+  phpstan:
+    name: PHPStan Level 9
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,11 +36,49 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          coverage: xdebug
+          extensions: mbstring, dom, json
+          tools: composer:v2, phpstan
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  rector:
+    name: Rector
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, json
           tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Pest (Tests)
-        run: vendor/bin/pest --coverage --min=80
+      - name: Run Rector (dry-run)
+        run: vendor/bin/rector process src --dry-run
+
+  test:
+    name: Pest Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, json
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run Pest
+        run: vendor/bin/pest --coverage

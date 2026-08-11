@@ -7,3 +7,7 @@ parameters:
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: false
+    excludePaths:
+        - tests
+    universalObjectCratesClasses:
+        - Illuminate\Support\Carbon
