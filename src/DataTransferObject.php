@@ -502,8 +502,10 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
             throw DTOException::invalidJson('(root)', 'Expected a JSON object, got '.get_debug_type($data));
         }
 
-        // Reject sequential arrays — only associative arrays (JSON objects) are valid
-        if (array_is_list($data)) {
+        // Reject sequential arrays — only associative arrays (JSON objects) are valid.
+        // Empty array [] is both a sequential list AND a valid empty JSON object {},
+        // so it's allowed. Only non-empty sequential arrays are rejected.
+        if ($data !== [] && array_is_list($data)) {
             throw DTOException::invalidJson('(root)', 'Expected a JSON object (associative array), got a sequential array');
         }
 
