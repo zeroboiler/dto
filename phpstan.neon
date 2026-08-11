@@ -1,11 +1,8 @@
 parameters:
     level: 9
     paths:
-        - src/
-    excludePaths:
-        - tests/*
-    treatPhpDocTypesAsCertain: false
-    reportUnmatchedIgnoredErrors: false
-    phpVersion: 80500
+        - src
     bootstrapFiles:
-        - vendor/larastan/larastan/bootstrap.php
+        - vendor/autoload.php
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
