@@ -13,6 +13,9 @@ use Attribute;
 /**
  * Provide a default value when the source key is entirely absent from input data.
  *
+ * A metadata-only attribute (does not implement
+ * {@see \ZeroBoiler\DTO\Contracts\ValidationAttribute}).
+ *
  * Applied during hydration: if the mapped source key (see {@see MapFrom})
  * is not present in the input array, this default is used. Explicit `null`
  * or empty string values are NOT overridden — only truly absent keys trigger

@@ -13,6 +13,9 @@ use Attribute;
 /**
  * Map a source key (from request/array) to a differently-named DTO property.
  *
+ * A metadata-only attribute (does not implement
+ * {@see \ZeroBoiler\DTO\Contracts\ValidationAttribute}).
+ *
  * When hydrating from an array or request, the resolver looks for the mapped
  * key instead of the property name. Supports dot notation for nested keys.
  *

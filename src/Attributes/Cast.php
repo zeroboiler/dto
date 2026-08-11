@@ -17,6 +17,9 @@ use Attribute;
  * Supported cast types are handled by
  * {@see \ZeroBoiler\DTO\DataTransferObject::castValue()}.
  *
+ * A metadata-only attribute (does not implement
+ * {@see \ZeroBoiler\DTO\Contracts\ValidationAttribute}).
+ *
  * Supported types:
  * - `'integer'`, `'int'` — Cast to int via `(int) $value`
  * - `'float'`, `'double'` — Cast to float via `(float) $value`
