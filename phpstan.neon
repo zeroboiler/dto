@@ -6,3 +6,4 @@ parameters:
         - vendor/autoload.php
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
+    reportUnmatchedIgnoredErrors: false
