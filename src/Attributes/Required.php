@@ -17,11 +17,13 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Generates a `required` Laravel validation rule. When used on a property,
  * the field must be present in the input data and must not be empty.
  *
- * In partial update mode ({@see fromPartialArray()}), `required` is
- * automatically relaxed to `sometimes` for present fields only.
+ * In partial update mode ({@see \ZeroBoiler\DTO\DataTransferObject::fromPartialArray()}),
+ * `required` is automatically relaxed to `sometimes` for present fields only.
  *
  *   #[Required]
  *   public readonly string $email;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Required implements ValidationAttribute

@@ -130,6 +130,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @param  mixed  $offset  The index to retrieve (0-based)
      * @return T|null The DTO instance at the offset, or null
+     *
+     * @phpstan-return T|null
      */
     #[\Override]
     public function offsetGet(mixed $offset): mixed

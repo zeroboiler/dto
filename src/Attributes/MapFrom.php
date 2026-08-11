@@ -25,7 +25,8 @@ use Attribute;
  *   #[MapFrom('meta.phone')]
  *   public readonly ?string $phone;
  *
- * The mapped key is also used for partial updates ({@see fromPartialArray()})
+ * The mapped key is also used for partial updates
+ * ({@see \ZeroBoiler\DTO\DataTransferObject::fromPartialArray()})
  * and validation rule field matching.
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]

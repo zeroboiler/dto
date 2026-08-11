@@ -15,14 +15,19 @@ use ZeroBoiler\DTO\DataTransferObject;
 /**
  * Mark an array property as a type-safe collection of DTO instances.
  *
- * During hydration, each element will be converted to the specified DTO class.
+ * During hydration, each element will be converted to the specified DTO class
+ * and wrapped in a {@see \ZeroBoiler\DTO\DtoCollection} instance.
  * During serialization, the value is returned as an array of normalized DTOs.
  *
- *   #[Collection(UserDTO::class)]
- *   public readonly array $users;
+ *   #[Collection(OrderItemDTO::class)]
+ *   public readonly DtoCollection $items;
  *
- * Unlike {@see NestedArray}, Collection also wraps the result in a
- * {@see \ZeroBoiler\DTO\DtoCollection} instance providing type-safe access.
+ * Unlike {@see \ZeroBoiler\DTO\Attributes\NestedArray} (which produces a plain PHP array),
+ * Collection wraps the result in a {@see \ZeroBoiler\DTO\DtoCollection} providing
+ * type-safe access methods (first, last, map, filter, pluck, etc.).
+ *
+ * @see \ZeroBoiler\DTO\DtoCollection For the collection wrapper class
+ * @see \ZeroBoiler\DTO\Attributes\NestedArray For plain array of nested DTOs (without DtoCollection wrapper)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Collection implements ValidationAttribute

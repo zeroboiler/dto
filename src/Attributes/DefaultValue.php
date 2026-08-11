@@ -16,7 +16,7 @@ use Attribute;
  * A metadata-only attribute (does not implement
  * {@see \ZeroBoiler\DTO\Contracts\ValidationAttribute}).
  *
- * Applied during hydration: if the mapped source key (see {@see MapFrom})
+ * Applied during hydration: if the mapped source key (see {@see \ZeroBoiler\DTO\Attributes\MapFrom})
  * is not present in the input array, this default is used. Explicit `null`
  * or empty string values are NOT overridden — only truly absent keys trigger
  * the default.

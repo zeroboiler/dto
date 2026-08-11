@@ -16,10 +16,16 @@ use ZeroBoiler\DTO\DataTransferObject;
  * Mark an array property as containing nested DTO instances.
  * During hydration, each element of the array will be converted to the DTO.
  *
+ * Produces a plain PHP array of DTO instances. For a type-safe collection
+ * wrapper with additional methods (first, last, map, filter, pluck, etc.),
+ * use {@see \ZeroBoiler\DTO\Attributes\Collection} instead.
+ *
  *   #[NestedArray(OrderItemDTO::class)]
  *   public readonly array $items;
  *
  * The DTO class must have a constructor that accepts an array (via fromArray).
+ *
+ * @see \ZeroBoiler\DTO\Attributes\Collection For DtoCollection-wrapped nested DTOs
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class NestedArray implements ValidationAttribute

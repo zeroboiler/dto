@@ -37,7 +37,7 @@ use Attribute;
  *   #[Cast('array')]
  *   public readonly array $metadata;
  *
- * @see DataTransferObject::castValue() For the cast implementation
+ * @see \ZeroBoiler\DTO\DataTransferObject::castValue() For the cast implementation
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Cast
