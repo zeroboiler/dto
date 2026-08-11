@@ -184,7 +184,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @return array<int, array<string, mixed>>
      */
     #[\Override]
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

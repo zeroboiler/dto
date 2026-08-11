@@ -410,7 +410,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @return array<string, mixed> The toArray() output
      */
     #[\Override]
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

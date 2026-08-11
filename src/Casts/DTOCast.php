@@ -50,7 +50,7 @@ final class DTOCast implements CastsAttributes
      * @return T|null
      */
     #[\Override]
-    public function get(object $model, string $key, $value, array $attributes)
+    public function get(object $model, string $key, mixed $value, array $attributes)
     {
         if ($value === null) {
             return null;
@@ -89,7 +89,7 @@ final class DTOCast implements CastsAttributes
      * @throws ValidationException When validation is enabled and data is invalid
      */
     #[\Override]
-    public function set(object $model, string $key, $value, array $attributes)
+    public function set(object $model, string $key, mixed $value, array $attributes)
     {
         if ($value === null) {
             return null;
@@ -132,7 +132,7 @@ final class DTOCast implements CastsAttributes
      * @return array<string, mixed>|null
      */
     #[\Override]
-    public function serialize(object $model, string $key, $value, array $attributes): array|string|null
+    public function serialize(object $model, string $key, mixed $value, array $attributes): array|string|null
     {
         return $value?->toArray();
     }
