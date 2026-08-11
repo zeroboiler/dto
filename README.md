@@ -2032,6 +2032,69 @@ while `profile` serializes to/from JSON.
 
 ## Source Code Structure
 
+### Attribute Type Signatures
+
+All validation attributes share a common structure:
+
+```php
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class <Name> implements ValidationAttribute
+{
+    public function __construct(
+        public readonly <typed_params>,
+        public readonly ?string $message = null,  // optional custom message
+    ) {}
+
+    public function ruleKey(): string { return '<rule>'; }
+}
+```
+
+| Category | Attribute | Constructor Signature | Rule Generated |
+|----------|-----------|----------------------|---------------|
+| **Presence** | `Required` | `()` | `required` |
+| | `Sometimes` | `()` | `sometimes` |
+| | `Present` | `()` | `present` |
+| | `Prohibited` | `()` | `prohibited` |
+| | `Nullable` | `()` | `nullable` |
+| **String** | `Email` | `()` | `email` |
+| | `Url` | `()` | `url` |
+| | `Uuid` | `()` | `uuid` |
+| | `Pattern` | `(string $regex)` | `regex:...` |
+| | `Min` | `(int\|float $value)` | `min:N` |
+| | `Max` | `(int\|float $value)` | `max:N` |
+| | `Size` | `(int $value)` | `size:N` |
+| | `Between` | `(int\|float $min, int\|float $max)` | `between:N,M` |
+| | `StartsWith` | `(string\|array $prefix)` | `starts_with:...` |
+| | `EndsWith` | `(string\|array $suffix)` | `ends_with:...` |
+| **Numeric** | `Integer` | `()` | `integer` |
+| | `Numeric` | `()` | `numeric` |
+| | `Boolean` | `()` | `boolean` |
+| **Enum/Set** | `In` | `(array $values)` | `in:a,b,...` |
+| | `Enum` | `(string $enumClass)` | Laravel `Enum` rule |
+| **Array** | `ArrayRule` | `(?int $min, ?int $max)` | `array` + optional min/max |
+| | `Distinct` | `()` | `distinct` |
+| | `Json` | `()` | `json` |
+| **Date** | `Date` | `(?string $format)` | `date` or `date_format:F` |
+| **Confirmation** | `Accepted` | `()` | `accepted` |
+| | `Declined` | `()` | `declined` |
+| | `Confirmed` | `()` | `confirmed` |
+| | `Same` | `(string $field)` | `same:field` |
+| | `Different` | `(string $field)` | `different:field` |
+| **Conditional** | `RequiredIf` | `(string $field, mixed $value)` | `required_if:...` |
+| | `RequiredUnless` | `(string $field, mixed $value)` | `required_unless:...` |
+| | `RequiredWith` | `(list<string> $fields)` | `required_with:...` |
+| | `RequiredWithAll` | `(list<string> $fields)` | `required_with_all:...` |
+| | `RequiredWithout` | `(list<string> $fields)` | `required_without:...` |
+| | `RequiredWithoutAll` | `(list<string> $fields)` | `required_without_all:...` |
+| **Metadata** | `Cast` | `(string $type)` | *(none — hydration only)* |
+| | `MapFrom` | `(string $key)` | *(none — hydration only)* |
+| | `Hidden` | `()` | *(none — serialization only)* |
+| | `DefaultValue` | `(mixed $value)` | *(none — hydration only)* |
+| | `NestedArray` | `(string $dtoClass)` | `array` |
+| | `Collection` | `(string $dtoClass)` | `array` |
+
+### Directory Layout
+
 ```
 src/
 ├── Attributes/              # PHP 8 attribute classes for validation & metadata
