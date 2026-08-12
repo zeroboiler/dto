@@ -319,9 +319,16 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
         $result = [];
 
         foreach ($this->items as $item) {
-            /** @var int|string $keyValue */
             $keyRef = new \ReflectionProperty($item, $keyField);
             $keyValue = $keyRef->getValue($item);
+
+            // Skip items where the key field is null — null cannot be used
+            // as a reliable array key (PHP converts it to empty string "").
+            if ($keyValue === null) {
+                continue;
+            }
+
+            /** @var int|string $keyValue */
             $result[$keyValue] = $valueField !== null
                 ? (new \ReflectionProperty($item, $valueField))->getValue($item)
                 : $item->toArray();

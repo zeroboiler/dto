@@ -46,4 +46,15 @@ final class DTOException extends Exception
     {
         return new self("Cannot decode JSON for property [{$property}]: {$jsonError}");
     }
+
+    /**
+     * Get a human-readable string representation of the exception.
+     *
+     * Useful for logging and display contexts where catching and
+     * re-throwing as a string is needed (e.g., custom error pages).
+     */
+    public function __toString(): string
+    {
+        return self::class.': '.$this->getMessage();
+    }
 }
