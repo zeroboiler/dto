@@ -10,6 +10,10 @@ namespace ZeroBoiler\DTO\Console\Commands;
 
 use Illuminate\Console\Command;
 use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionUnionType;
+use ZeroBoiler\DTO\DataTransferObject;
+use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 
 /**
  * Generate Pest tests for a DTO class.
@@ -200,6 +204,10 @@ PHP;
     /**
      * Generate fake data for a DTO class by reading its properties via reflection.
      *
+     * Generates type-appropriate fake values for each required constructor parameter.
+     * For complex types (nested DTOs without defaults, DtoCollection), the parameter
+     * is skipped since a meaningful fake value cannot be generated.
+     *
      * @param  class-string  $dtoClass
      * @return array<string, mixed>
      */
@@ -227,10 +235,68 @@ PHP;
                 continue;
             }
 
-            $data[$name] = $this->fakeValueForType($type, $name);
+            // Skip nested DTO properties — cannot generate meaningful fake nested structure
+            if ($this->isNestedDtoType($type)) {
+                continue;
+            }
+
+            // Skip DtoCollection properties — requires typed array of DTO instances
+            if ($this->isDtoCollectionType($type)) {
+                continue;
+            }
+
+            $fake = $this->fakeValueForType($type, $name);
+
+            // Skip null values — they won't satisfy required properties
+            if ($fake !== null) {
+                $data[$name] = $fake;
+            }
         }
 
         return $data;
+    }
+
+    /**
+     * Check if a reflection type represents a nested DTO class.
+     *
+     * Checks both direct named types and nullable wrappers.
+     */
+    private function isNestedDtoType(\ReflectionType $type): bool
+    {
+        if ($type instanceof ReflectionNamedType) {
+            $typeName = $type->getName();
+            if (class_exists($typeName) && is_subclass_of($typeName, DataTransferObject::class)) {
+                return true;
+            }
+        }
+
+        if ($type instanceof ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof ReflectionNamedType
+                    && $innerType->getName() !== 'null'
+                    && $this->isNestedDtoType($innerType)
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if a reflection type represents a DtoCollection class.
+     */
+    private function isDtoCollectionType(\ReflectionType $type): bool
+    {
+        if ($type instanceof ReflectionNamedType) {
+            $typeName = $type->getName();
+
+            return $typeName === \ZeroBoiler\DTO\DtoCollection::class
+                || (class_exists($typeName) && is_subclass_of($typeName, \ZeroBoiler\DTO\DtoCollection::class));
+        }
+
+        return false;
     }
 
     /**
@@ -238,12 +304,31 @@ PHP;
      *
      * Uses the property name to generate more realistic values
      * (e.g. "email" fields get fake email addresses).
+     *
+     * Handles scalar types, BackedEnum, ValueObject, and nested DTO types.
+     * For complex types that cannot be faked from reflection alone (union types,
+     * unknown classes), returns null and the parameter is skipped.
      */
     private function fakeValueForType(\ReflectionType $type, string $name): mixed
     {
         $lowerName = strtolower($name);
 
-        // Name-based hints first
+        // Name-based hints first (only for scalar-compatible types)
+        if ($type instanceof ReflectionNamedType) {
+            $typeName = $type->getName();
+
+            // Skip complex types — let the type-based handler below deal with them
+            if ($typeName === 'array' || $typeName === 'bool' || $typeName === 'boolean') {
+                // fall through to name-based hints
+            } elseif ($typeName === 'string' || $typeName === 'int' || $typeName === 'float') {
+                // fall through to name-based hints
+            } else {
+                // Complex type (enum, VO, DTO, Carbon, etc.) — skip name hints
+                return $this->fakeValueForComplexType($type, $name);
+            }
+        }
+
+        // Name-based hints for scalar types
         if (str_contains($lowerName, 'email')) {
             return 'test@example.com';
         }
@@ -260,29 +345,103 @@ PHP;
             return '2024-01-15 10:30:00';
         }
         if (str_contains($lowerName, 'phone')) {
-            return '+1234567890';
+            return '+123****7890';
         }
         if (str_contains($lowerName, 'password')) {
             return 'password123';
         }
 
         // Type-based fallback
-        if ($type instanceof \ReflectionNamedType) {
-            return match ($type->getName()) {
-                'string' => 'test-'.$name,
-                'int' => 42,
-                'float' => 99.99,
-                'bool' => true,
-                'array' => [],
-                default => null,
-            };
+        if ($type instanceof ReflectionNamedType) {
+            return $this->fakeValueForComplexType($type, $name);
+        }
+
+        // Union types — try to find a non-null scalar member
+        if ($type instanceof ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                if ($innerType instanceof ReflectionNamedType && ! $innerType->allowsNull()) {
+                    $innerName = $innerType->getName();
+                    if ($innerName === 'string') {
+                        return 'test-'.$name;
+                    }
+                    if ($innerName === 'int') {
+                        return 42;
+                    }
+                    if ($innerName === 'float') {
+                        return 99.99;
+                    }
+                    if ($innerName === 'bool') {
+                        return true;
+                    }
+                }
+            }
         }
 
         return null;
     }
 
     /**
+     * Generate a fake value for a named type, handling complex types.
+     *
+     * For BackedEnums: returns the first case's backed value.
+     * For ValueObjects: returns a scalar placeholder string.
+     * For nested DTOs: returns null (requires nested structure).
+     * For scalars: returns a type-appropriate default.
+     *
+     * @param  ReflectionNamedType  $type
+     * @return mixed
+     */
+    private function fakeValueForComplexType(ReflectionNamedType $type, string $name): mixed
+    {
+        $typeName = $type->getName();
+
+        // BackedEnum — use first case's backed value
+        if (enum_exists($typeName) && is_a($typeName, \BackedEnum::class, true)) {
+            $cases = $typeName::cases();
+            if ($cases !== []) {
+                return $cases[0]->value;
+            }
+        }
+
+        // ValueObject — use a generic string placeholder
+        if (class_exists($typeName) && is_a($typeName, ValueObjectContract::class, true)) {
+            return 'test-'.$name;
+        }
+
+        // Nested DTO — return null (cannot generate nested structure without source data)
+        if (class_exists($typeName) && is_subclass_of($typeName, DataTransferObject::class)) {
+            return null;
+        }
+
+        // Carbon / DateTime — use ISO string
+        if ($typeName === \Illuminate\Support\Carbon::class
+            || $typeName === \Carbon\Carbon::class
+            || is_a($typeName, \DateTimeInterface::class, true)
+        ) {
+            return '2024-01-15 10:30:00';
+        }
+
+        // DtoCollection — return empty array
+        if ($typeName === \ZeroBoiler\DTO\DtoCollection::class) {
+            return [];
+        }
+
+        // Scalar fallback
+        return match ($typeName) {
+            'string' => 'test-'.$name,
+            'int' => 42,
+            'float' => 99.99,
+            'bool' => true,
+            'array' => [],
+            default => null,
+        };
+    }
+
+    /**
      * Format a data array as a PHP literal string for the generated test.
+     *
+     * Handles scalars, arrays, null, and BackedEnum values (serialized
+     * as their backed value).
      *
      * @param  array<string, mixed>  $data
      */
@@ -295,7 +454,7 @@ PHP;
         $lines = ['['];
         foreach ($data as $key => $value) {
             if (is_string($value)) {
-                $escaped = str_replace("'", "\\'", $value);
+                $escaped = str_replace("'", "\'", $value);
                 $lines[] = "    '{$key}' => '{$escaped}',";
             } elseif (is_int($value)) {
                 $lines[] = "    '{$key}' => {$value},";
@@ -303,6 +462,14 @@ PHP;
                 $lines[] = "    '{$key}' => {$value},";
             } elseif (is_bool($value)) {
                 $lines[] = "    '{$key}' => ".($value ? 'true' : 'false').',';
+            } elseif ($value instanceof \BackedEnum) {
+                $backedValue = $value->value;
+                if (is_int($backedValue)) {
+                    $lines[] = "    '{$key}' => {$backedValue},";
+                } else {
+                    $escaped = str_replace("'", "\'", (string) $backedValue);
+                    $lines[] = "    '{$key}' => '{$escaped}',";
+                }
             } elseif (is_array($value)) {
                 $lines[] = "    '{$key}' => [],";
             } elseif ($value === null) {
