@@ -5,6 +5,14 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `LICENSE` file — proprietary license text
+
+### Changed
+- Fixed `CHANGELOG.md` — moved `[Unreleased]` section to top per Keep a Changelog convention
+
 ## [1.1.0] - 2025-08-11
 
 ### Added
@@ -40,8 +48,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of ZeroBoiler DTO package
-
-## [Unreleased]
-
-### Added
-- `LICENSE` file — proprietary license text
