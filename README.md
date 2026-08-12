@@ -117,7 +117,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 | `Email` | `Attributes` | `#[Email]` — validates as email address |
 | `Max`, `Min` | `Attributes` | `#[Max(n)]` / `#[Min(n)]` — max/min length or numeric bound |
 | `Between` | `Attributes` | `#[Between(min, max)]` — numeric or string length between bounds |
-| `Pattern` | `Attributes` | `#[Pattern('/regex/')` — regex validation |
+| `Pattern` | `Attributes` | `#[Pattern('/regex/')]` — regex validation |
 | `In` | `Attributes` | `#[In([...])` — value must be in allowed list |
 | `Url`, `Uuid` | `Attributes` | `#[Url]` / `#[Uuid]` — format validation |
 | `Integer`, `Numeric`, `Boolean` | `Attributes` | Type validation — `#[Integer]`, `#[Numeric]`, `#[Boolean]` |
