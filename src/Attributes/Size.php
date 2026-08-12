@@ -19,6 +19,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Size(3)]
  *   public readonly array $items;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Min For minimum size constraint
+ * @see \ZeroBoiler\DTO\Attributes\Max For maximum size constraint
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Size implements ValidationAttribute

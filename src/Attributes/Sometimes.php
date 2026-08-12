@@ -16,6 +16,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Sometimes]
  *   public readonly ?string $nickname;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Nullable For allowing null values
+ * @see \ZeroBoiler\DTO\Attributes\Present For requiring field presence (even if null)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Sometimes implements ValidationAttribute

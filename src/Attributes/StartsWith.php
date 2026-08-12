@@ -19,6 +19,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[StartsWith(['+90', '+1'])]
  *   public readonly string $phone;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\EndsWith For suffix validation
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class StartsWith implements ValidationAttribute

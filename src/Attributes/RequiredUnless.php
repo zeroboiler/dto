@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[RequiredUnless('type', 'company')]
  *   public readonly ?string $firstName;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\RequiredIf For the inverse condition
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredUnless implements ValidationAttribute

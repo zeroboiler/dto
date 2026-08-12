@@ -16,6 +16,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Url]
  *   public readonly string $website;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Url implements ValidationAttribute

@@ -16,6 +16,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Numeric]
  *   public readonly string|float|int $price;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Numeric implements ValidationAttribute

@@ -16,6 +16,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Boolean]
  *   public readonly bool $acceptsTerms;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Boolean implements ValidationAttribute

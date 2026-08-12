@@ -16,6 +16,8 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Pattern('/^[A-Z]{3}-\d{4}$/')]
  *   public readonly string $code;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Pattern implements ValidationAttribute

@@ -19,6 +19,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[ArrayRule(min: 1, max: 10)]
  *   public readonly array $items;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\NestedArray For arrays of nested DTO instances
+ * @see \ZeroBoiler\DTO\Attributes\Collection For DtoCollection-wrapped nested DTOs
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class ArrayRule implements ValidationAttribute

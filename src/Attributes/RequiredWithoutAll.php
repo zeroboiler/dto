@@ -20,6 +20,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Also accepts a single string:
  *   #[RequiredWithoutAll('email')]
  *   public readonly ?string $username;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\RequiredWithout For requiring when ANY field is absent
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredWithoutAll implements ValidationAttribute

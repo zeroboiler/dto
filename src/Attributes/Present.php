@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Present]
  *   public readonly ?string $apiKey;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Required For requiring field presence AND non-empty value
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Present implements ValidationAttribute

@@ -18,6 +18,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *   public readonly string $password;
  *
  * Validates that `password_confirmation` matches `password`.
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Same For matching two different fields
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Confirmed implements ValidationAttribute

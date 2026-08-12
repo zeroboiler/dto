@@ -19,6 +19,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Between(10, 255)]
  *   public readonly string $description;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Min For minimum bound only
+ * @see \ZeroBoiler\DTO\Attributes\Max For maximum bound only
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Between implements ValidationAttribute

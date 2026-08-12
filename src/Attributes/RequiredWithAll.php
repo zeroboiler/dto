@@ -19,6 +19,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *   #[RequiredWithAll('email')]
  *   #[RequiredWithAll(['email', 'phone'])]
  *   public readonly ?string $username;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\RequiredWith For requiring when ANY field is present
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredWithAll implements ValidationAttribute

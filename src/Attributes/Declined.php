@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Declined]
  *   public readonly bool $optOut;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Accepted For the inverse (require accept)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Declined implements ValidationAttribute

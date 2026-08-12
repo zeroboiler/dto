@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Different('email')]
  *   public readonly string $secondaryEmail;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Same For requiring values to match
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Different implements ValidationAttribute

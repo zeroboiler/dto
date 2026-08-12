@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[RequiredIf('type', 'individual')]
  *   public readonly ?string $firstName;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\RequiredUnless For the inverse condition
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class RequiredIf implements ValidationAttribute

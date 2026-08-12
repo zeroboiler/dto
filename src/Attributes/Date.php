@@ -19,6 +19,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Date(format: 'd-m-Y')]
  *   public readonly string $birthDate;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Cast For type casting to Carbon (use #[Cast('date')] for hydration)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Date implements ValidationAttribute

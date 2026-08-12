@@ -20,6 +20,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  * Or with enum:
  *   #[Enum(UserStatus::class)]
  *   public readonly string $status;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Enum For enum-based value validation (preferred for backed enums)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class In implements ValidationAttribute

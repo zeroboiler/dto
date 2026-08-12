@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Json]
  *   public readonly string $metadata;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Cast For casting JSON strings to arrays (use #[Cast('array')] for hydration)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Json implements ValidationAttribute

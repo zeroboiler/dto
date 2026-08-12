@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Accepted]
  *   public readonly bool $terms;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Declined For the inverse (require decline)
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Accepted implements ValidationAttribute

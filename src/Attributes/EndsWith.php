@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[EndsWith('@company.com')]
  *   public readonly string $workEmail;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\StartsWith For prefix validation
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class EndsWith implements ValidationAttribute

@@ -16,6 +16,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Nullable]
  *   public readonly ?string $bio;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Sometimes For conditional validation
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Nullable implements ValidationAttribute

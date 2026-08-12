@@ -16,6 +16,10 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *
  *   #[Same('password')]
  *   public readonly string $passwordRepeat;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Different For requiring values to differ
+ * @see \ZeroBoiler\DTO\Attributes\Confirmed For the confirmation field convention
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Same implements ValidationAttribute
