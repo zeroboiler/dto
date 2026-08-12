@@ -209,9 +209,9 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * Unlike {@see append()} which returns a new immutable collection,
      * push() modifies the current instance and returns it for chaining.
      *
-     * @param  T  $dto
+     * @param  DataTransferObject  $dto  The DTO to append
      *
-     * @return self
+     * @return self This collection instance (for chaining)
      *
      * @phpstan-return DtoCollection<DataTransferObject>
      */
@@ -270,6 +270,9 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
     /**
      * Filter items by a callback and return a new collection.
+     *
+     * The resulting collection is re-indexed to prevent gaps,
+     * consistent with {@see offsetUnset()} behavior.
      *
      * @param  callable(T): bool  $callback
      *

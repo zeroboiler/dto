@@ -26,6 +26,9 @@ interface FromRequestDTO
      * Create a DTO instance from an HTTP request.
      *
      * @param  bool  $validate  Run validation before hydration
+     * @return static
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails and $validate is true
      */
     public static function fromRequest(Request $request, bool $validate = true): static;
 }

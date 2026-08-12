@@ -21,6 +21,7 @@ use ZeroBoiler\DTO\DataTransferObject;
  * @see DataTransferObject::rules() For attribute-based rule resolution
  * @see DataTransferObject::rulesFor() For action-scoped overrides
  * @see DataTransferObject::validateArray() For running validation
+ * @see DataTransferObject::fromArray() For hydration with validation
  */
 interface ValidatableDTO
 {

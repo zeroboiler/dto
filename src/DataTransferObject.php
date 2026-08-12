@@ -103,8 +103,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *
      * @param  array<string, mixed>  $data
      * @param  bool  $validate  Run validation before hydration
+     * @return static
      *
-     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException If validation fails and $validate is true
      */
     public static function fromArray(array $data, bool $validate = true): static
     {
@@ -145,7 +146,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @param  array<string, mixed>  $data
      * @param  bool  $validatePresent  Run validation on fields present in $data
      *
-     * @throws ValidationException
+     * @return static
+     * @throws \Illuminate\Validation\ValidationException If validation fails and $validatePresent is true
      */
     public static function fromPartialArray(array $data, bool $validatePresent = true): static
     {
@@ -250,10 +252,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     /**
      * Validate only the fields present in the partial data.
      *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * Converts 'required' to 'sometimes' for partial (PATCH) semantics.
+     * Fields not present in $data are not validated.
      *
-     * @throws ValidationException
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed> Validated data
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails on present fields
      */
     public static function validatePartialArray(array $data): array
     {
@@ -293,7 +298,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Missing fields fall back to their default values or type-appropriate
      * empty values when no default exists.
      *
-     * @throws ValidationException If validation fails and $validate is true
+     * @param  Request  $request  The HTTP request
+     * @param  bool  $validate  Run validation on fields present in the request
+     * @return static
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails and $validate is true
      */
     public static function fromPartialRequest(Request $request, bool $validate = true): static
     {
@@ -308,7 +317,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @param  Request  $request  The HTTP request
      * @param  bool  $validate  Run validation before hydration
      *
-     * @throws ValidationException If validation fails and $validate is true
+     * @return static
+     * @throws \Illuminate\Validation\ValidationException If validation fails and $validate is true
      */
     #[\Override]
     public static function fromRequest(Request $request, bool $validate = true): static
@@ -317,10 +327,14 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * Validate raw data against this DTO's rules and return the validated data.
      *
-     * @throws ValidationException
+     * Uses {@see resolveMetadata()} for rule resolution. Throws on failure.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed> Validated and potentially sanitized data
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails
      */
     public static function validateArray(array $data): array
     {
