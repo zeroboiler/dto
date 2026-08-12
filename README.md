@@ -550,6 +550,15 @@ $collection->push($dto4);   // mutates in-place, returns $collection
 // ── Immutable alternatives ───────────────────────────────────
 $newCol = $collection->append($dto4);  // returns NEW collection (immutable)
 $newCol = $collection->merge($other);  // returns NEW collection combining both
+
+// ── Re-keying ────────────────────────────────────────────
+// toArrayBy: re-key by a property value
+$keyed = $collection->toArrayBy('id');
+// ['42' => ['id' => 42, 'name' => 'Alice'], ...]
+
+// toDictionary: map one property to another
+$dict = $collection->toDictionary('id', 'name');
+// [42 => 'Alice', 43 => 'Bob', ...]
 ```
 
 ### Partial Updates (PATCH)
