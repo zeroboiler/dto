@@ -59,6 +59,10 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 /**
  * Resolves validation rules and property metadata from DTO attribute definitions.
  *
+ * @internal Not part of the public API — used internally by {@see DataTransferObject}.
+ *          Consumers should use {@see DataTransferObject::rules()} or
+ *          {@see DataTransferObject::fromArray()} instead of calling this class directly.
+ *
  * Reads constructor parameters via reflection, detects attribute types
  * (ValueObject, BackedEnum, nested DTO), infers base validation rules
  * from PHP types, and collects validation attribute rules.

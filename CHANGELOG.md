@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `LICENSE` file — proprietary license text
+- `DtoCollection::toArrayBy()` — re-key collection by a property value (returns `{value: array}`)
+- `DtoCollection::toDictionary()` — build lookup maps from two properties (returns `{key: value}`)
+- `@internal` annotations on `DtoMetadataResolver` and `OpenApiSchemaGenerator` support classes
 
 ### Changed
 - Fixed `CHANGELOG.md` — moved `[Unreleased]` section to top per Keep a Changelog convention

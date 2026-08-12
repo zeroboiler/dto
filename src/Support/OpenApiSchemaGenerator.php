@@ -34,6 +34,10 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
 /**
  * Generate OpenAPI 3.0 schemas from DTO class definitions.
  *
+ * @internal Not part of the public API for most consumers. Use the
+ *           {@see \ZeroBoiler\DTO\Facades\DTO::schema()} facade method or
+ *           the `zeroboiler:dto-schema` artisan command instead.
+ *
  * Reads constructor parameters and validation attributes via reflection
  * to produce accurate property schemas with types, constraints, and
  * required-field lists. Supports nested DTOs (via `$ref` to component

@@ -1031,6 +1031,8 @@ class OrderDTO extends DataTransferObject
 | `->count()` | `int` | Item count |
 | `->isEmpty()` | `bool` | Check if empty |
 | `->isNotEmpty()` | `bool` | Check if not empty |
+| `->toArrayBy(string)` | `array` | Re-key collection by a property value |
+| `->toDictionary(string, string)` | `array` | Build lookup map from two properties |
 
 ### DTOManager (via Facade)
 

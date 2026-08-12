@@ -394,4 +394,58 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     {
         return $this->items !== [];
     }
+
+    /**
+     * Re-key the collection by a property value.
+     *
+     * Returns an associative array where each DTO's array representation
+     * is keyed by the value of the specified property. Items with null
+     * key values are silently skipped (PHP converts null keys to empty string).
+     *
+     * Useful for building ID-keyed maps for frontend state or lookup tables:
+     *
+     *   $keyed = $collection->toArrayBy('id');
+     *   // ['42' => ['id' => 42, 'name' => 'Alice'], ...]
+     *
+     * @param  string  $keyField  The DTO property to use as the array key
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function toArrayBy(string $keyField): array
+    {
+        return $this->pluckKey($keyField);
+    }
+
+    /**
+     * Re-key the collection by one property and extract another property as the value.
+     *
+     * Returns an associative array mapping one DTO property to another.
+     * Items where the key property is null are silently skipped.
+     *
+     * Useful for building lookup maps:
+     *
+     *   $map = $collection->toDictionary('id', 'name');
+     *   // [42 => 'Alice', 43 => 'Bob', ...]
+     *
+     * @param  string  $keyField  The DTO property to use as the array key
+     * @param  string  $valueField  The DTO property to use as the value
+     * @return array<int|string, mixed>
+     */
+    public function toDictionary(string $keyField, string $valueField): array
+    {
+        $result = [];
+
+        foreach ($this->items as $item) {
+            $keyRef = new \ReflectionProperty($item, $keyField);
+            $keyValue = $keyRef->getValue($item);
+
+            if ($keyValue === null) {
+                continue;
+            }
+
+            /** @var int|string $keyValue */
+            $result[$keyValue] = (new \ReflectionProperty($item, $valueField))->getValue($item);
+        }
+
+        return $result;
+    }
 }
