@@ -12,6 +12,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 ## Table of Contents
 
 - [Installation](#installation)
+- [Source Code Index](#source-code-index)
 - [Quick Reference Card](#quick-reference-card)
 - [Type System](#type-system)
   - [Readonly Promoted Properties](#readonly-promoted-properties)
@@ -95,6 +96,48 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - PHP 8.5+
 - Laravel 13+
 - `zeroboiler/value-objects` (installed automatically as a dependency)
+
+## Source Code Index
+
+| Class | Namespace | Purpose |
+|-------|-----------|---------|
+| `DataTransferObject` | Root | Abstract base class — provides fromArray, fromRequest, fromJson, fromPartialArray, toArray, with, equals, rules, validation |
+| `DtoCollection` | Root | Type-safe collection wrapper with pluck, pluckKey, map, filter, push, append, merge, ArrayAccess, IteratorAggregate |
+| `DTOManager` | Root | Runtime helper (injectable/facade) — validate, make, makeFromJson, schema |
+| `DTO` | `Facades` | Laravel facade for `DTOManager` — `DTO::make(...)`, `DTO::validate(...)` |
+| `DTOSServiceProvider` | Root | Registers singleton, artisan commands, dev cache TTL, and Octane flush listeners |
+| `DtoMetadataResolver` | `Support` | Resolves validation rules + property metadata from constructor reflection and attributes |
+| `OpenApiSchemaGenerator` | `Support` | Generates OpenAPI 3.0 schemas from DTO definitions (supports nested DTOs, union types) |
+| `DTOCast` | `Casts` | Eloquent cast — stores DTOs as JSON columns in the database |
+| `DTOException` | `Exceptions` | Thrown for invalid casts and JSON decode failures |
+| `FromRequestDTO` | `Contracts` | Interface for DTOs that can be hydrated from HTTP requests |
+| `ValidatableDTO` | `Contracts` | Interface for DTOs providing validation rules (rules + rulesFor) |
+| `ValidationAttribute` | `Contracts` | Interface for attributes that participate in validation (ruleKey method) |
+| `Required` | `Attributes` | `#[Required]` — marks property as required |
+| `Email` | `Attributes` | `#[Email]` — validates as email address |
+| `Max`, `Min` | `Attributes` | `#[Max(n)]` / `#[Min(n)]` — max/min length or numeric bound |
+| `Between` | `Attributes` | `#[Between(min, max)]` — numeric or string length between bounds |
+| `Pattern` | `Attributes` | `#[Pattern('/regex/')` — regex validation |
+| `In` | `Attributes` | `#[In([...])` — value must be in allowed list |
+| `Url`, `Uuid` | `Attributes` | `#[Url]` / `#[Uuid]` — format validation |
+| `Integer`, `Numeric`, `Boolean` | `Attributes` | Type validation — `#[Integer]`, `#[Numeric]`, `#[Boolean]` |
+| `Date` | `Attributes` | `#[Date]` / `#[Date('Y-m-d')]` — date/date_format validation |
+| `ArrayRule` | `Attributes` | `#[ArrayRule]` / `#[ArrayRule(min:1, max:10)]` — array with optional count bounds |
+| `Json` | `Attributes` | `#[Json]` — validates as JSON string |
+| `Enum` | `Attributes` | `#[Enum(MyBackedEnum::class)]` — validates against backed enum values |
+| `MapFrom` | `Attributes` | `#[MapFrom('source_key')]` — maps source key to DTO property (supports dot notation) |
+| `Cast` | `Attributes` | `#[Cast('integer')]` — type casting during hydration (int, string, bool, array, date) |
+| `DefaultValue` | `Attributes` | `#[DefaultValue('active')]` — default when source key is absent |
+| `Hidden` | `Attributes` | `#[Hidden]` — excludes from toArray/toJson output |
+| `Nullable`, `Sometimes`, `Present` | `Attributes` | Field presence control — `#[Nullable]`, `#[Sometimes]`, `#[Present]` |
+| `Prohibited`, `Accepted`, `Declined` | `Attributes` | Field value control — `#[Prohibited]`, `#[Accepted]`, `#[Declined]` |
+| `Confirmed`, `Same`, `Different`, `Distinct` | `Attributes` | Cross-field validation — confirmed, same, different, distinct array elements |
+| `RequiredIf`, `RequiredUnless`, `RequiredWith`, etc. | `Attributes` | Conditional requirement — 7 conditional required attributes |
+| `Size`, `StartsWith`, `EndsWith` | `Attributes` | Size constraint, string prefix/suffix validation |
+| `NestedArray` | `Attributes` | `#[NestedArray(ItemDTO::class)]` — array of nested DTO instances |
+| `Collection` | `Attributes` | `#[Collection(ItemDTO::class)]` — DtoCollection-wrapped nested DTOs |
+| `MakeDtoTestCommand` | `Console\Commands` | `php artisan zeroboiler:dto-test` — generates Pest test file for a DTO |
+| `MakeDtoSchemaCommand` | `Console\Commands` | `php artisan zeroboiler:dto-schema` — generates OpenAPI schema for a DTO |
 
 ## Quick Reference Card
 
