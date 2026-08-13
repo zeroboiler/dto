@@ -1034,14 +1034,20 @@ class OrderDTO extends DataTransferObject
 | `->filter(callable)` | `self` | Filter items (returns new collection) |
 | `->pluck(string)` | `array` | Extract single field from all DTOs |
 | `->pluckKey(string, ?string)` | `array` | Key/value map from fields |
+| `->toArrayBy(string)` | `array` | Re-key collection by a property value (alias for pluckKey) |
+| `->toDictionary(string, string)` | `array` | Build lookup map from two properties |
 | `->items()` | `array` | Raw DTO instances |
 | `->toArray()` | `array` | All DTOs serialized via toArray() |
 | `->allValues()` | `array` | All DTOs serialized including hidden |
-| `->count()` | `int` | Item count |
+| `->count()` | `int` | Item count (Countable interface) |
 | `->isEmpty()` | `bool` | Check if empty |
 | `->isNotEmpty()` | `bool` | Check if not empty |
-| `->toArrayBy(string)` | `array` | Re-key collection by a property value |
-| `->toDictionary(string, string)` | `array` | Build lookup map from two properties |
+| `->offsetExists(mixed)` | `bool` | ArrayAccess: check if index exists |
+| `->offsetGet(mixed)` | `?DataTransferObject` | ArrayAccess: get item at index |
+| `->offsetSet(mixed, mixed)` | `void` | ArrayAccess: set item at index |
+| `->offsetUnset(mixed)` | `void` | ArrayAccess: remove item (re-indexes) |
+| `->jsonSerialize()` | `array` | JsonSerializable: returns toArray() |
+| `->getIterator()` | `Traversable` | IteratorAggregate: enables foreach |
 
 ### DTOManager (via Facade)
 
