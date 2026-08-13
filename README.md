@@ -2277,3 +2277,316 @@ $dto->toArray();       // ['email' => 'a@b.com'] — password excluded
 $dto->allValues();     // ['email' => 'a@b.com', 'password' => 'secret'] — internal only
 $dto->password;        // 'secret' — direct property access still works
 ```
+
+## Real-World Patterns
+
+### DataTransferObject — Complete Method Reference
+
+```php
+use ZeroBoiler\DTO\DataTransferObject;
+
+// ── Hydration Methods ─────────────────────────────────────────
+$dto = CreateUserDTO::fromArray($data);               // array → DTO (validates)
+$dto = CreateUserDTO::fromArray($data, validate: false); // skip validation
+$dto = CreateUserDTO::fromRequest($request);            // HTTP request → DTO
+$dto = CreateUserDTO::fromRequest($request, validate: false);
+
+$dto = CreateUserDTO::fromJson('{"email":"a@b.com","name":"Alice"}');
+// Throws DTOException on invalid JSON or sequential arrays
+
+// ── Partial Hydration (PATCH) ──────────────────────────────────
+$patched = CreateUserDTO::fromPartialArray(['name' => 'Updated']);
+// Missing fields use defaults or type-appropriate empty values
+// 'required' is relaxed to 'sometimes' for present fields only
+
+$patched = CreateUserDTO::fromPartialRequest($request);
+
+// ── Validation ─────────────────────────────────────────────────
+CreateUserDTO::rules();
+// ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
+
+$validated = CreateUserDTO::validateArray($data);        // returns validated data
+$validated = CreateUserDTO::validatePartialArray($data); // PATCH validation
+
+CreateUserDTO::rulesFor('create');  // action-scoped (default: same as rules())
+CreateUserDTO::rulesFor('update');  // override in subclass
+
+// ── Serialization ──────────────────────────────────────────────
+$dto->toArray();    // public fields only (#[Hidden] excluded)
+$dto->allValues();  // includes hidden fields
+$dto->toJson();     // JSON string (hidden excluded)
+$dto->toJson(JSON_PRETTY_PRINT); // formatted JSON
+
+// ── Selective Output ──────────────────────────────────────────
+$dto->only('email', 'name');  // ['email' => '...', 'name' => '...']
+$dto->only('email');           // single string key
+$dto->except('password');       // all except 'password'
+$dto->except('age', 'tags');   // multiple keys
+
+// ── Immutable Update ───────────────────────────────────────────
+$updated = $dto->with(['name' => 'Bob']);  // new instance (always validates)
+// Original $dto is unchanged
+
+// ── Equality & State ───────────────────────────────────────────
+$dto->equals($other);    // true if toArray() matches exactly
+$dto->isEmpty();         // true if all properties are default/empty
+$dto->isNotEmpty();      // at least one property has a value
+
+// ── Cache Management (static) ──────────────────────────────────
+CreateUserDTO::setMetadataCacheTtl(2.0);    // dev: short TTL
+CreateUserDTO::flushMetadataCache();          // flush all
+CreateUserDTO::flushMetadataCache(CreateUserDTO::class); // flush one
+```
+
+### DtoCollection — Full Method Reference
+
+```php
+use ZeroBoiler\DTO\DtoCollection;
+
+$collection = DtoCollection::make([$dto1, $dto2, $dto3]);
+
+// ── Iteration ──────────────────────────────────────────────────
+foreach ($collection as $dto) { ... }  // IteratorAggregate
+$collection[0];        // ArrayAccess
+$collection[0] = $dto; // ArrayAccess set (validated: must be DTO)
+isset($collection[0]); // offsetExists
+unset($collection[0]); // offsetUnset (re-indexes automatically)
+
+// ── Extraction ────────────────────────────────────────────────
+$emails = $collection->pluck('email');
+// ['a@example.com', 'b@example.com']
+
+$map = $collection->pluckKey('email', 'name');
+// ['a@example.com' => 'Alice', 'b@example.com' => 'Bob']
+
+$keyed = $collection->toArrayBy('id');
+// ['42' => ['id' => 42, 'name' => 'Alice'], ...]
+
+$dict = $collection->toDictionary('id', 'name');
+// [42 => 'Alice', 43 => 'Bob']
+
+// ── Transformation ──────────────────────────────────────────────
+$names = $collection->map(fn ($dto) => $dto->name);
+// ['Alice', 'Bob', 'Charlie']
+
+$active = $collection->filter(fn ($dto) => $dto->status === 'active');
+// Returns new DtoCollection (immutable)
+
+// ── Mutation ────────────────────────────────────────────────────
+$collection->push($dto4);     // mutates in-place, returns $collection
+$new = $collection->append($dto4);   // returns NEW collection (immutable)
+$merged = $collection->merge($other); // returns NEW collection
+
+// ── State ──────────────────────────────────────────────────────
+$collection->count();       // 3
+$collection->isEmpty();     // false
+$collection->isNotEmpty();  // true
+$collection->first();       // $dto1
+$collection->last();        // $dto3
+$collection->items();       // raw DTO array (no serialization)
+
+// ── Serialization ───────────────────────────────────────────────
+$collection->toArray();     // array of toArray() results
+$collection->allValues();   // array of allValues() results (includes hidden)
+json_encode($collection);  // uses jsonSerialize() → toArray()
+```
+
+### DTOManager & Facade — Dependency Injection
+
+```php
+use ZeroBoiler\DTO\DTOManager;
+use ZeroBoiler\DTO\Facades\DTO;
+
+// ── Facade Usage ────────────────────────────────────────────────
+$dto = DTO::make(CreateUserDTO::class, $data);
+$dto = DTO::makeFromJson(CreateUserDTO::class, $json);
+DTO::validate(CreateUserDTO::class, $data);
+DTO::rules(CreateUserDTO::class);
+DTO::rulesFor(CreateUserDTO::class, 'update');
+$schema = DTO::schema(CreateUserDTO::class);
+
+// ── DI Usage (controller/service injection) ────────────────────
+class UserController extends Controller
+{
+    public function __construct(
+        private readonly DTOManager $dtoManager,
+    ) {}
+
+    public function store(Request $request): JsonResponse
+    {
+        $dto = $this->dtoManager->make(CreateUserDTO::class, $request->all());
+        // ... create user from DTO
+    }
+}
+```
+
+### DTOCast — Eloquent JSON Column
+
+```php
+use ZeroBoiler\DTO\Casts\DTOCast;
+
+// Store DTOs as JSON columns
+protected $casts = [
+    'profile' => UserProfileDTO::class,
+    'settings' => new UserSettingsDTO::class(validate: false),
+];
+
+// Reading: JSON string → DTO instance
+$user->profile;  // UserProfileDTO instance (or null)
+
+// Writing: DTO instance → JSON string
+$user->profile = new UserProfileDTO(email: 'a@b.com', name: 'Alice');
+$user->save();
+// Database column: '{"email":"a@b.com","name":"Alice"}'
+
+// Writing: array → validated + serialized
+$user->profile = ['email' => 'new@b.com', 'name' => 'Bob'];
+$user->save();
+// Goes through fromArray() → validation → JSON encode
+
+// Serialization for API responses
+$user->toArray();  // profile is serialized via DTOCast::serialize()
+```
+
+### DTOException — Error Handling
+
+```php
+use ZeroBoiler\DTO\Exceptions\DTOException;
+
+// fromJson() throws on invalid JSON
+try {
+    $dto = MyDTO::fromJson('{invalid json}');
+} catch (DTOException $e) {
+    // "Cannot decode JSON for property (root): Syntax error"
+}
+
+// __toString() for logging
+(string) $e;
+// "ZeroBoiler\DTO\Exceptions\DTOException: Cannot decode JSON..."
+
+// invalidCast() factory (internal, thrown by cast pipeline)
+$e = DTOException::invalidCast('age', 'integer', 'not_a_number');
+// "Cannot cast property [age] value [string] to [integer]."
+
+// invalidJson() factory
+$e = DTOException::invalidJson('settings', 'Syntax error');
+// "Cannot decode JSON for property [settings]: Syntax error"
+```
+
+### Advanced: Nested DTOs with Collections
+
+```php
+use ZeroBoiler\DTO\Attributes\{Required, Email, Min, Max, NestedArray, Collection};
+
+// ── Nested DTO ─────────────────────────────────────────────────
+class AddressDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $street,
+
+        #[Required]
+        public readonly string $city,
+
+        #[Required]
+        public readonly string $country,
+    ) {}
+}
+
+// ── Parent DTO with NestedArray ────────────────────────────────
+class OrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $customerEmail,
+
+        #[NestedArray(AddressDTO::class)]
+        public readonly array $shippingAddresses = [],
+    ) {}
+}
+
+// Usage
+$dto = OrderDTO::fromArray([
+    'customerEmail' => 'buyer@example.com',
+    'shippingAddresses' => [
+        ['street' => '123 Main', 'city' => 'Ankara', 'country' => 'TR'],
+        ['street' => '456 Oak', 'city' => 'Istanbul', 'country' => 'TR'],
+    ],
+]);
+
+$dto->shippingAddresses;  // array of AddressDTO instances
+$dto->toArray();
+// ['customerEmail' => '...', 'shippingAddresses' => [...toArray()...]]
+```
+
+### Advanced: Action-Scoped Rules
+
+```php
+class RegistrationDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(8)]
+        public readonly string $password,
+
+        #[Same('password')]
+        public readonly ?string $passwordConfirmation = null,
+    ) {}
+
+    // Override for different actions
+    public static function rulesFor(string $action): array
+    {
+        return match ($action) {
+            'create' => static::rules(),  // all rules
+            'update' => [
+                'email' => ['sometimes', 'email'],
+                'password' => ['sometimes', 'min:8'],
+            ],
+            default => static::rules(),
+        };
+    }
+}
+
+// In controller
+$rules = RegistrationDTO::rulesFor('update');
+$validated = RegistrationDTO::validateArray(array_merge($existing, $request->only(['email'])));
+```
+
+### Advanced: MapFrom with Dot Notation
+
+```php
+use ZeroBoiler\DTO\Attributes\MapFrom;
+
+class PaymentDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        #[MapFrom('payment.method')]
+        public readonly string $method,
+
+        #[Required]
+        #[MapFrom('payment.amount')]
+        public readonly float $amount,
+
+        #[MapFrom('payment.details.card_last_four')]
+        public readonly ?string $cardLastFour = null,
+    ) {}
+}
+
+// Deeply nested input → flat DTO properties
+$dto = PaymentDTO::fromArray([
+    'payment' => [
+        'method' => 'credit_card',
+        'amount' => 99.99,
+        'details' => [
+            'card_last_four' => '4242',
+        ],
+    ],
+]);
+
+$dto->method;       // 'credit_card'
+$dto->amount;       // 99.99
+$dto->cardLastFour; // '4242'
+```
