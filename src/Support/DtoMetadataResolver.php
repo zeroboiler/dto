@@ -516,8 +516,6 @@ final class DtoMetadataResolver
      * Check if a class name is a DTO subclass.
      *
      * @return class-string<DataTransferObject>|null
-     *
-     * @phpstan-return class-string<static>|null
      */
     private static function checkDtoClass(string $typeName): ?string
     {
