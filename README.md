@@ -752,6 +752,10 @@ $validated = DTO::validate(CreateUserDTO::class, $rawData);
 $dto = DTO::makeFromJson(CreateUserDTO::class, $jsonString);
 // Throws DTOException on invalid JSON, ValidationException on invalid data
 
+// Get validation rules (useful for form builders, API clients)
+$rules = DTO::rules(CreateUserDTO::class);
+$rules = DTO::rulesFor(CreateUserDTO::class, 'update');
+
 // Generate OpenAPI schema for API documentation
 $schema = DTO::schema(CreateUserDTO::class);
 // Returns OpenAPI 3.0 property schema array
@@ -1056,6 +1060,8 @@ class OrderDTO extends DataTransferObject
 | `DTO::validate(string, array)` | Validate data against a DTO class |
 | `DTO::make(string, array)` | Create DTO from data |
 | `DTO::makeFromJson(string, string)` | Create DTO from JSON string |
+| `DTO::rules(string)` | Get validation rules for a DTO class |
+| `DTO::rulesFor(string, string)` | Get action-scoped validation rules |
 | `DTO::schema(string)` | Generate OpenAPI schema |
 
 ### OpenApiSchemaGenerator

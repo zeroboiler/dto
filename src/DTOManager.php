@@ -14,11 +14,14 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 /**
  * Runtime DTO helper — accessible via `DTO` facade or injected.
  *
- * Provides methods for validation, DTO creation, and OpenAPI schema
- * generation without direct static method usage.
+ * Provides methods for validation, DTO creation, rules retrieval,
+ * and OpenAPI schema generation without direct static method usage.
  *
  *   DTO::validate(CreateUserDTO::class, $data);
  *   DTO::make(CreateUserDTO::class, $data);
+ *   DTO::makeFromJson(CreateUserDTO::class, $json);
+ *   DTO::rules(CreateUserDTO::class);
+ *   DTO::rulesFor(CreateUserDTO::class, 'update');
  *   DTO::schema(CreateUserDTO::class);
  *
  * @see \ZeroBoiler\DTO\Facades\DTO
@@ -63,6 +66,29 @@ final readonly class DTOManager
     public function makeFromJson(string $dtoClass, string $json): DataTransferObject
     {
         return $dtoClass::fromJson($json);
+    }
+
+    /**
+     * Get validation rules for a DTO class.
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @return array<string, array<int, mixed>>
+     */
+    public function rules(string $dtoClass): array
+    {
+        return $dtoClass::rules();
+    }
+
+    /**
+     * Get action-scoped validation rules for a DTO class.
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  string  $action  The action context (e.g. 'create', 'update', 'patch')
+     * @return array<string, array<int, mixed>>
+     */
+    public function rulesFor(string $dtoClass, string $action): array
+    {
+        return $dtoClass::rulesFor($action);
     }
 
     /**
