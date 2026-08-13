@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DtoCollection toArrayBy/toDictionary/pluck/pluckKey edge case tests for full coverage
 - `DTOManager::rules()` and `DTOManager::rulesFor()` — access validation rules via manager and `DTO` facade
 - `DTOManagerTest` and `DTOManagerRulesAndRulesForTest` — facade delegation tests for rules/rulesFor
+- GitHub issue templates (bug report, feature request) and pull request template
+- `DtoSourceCodeProductionReadinessAuditTest` — comprehensive PHPStan Level 9 structural audit verifying strict_types, final classes, return types, typed properties, readonly enforcement, attribute contracts, and docblock completeness across all source files
 
 ### Changed
 - Fixed `CHANGELOG.md` — moved `[Unreleased]` section to top per Keep a Changelog convention
