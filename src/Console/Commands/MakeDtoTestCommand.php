@@ -260,6 +260,9 @@ PHP;
      * Check if a reflection type represents a nested DTO class.
      *
      * Checks both direct named types and nullable wrappers.
+     *
+     * @param  \ReflectionType  $type  The property reflection type to inspect
+     * @return bool True if the type is or contains a DataTransferObject subclass
      */
     private function isNestedDtoType(\ReflectionType $type): bool
     {
@@ -286,6 +289,9 @@ PHP;
 
     /**
      * Check if a reflection type represents a DtoCollection class.
+     *
+     * @param  \ReflectionType  $type  The property reflection type to inspect
+     * @return bool True if the type is or extends DtoCollection
      */
     private function isDtoCollectionType(\ReflectionType $type): bool
     {
@@ -388,8 +394,9 @@ PHP;
      * For nested DTOs: returns null (requires nested structure).
      * For scalars: returns a type-appropriate default.
      *
-     * @param  ReflectionNamedType  $type
-     * @return mixed
+     * @param  ReflectionNamedType  $type  The named type to generate a fake value for
+     * @param  string  $name  The property name (used for generating contextual fake values)
+     * @return mixed A type-appropriate fake value, or null if no value can be generated
      */
     private function fakeValueForComplexType(ReflectionNamedType $type, string $name): mixed
     {
