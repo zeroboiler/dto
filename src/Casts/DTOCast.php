@@ -27,9 +27,9 @@ use ZeroBoiler\DTO\DataTransferObject;
  *       return ['payload' => new DTOCast(CreateUserDTO::class, validate: false)];
  *   }
  *
- * @template T of \ZeroBoiler\DTO\DataTransferObject
+ * @template T of \\ZeroBoiler\\DTO\\DataTransferObject
  *
- * @implements CastsAttributes<T, T|array<string, mixed>|null>
+ * @implements CastsAttributes<T|null, T|array<string, mixed>|null>
  */
 final class DTOCast implements CastsAttributes
 {
@@ -50,7 +50,7 @@ final class DTOCast implements CastsAttributes
      * @return T|null
      */
     #[\Override]
-    public function get(object $model, string $key, mixed $value, array $attributes)
+    public function get(object $model, string $key, mixed $value, array $attributes): ?DataTransferObject
     {
         if ($value === null) {
             return null;
