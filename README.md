@@ -83,6 +83,10 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Validation Attributes (39 total)](#validation-attributes-39-total)
   - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
   - [Service & Infrastructure Classes](#service--infrastructure-classes)
+- [Source Code Structure](#source-code-structure)
+  - [Attribute Type Signatures](#attribute-type-signatures)
+  - [Directory Layout](#directory-layout)
+- [Security](#security)
 
 ## Installation
 
