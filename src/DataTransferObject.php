@@ -347,6 +347,14 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Return validation rules resolved from attributes.
+     *
+     * Reads constructor parameters via reflection, extracts
+     * {@see \ZeroBoiler\DTO\Contracts\ValidationAttribute} instances,
+     * and builds a Laravel-compatible rules array.
+     *
+     * Results are cached by {@see resolveMetadata()}.
+     *
      * @return array<string, array<int, mixed>>
      */
     #[\Override]
