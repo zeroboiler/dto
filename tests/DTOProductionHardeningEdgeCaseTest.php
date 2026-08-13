@@ -178,17 +178,18 @@ describe('DTO — PHPStan L9 edge cases and production hardening', function () {
 
         it('MapFrom attribute has readonly typed constructor property', function () {
             $attr = new MapFrom('source_key');
-            $ref = new ReflectionProperty($attr, 'sourceKey');
+            $ref = new ReflectionProperty($attr, 'key');
             expect($ref->isReadOnly())->toBeTrue();
             expect($ref->getType()->getName())->toBe('string');
-            expect($attr->sourceKey)->toBe('source_key');
+            expect($attr->key)->toBe('source_key');
         });
 
-        it('Hidden attribute has readonly typed constructor property', function () {
+        it('Hidden attribute has no constructor properties (marker class)', function () {
             $attr = new Hidden();
-            $ref = new ReflectionProperty($attr, 'hidden');
-            expect($ref->isReadOnly())->toBeTrue();
-            expect($attr->hidden)->toBeTrue();
+            $ref = new ReflectionClass($attr);
+            $props = $ref->getProperties();
+            expect($props)->toHaveCount(0);
+            expect($ref->isFinal())->toBeTrue();
         });
 
         it('DefaultValue attribute stores mixed value', function () {
