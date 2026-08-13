@@ -22,9 +22,11 @@ use ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand;
  *
  * Auto-discovered via Laravel's package discovery — no manual registration needed.
  *
- * @see \ZeroBoiler\DTO\DTOManager
- * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand
- * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand
+ * @see \ZeroBoiler\DTO\DTOManager For the singleton manager
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoTestCommand For the DTO test generation command
+ * @see \ZeroBoiler\DTO\Console\Commands\MakeDtoSchemaCommand For the OpenAPI schema generation command
+ * @see \ZeroBoiler\DTO\DataTransferObject For the base DTO class with metadata cache
+ * @see \ZeroBoiler\DTO\Support\OpenApiSchemaGenerator For the schema generation logic
  */
 final class DTOSServiceProvider extends ServiceProvider
 {
