@@ -89,7 +89,7 @@ final class DTOCast implements CastsAttributes
      * @throws ValidationException When validation is enabled and data is invalid
      */
     #[\Override]
-    public function set(object $model, string $key, mixed $value, array $attributes)
+    public function set(object $model, string $key, mixed $value, array $attributes): array|string|null
     {
         if ($value === null) {
             return null;
