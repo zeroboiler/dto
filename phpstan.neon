@@ -1,0 +1,13 @@
+parameters:
+    level: 9
+    paths:
+        - src
+    checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # Laravel facades use magic __call — false positives
+        - '#Call to an undefined static method#'
+        # Dynamic property access via reflection (DtoMetadataResolver, DtoCollection pluck)
+        - '#Access to an undefined property#'
+        # Array access on generic template types
+        - '#Offset .+\[(int\|string)\] does not accept type#'
