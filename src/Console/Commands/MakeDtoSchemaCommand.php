@@ -49,11 +49,11 @@ final class MakeDtoSchemaCommand extends Command
         $shortName = class_basename($dtoClass);
 
         try {
-            /** @var array<string, mixed> $schema */
             if ($this->option('with-components')) {
-                $result = OpenApiSchemaGenerator::generateWithComponents($dtoClass);
-                $schema = $result;
+                /** @var array{schema: array<string, mixed>, components: array{schemas: array<string, array<string, mixed>>}} $schema */
+                $schema = OpenApiSchemaGenerator::generateWithComponents($dtoClass);
             } else {
+                /** @var array<string, mixed> $schema */
                 $schema = OpenApiSchemaGenerator::generate($dtoClass);
             }
         } catch (\LogicException $e) {
