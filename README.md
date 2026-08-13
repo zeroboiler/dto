@@ -87,6 +87,22 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Attribute Type Signatures](#attribute-type-signatures)
   - [Directory Layout](#directory-layout)
 
+## Why ZeroBoiler DTO?
+
+| Problem | ZeroBoiler Solution |
+|---------|-------------------|
+| Repetitive Form Request validation rules | **Attribute-driven validation** — `#[Required]`, `#[Email]`, `#[Max]` directly on properties |
+| Manual array-to-object hydration in controllers | **`fromArray()` / `fromRequest()`** — auto-hydration with zero boilerplate |
+| No PATCH/partial update support | **`fromPartialArray()` / `fromPartialRequest()`** — PATCH semantics built-in |
+| Inconsistent serialization across DTOs | **`toArray()` / `toJson()` / `jsonSerialize()`** — uniform output with `#[Hidden]` support |
+| Manual OpenAPI schema maintenance | **`DTO::schema()`** / `zeroboiler:dto-schema` — auto-generated from attributes |
+| No immutable update pattern | **`with()`** — returns a new DTO instance, always validates |
+| Missing test coverage for DTOs | **`zeroboiler:dto-test`** — generates comprehensive Pest tests automatically |
+| Nested DTO/array handling is complex | **`#[NestedArray]` / `#[Collection]`** — recursive hydration with type-safe collections |
+| Source key mismatches (camelCase ↔ snake_case) | **`#[MapFrom('user_name')]`** — maps any source key to your property |
+
+**Zero ceremony. Zero boilerplate. Production-grade from day one.**
+
 ## Installation
 
 ```bash
