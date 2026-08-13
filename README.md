@@ -83,10 +83,10 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Validation Attributes (39 total)](#validation-attributes-39-total)
   - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
   - [Service & Infrastructure Classes](#service--infrastructure-classes)
-- [Source Code Structure](#source-code-structure)
+|- [Source Code Structure](#source-code-structure)
   - [Attribute Type Signatures](#attribute-type-signatures)
   - [Directory Layout](#directory-layout)
-- [Security](#security)
+|- [Security](#security)
 
 ## Installation
 
@@ -2243,3 +2243,37 @@ src/
 ## Security
 
 See [SECURITY.md](SECURITY.md) for our security policy.
+
+### Built-In Security Features
+
+| Feature | Implementation | Description |
+|---------|---------------|-------------|
+| **Input validation** | Attribute-based rules + Laravel Validator | All DTO inputs validated before hydration — invalid data rejected early |
+| **Output filtering** | `#[Hidden]` attribute | Sensitive fields (passwords, tokens) excluded from `toArray()`/`toJson()` |
+| **Type enforcement** | `public readonly` + strict types | Properties cannot be modified after construction; strict type coercion |
+| **JSON injection prevention** | `json_decode(..., true, 512, JSON_THROW_ON_ERROR)` | `fromJson()` rejects malformed JSON with `DTOException` |
+| **Enum validation** | `#[Enum]` attribute + backing type check | `EnumRule` verifies type match before `tryFrom()` — no TypeError leakage |
+| **No magic methods** | Explicit API only | No `__get`/`__set` — all access through typed properties |
+| **Immutable data** | `readonly` + `with()` returns new instance | DTOs cannot be mutated in-place — prevents state tampering |
+
+### Safe by Default
+
+```php
+// Sensitive data never leaks to output
+class LoginDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required]
+        #[Hidden]  // ← excluded from toArray(), toJson(), jsonSerialize()
+        public readonly string $password,
+    ) {}
+}
+
+$dto = LoginDTO::fromArray(['email' => 'a@b.com', 'password' => 'secret']);
+$dto->toArray();       // ['email' => 'a@b.com'] — password excluded
+$dto->allValues();     // ['email' => 'a@b.com', 'password' => 'secret'] — internal only
+$dto->password;        // 'secret' — direct property access still works
+```
