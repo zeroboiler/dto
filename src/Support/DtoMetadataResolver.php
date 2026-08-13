@@ -528,6 +528,7 @@ final class DtoMetadataResolver
         }
 
         if (is_subclass_of($typeName, DataTransferObject::class)) {
+            /** @var class-string<DataTransferObject> $typeName */
             return $typeName;
         }
 
