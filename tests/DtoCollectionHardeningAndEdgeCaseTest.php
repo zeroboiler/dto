@@ -201,11 +201,13 @@ describe('DTO production hardening — DtoCollection edge cases and validation c
 
     // ── fromArray with empty data ──────────────────────────────────────────
 
-    it('fromArray with empty data for DTO with all optional fields works', function () {
-        $dto = MinimalDTO::fromArray([], validate: false);
+    it('fromArray with valid data for DTO with all required fields works', function () {
+        $dto = MinimalDTO::fromArray(['name' => 'test', 'value' => '42'], validate: false);
 
         expect($dto)->toBeInstanceOf(MinimalDTO::class);
         expect($dto->toArray())->toBeArray();
+        expect($dto->name)->toBe('test');
+        expect($dto->value)->toBe('42');
     });
 
     // ── DtoCollection JSON serialization ───────────────────────────────────
