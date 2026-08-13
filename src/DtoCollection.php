@@ -258,10 +258,15 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     /**
      * Map over each DTO and return a plain array of results.
      *
+     * Unlike Laravel Collection's map(), this returns a plain array, not a DtoCollection.
+     * The callback receives the DTO instance and its 0-based index.
+     *
      * @template R
      *
      * @param  callable(T, int): R  $callback
      * @return array<int, R>
+     *
+     * @phpstan-return array<int, R>
      */
     public function map(callable $callback): array
     {
@@ -275,6 +280,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * consistent with {@see offsetUnset()} behavior.
      *
      * @param  callable(T): bool  $callback
+     * @return self A new filtered DtoCollection instance (not mutated)
      *
      * @phpstan-return DtoCollection<DataTransferObject>
      */
@@ -292,7 +298,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * Uses reflection to safely access public readonly properties,
      * avoiding dynamic property access that triggers PHPStan warnings.
      *
-     * @return array<int, mixed>
+     * @param  string  $key  The DTO property name to extract
+     * @return array<int, mixed> List of property values, preserving order
      */
     public function pluck(string $key): array
     {
