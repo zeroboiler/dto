@@ -2,6 +2,14 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.5] - 2026-08-14
+
+### Changed
+- Enriched README with comprehensive Nested DTOs example including recursive serialization, #[Hidden] exclusion, and nested array hydration
+- Expanded DTO Collections example with full method reference (pluck, pluckKey, toArrayBy, filter, map, push, append, iteration, ArrayAccess, JSON serialization)
+- Updated test count badge (227 → 225) and version badge (1.1.4 → 1.1.5)
+- Updated composer.json version to 1.1.5
+
 ## [1.1.0] - 2025-08-14
 
 ### Added

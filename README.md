@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 227](https://img.shields.io/badge/Tests-227-brightgreen)]()
-|[![Version 1.1.4](https://img.shields.io/badge/Version-1.1.4-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Tests: 225](https://img.shields.io/badge/Tests-225-brightgreen)]()
+|[![Version 1.1.5](https://img.shields.io/badge/Version-1.1.5-green)](https://github.com/zeroboiler/dto/releases)|
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -921,8 +921,28 @@ $user->toArray()['status'];            // 'active' (serialized to backed value)
 
 ### Nested DTOs
 
+DTOs can contain other DTOs as properties. Nested DTOs are automatically
+hydrated from arrays and recursively serialized:
+
 ```php
 use ZeroBoiler\DTO\Attributes\NestedArray;
+use ZeroBoiler\DTO\Attributes\Required;
+
+class AddressDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $street,
+
+        #[Required]
+        public readonly string $city,
+
+        public readonly ?string $zipCode = null,
+
+        #[Hidden]
+        public readonly ?string $internalNotes = null,
+    ) {}
+}
 
 class OrderDTO extends DataTransferObject
 {
@@ -930,6 +950,7 @@ class OrderDTO extends DataTransferObject
         #[Required]
         public readonly string $orderNumber,
 
+        #[Required]
         public readonly AddressDTO $shippingAddress,
 
         #[NestedArray(AddressDTO::class)]
@@ -937,24 +958,54 @@ class OrderDTO extends DataTransferObject
     ) {}
 }
 
-// Nested DTO auto-hydrated
+// Nested DTO auto-hydrated from nested arrays
 $order = OrderDTO::fromArray([
     'orderNumber' => 'ORD-001',
-    'shippingAddress' => ['street' => '123 Main St', 'city' => 'Istanbul'],
+    'shippingAddress' => ['street' => '123 Main St', 'city' => 'Istanbul', 'zipCode' => '34100'],
     'items' => [
         ['street' => '456 Oak Ave', 'city' => 'Ankara'],
+        ['street' => '789 Pine Rd', 'city' => 'Izmir'],
     ],
 ]);
 
-$order->shippingAddress; // AddressDTO instance
-$order->items;            // array of AddressDTO instances
+$order->shippingAddress;          // AddressDTO instance
+$order->shippingAddress->city;   // "Istanbul"
+$order->items;                   // array<AddressDTO> (2 instances)
+
+// Recursive serialization — nested DTOs become arrays
+$order->toArray();
+// [
+//     'orderNumber' => 'ORD-001',
+//     'shippingAddress' => ['street' => '123 Main St', 'city' => 'Istanbul', 'zipCode' => '34100'],
+//     'items' => [
+//         ['street' => '456 Oak Ave', 'city' => 'Ankara', 'zipCode' => null],
+//         ['street' => '789 Pine Rd', 'city' => 'Izmir', 'zipCode' => null],
+//     ],
+// ]
+// Note: 'internalNotes' is excluded (#[Hidden])
 ```
 
 ### DTO Collections
 
+For collections of DTOs with type-safe access, use `DtoCollection`:
+
 ```php
 use ZeroBoiler\DTO\Attributes\Collection;
+use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DtoCollection;
+
+class ItemDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $name,
+
+        #[Required, Min(0)]
+        public readonly float $price,
+
+        public readonly int $quantity = 1,
+    ) {}
+}
 
 class OrderDTO extends DataTransferObject
 {
@@ -972,12 +1023,43 @@ $order = OrderDTO::fromArray([
     'orderNumber' => 'ORD-001',
     'items' => [
         ['name' => 'Widget A', 'price' => 9.99],
-        ['name' => 'Widget B', 'price' => 14.99],
+        ['name' => 'Widget B', 'price' => 14.99, 'quantity' => 3],
     ],
 ]);
 
-$order->items->count();     // 2
-$order->items->pluck('name'); // ['Widget A', 'Widget B']
+$order->items->count();      // 2
+$order->items->isEmpty();    // false
+$order->items->first();      // ItemDTO instance
+$order->items->last();       // ItemDTO instance
+
+// Extraction helpers
+$order->items->pluck('name');              // ['Widget A', 'Widget B']
+$order->items->pluckKey('name', 'price');  // ['Widget A' => 9.99, 'Widget B' => 14.99]
+
+// Dictionary by key
+$order->items->toArrayBy('name');
+// ['Widget A' => ['name' => 'Widget A', 'price' => 9.99, 'quantity' => 1], ...]
+
+// Iteration
+foreach ($order->items as $item) {
+    echo $item->name . ': ' . $item->price;
+}
+
+// ArrayAccess
+echo $order->items[0]->name; // "Widget A"
+
+// Filter and map (immutable — returns new collection)
+$expensive = $order->items->filter(fn ($item) => $item->price > 10.0);
+$names = $order->items->map(fn ($item) => $item->name);
+// ['Widget A', 'Widget B']
+
+// Push (mutable, in-place) vs Append (immutable)
+$order->items->push($newItem);  // mutates, returns $order->items
+$newCollection = $order->items->append($newItem);  // returns new collection
+
+// JSON serialization
+echo json_encode($order->items);
+// [{"name":"Widget A","price":9.99,"quantity":1}, ...]
 ```
 
 ### Value Object Integration
