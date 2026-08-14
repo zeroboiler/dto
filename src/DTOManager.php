@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO;
 
+use Illuminate\Http\Request;
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
 
@@ -20,6 +21,9 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  *   DTO::validate(CreateUserDTO::class, $data);
  *   DTO::make(CreateUserDTO::class, $data);
  *   DTO::makeFromJson(CreateUserDTO::class, $json);
+ *   DTO::fromJson(CreateUserDTO::class, $json);
+ *   DTO::fromPartialArray(CreateUserDTO::class, $data);
+ *   DTO::fromPartialRequest(CreateUserDTO::class, $request);
  *   DTO::rules(CreateUserDTO::class);
  *   DTO::rulesFor(CreateUserDTO::class, 'update');
  *   DTO::schema(CreateUserDTO::class);
@@ -103,5 +107,48 @@ final readonly class DTOManager
     public function schema(string $dtoClass): array
     {
         return OpenApiSchemaGenerator::generate($dtoClass);
+    }
+
+    /**
+     * Create a DTO instance from a partial array (PATCH semantics).
+     *
+     * Only fields present in $data are validated and hydrated.
+     * Missing fields fall back to their default values or type-appropriate empty values.
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  array<string, mixed>  $data
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails
+     */
+    public function fromPartialArray(string $dtoClass, array $data): DataTransferObject
+    {
+        return $dtoClass::fromPartialArray($data);
+    }
+
+    /**
+     * Create a DTO instance from a partial HTTP request (PATCH semantics).
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  Request  $request
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails
+     */
+    public function fromPartialRequest(string $dtoClass, Request $request): DataTransferObject
+    {
+        return $dtoClass::fromPartialRequest($request);
+    }
+
+    /**
+     * Create a DTO instance from a JSON string.
+     *
+     * @param  class-string<DataTransferObject>  $dtoClass
+     * @param  string  $json
+     *
+     * @throws DTOException If the JSON cannot be decoded
+     * @throws \Illuminate\Validation\ValidationException If validation fails
+     */
+    public function fromJson(string $dtoClass, string $json): DataTransferObject
+    {
+        return $dtoClass::fromJson($json);
     }
 }

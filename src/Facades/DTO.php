@@ -31,6 +31,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static array validate(string $dtoClass, array $data) Validate data against a DTO class.
  * @method static \ZeroBoiler\DTO\DataTransferObject make(string $dtoClass, array $data) Create a DTO instance from data.
  * @method static \ZeroBoiler\DTO\DataTransferObject makeFromJson(string $dtoClass, string $json) Create a DTO instance from a JSON string.
+ * @method static \ZeroBoiler\DTO\DataTransferObject fromJson(string $dtoClass, string $json) Create a DTO instance from a JSON string.
+ * @method static \ZeroBoiler\DTO\DataTransferObject fromPartialArray(string $dtoClass, array $data) Create a DTO instance from partial data (PATCH).
+ * @method static \ZeroBoiler\DTO\DataTransferObject fromPartialRequest(string $dtoClass, \Illuminate\Http\Request $request) Create a DTO instance from a partial request (PATCH).
  * @method static array rules(string $dtoClass) Get validation rules for a DTO class.
  * @method static array rulesFor(string $dtoClass, string $action) Get action-scoped validation rules.
  * @method static array schema(string $dtoClass) Generate OpenAPI schema for a DTO class.

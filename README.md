@@ -290,6 +290,11 @@ use ZeroBoiler\DTO\Facades\DTO;
 DTO::make(UserDTO::class, $data);
 DTO::validate(UserDTO::class, $data);
 DTO::makeFromJson(UserDTO::class, $json);
+DTO::fromJson(UserDTO::class, $json);
+DTO::fromPartialArray(UserDTO::class, $data);   // PATCH semantics
+DTO::fromPartialRequest(UserDTO::class, $request);
+DTO::rules(UserDTO::class);
+DTO::rulesFor(UserDTO::class, 'update');
 DTO::schema(UserDTO::class);
 
 // ── CLI ────────────────────────────────────────────────────
@@ -1082,6 +1087,9 @@ class OrderDTO extends DataTransferObject
 | `DTO::validate(string, array)` | Validate data against a DTO class |
 | `DTO::make(string, array)` | Create DTO from data |
 | `DTO::makeFromJson(string, string)` | Create DTO from JSON string |
+| `DTO::fromJson(string, string)` | Create DTO from JSON string (alias) |
+| `DTO::fromPartialArray(string, array)` | Create DTO from partial data (PATCH semantics) |
+| `DTO::fromPartialRequest(string, Request)` | Create DTO from partial request (PATCH semantics) |
 | `DTO::rules(string)` | Get validation rules for a DTO class |
 | `DTO::rulesFor(string, string)` | Get action-scoped validation rules |
 | `DTO::schema(string)` | Generate OpenAPI schema |
