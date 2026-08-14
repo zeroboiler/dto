@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\OrderItemDTO;
 
 describe('fromJson strict validation', function () {
     it('rejects non-empty sequential JSON arrays', function () {

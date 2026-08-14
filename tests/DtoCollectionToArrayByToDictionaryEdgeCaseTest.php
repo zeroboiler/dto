@@ -8,9 +8,6 @@ declare(strict_types=1);
 
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\OrderDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\OrderItemDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('DtoCollection toArrayBy and toDictionary edge cases', function () {
     it('toArrayBy skips items with null key values', function () {

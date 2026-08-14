@@ -6,7 +6,6 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 
 describe('Cross-package enum-DTO integration pattern', function () {
