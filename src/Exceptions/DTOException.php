@@ -19,6 +19,7 @@ use Exception;
  *
  * @see \ZeroBoiler\DTO\DataTransferObject For the base DTO class that throws this exception
  * @see \ZeroBoiler\DTO\Casts\DTOCast For the Eloquent cast that may throw this exception
+ * @see \ZeroBoiler\DTO\Attributes\Cast For the Cast attribute that triggers casting
  */
 final class DTOException extends Exception
 {
