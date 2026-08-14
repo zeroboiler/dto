@@ -2618,6 +2618,115 @@ $dto->amount;       // 99.99
 $dto->cardLastFour; // '4242'
 ```
 
+## Attribute Type Signatures
+
+### Validation Attributes (37 total)
+
+All validation attributes implement `ValidationAttribute` (providing `ruleKey()`)
+except metadata attributes. All are `final` classes with promoted `readonly` properties.
+
+#### Presence & Field Control
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Required` | `(?string $message = null)` | `required` | `required` |
+| `Nullable` | `(?string $message = null)` | `nullable` | `nullable` |
+| `Sometimes` | `(?string $message = null)` | `sometimes` | `sometimes` |
+| `Present` | `(?string $message = null)` | `present` | `present` |
+| `Prohibited` | `(?string $message = null)` | `prohibited` | `prohibited` |
+| `Accepted` | `(?string $message = null)` | `accepted` | `accepted` |
+| `Declined` | `(?string $message = null)` | `declined` | `declined` |
+
+#### String Validation
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Email` | `(?string $message = null)` | `email` | `email` |
+| `Url` | `(?string $message = null)` | `url` | `url` |
+| `Uuid` | `(?string $message = null)` | `uuid` | `uuid` |
+| `Pattern` | `(string $regex, ?string $message = null)` | `regex:{regex}` | `regex` |
+| `StartsWith` | `(string\|array $prefix, ?string $message = null)` | `starts_with:...` | `starts_with` |
+| `EndsWith` | `(string\|array $suffix, ?string $message = null)` | `ends_with:...` | `ends_with` |
+
+#### Numeric & Size Validation
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Max` | `(int\|float $value, ?string $message = null)` | `max:{value}` | `max` |
+| `Min` | `(int\|float $value, ?string $message = null)` | `min:{value}` | `min` |
+| `Between` | `(int\|float $min, int\|float $max, ?string $message = null)` | `between:{min},{max}` | `between` |
+| `Size` | `(int\|float $value, ?string $message = null)` | `size:{value}` | `size` |
+| `Integer` | `(?string $message = null)` | `integer` | `integer` |
+| `Numeric` | `(?string $message = null)` | `numeric` | `numeric` |
+| `Boolean` | `(?string $message = null)` | `boolean` | `boolean` |
+
+#### Date, Array & Format
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Date` | `(?string $format = null, ?string $message = null)` | `date` or `date_format:{format}` | `date_format` / `date` |
+| `ArrayRule` | `(?int $min = null, ?int $max = null, ?string $message = null)` | `array` + optional `min`/`max` | `array` |
+| `Json` | `(?string $message = null)` | `json` | `json` |
+| `In` | `(array $values, ?string $message = null)` | `in:val1,val2,...` | `in` |
+
+#### Enum Validation
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Enum` | `(string $enumClass, ?string $message = null)` | Laravel `Rule::enum($enumClass)` | `enum` |
+
+> `$enumClass` must be a `class-string<\BackedEnum>`. The attribute also enables auto-casting
+> during hydration — the DTO property will hold the actual enum case instance.
+
+#### Cross-Field Validation
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `Confirmed` | `(?string $message = null)` | `confirmed` | `confirmed` |
+| `Same` | `(string $field, ?string $message = null)` | `same:{field}` | `same` |
+| `Different` | `(string $field, ?string $message = null)` | `different:{field}` | `different` |
+| `Distinct` | `(?string $message = null)` | `distinct` + `field.*` wildcard | `distinct` |
+
+#### Conditional Requirement (7 attributes)
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key |
+|-----------|----------------------|----------------|----------|
+| `RequiredIf` | `(string $field, mixed $value, ?string $message = null)` | `required_if:{field},{value}` | `required_if` |
+| `RequiredUnless` | `(string $field, mixed $value, ?string $message = null)` | `required_unless:{field},{value}` | `required_unless` |
+| `RequiredWith` | `(string $fields, ?string $message = null)` | `required_with:{fields}` | `required_with` |
+| `RequiredWithAll` | `(string $fields, ?string $message = null)` | `required_with_all:{fields}` | `required_with_all` |
+| `RequiredWithout` | `(string $fields, ?string $message = null)` | `required_without:{fields}` | `required_without` |
+| `RequiredWithoutAll` | `(string $fields, ?string $message = null)` | `required_without_all:{fields}` | `required_without_all` |
+
+> `$fields` is a comma-separated string of field names (e.g., `'email,phone'`).
+
+### Metadata Attributes (4 total)
+
+Metadata attributes do **not** implement `ValidationAttribute` — they control
+hydration, serialization, and source key mapping behavior.
+
+| Attribute | Constructor Signature | Purpose |
+|-----------|----------------------|---------|
+| `MapFrom` | `(string $key)` | Maps source key to property name (supports dot notation) |
+| `Cast` | `(string $type)` | Type casting during hydration: `int`, `integer`, `string`, `bool`, `boolean`, `float`, `double`, `array`, `date`, `datetime` |
+| `DefaultValue` | `(mixed $value)` | Default value when source key is absent |
+| `Hidden` | `()` | Excludes property from `toArray()`, `toJson()`, `jsonSerialize()`, OpenAPI schema |
+| `Collection` | `(string $dtoClass, ?string $message = null)` | Array of nested DTOs wrapped in `DtoCollection` |
+| `NestedArray` | `(string $dtoClass, ?string $message = null)` | Array of nested DTO instances (plain array, not DtoCollection) |
+
+### PHP 8.5 Features Used
+
+| Feature | Where Used | Benefit |
+|---------|-------------|---------|
+| `final readonly class` | `DTOManager` | Compile-time immutability and non-extensibility guarantee |
+| `#[\Override]` | `DataTransferObject`, `DtoCollection`, `DTOSServiceProvider`, `DTO` facade, `DTOException`, `DTOCast` | Explicit override intent, catches base class method signature changes |
+| Promoted `readonly` properties | All DTO properties, all Attribute constructors | Language-level immutability guarantee |
+| `readonly` modifier on constructor promotion | `public readonly string $email` | Single-keyword immutability in DTO definitions |
+| `never` return type | N/A (no never-return methods) | — |
+| Match expressions | `DataTransferObject::castValue()`, `emptyValueForType()`, `DtoMetadataResolver::applyValidationAttribute()`, `OpenApiSchemaGenerator` | Exhaustive pattern matching with compiler optimization |
+| Named arguments | Test generators, Attribute instantiation | Improves readability of complex constructor calls |
+| Union types in generics | `DtoCollection<T>`, `CastsAttributes<T\|null, ...>` | Type-safe generic wrappers |
+
 ## Production Readiness Checklist
 
 This package is production-ready. Every source file passes the following checks:
