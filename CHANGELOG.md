@@ -2,6 +2,13 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.8] - 2026-08-14
+
+### Added
+- DTO fromJson error handling and edge-case tests (invalid JSON, sequential array rejection, null/boolean/number/string JSON, unicode, escaped chars, structural contract)
+- DtoCollection immutability and edge-case tests (clone prevention, append/merge/filter immutability, ArrayAccess edge cases, offsetUnset re-indexing, serialization hidden props, iteration/counting, structural contract)
+- Updated test count (242 → 244)
+
 ## [1.1.7] - 2026-08-14
 
 ### Added
