@@ -14,6 +14,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 
 - [Installation](#installation)
 - [Source Code Index](#source-code-index)
+- [Quick Start](#quick-start)
 - [Quick Reference Card](#quick-reference-card)
 - [Type System](#type-system)
   - [Readonly Promoted Properties](#readonly-promoted-properties)
@@ -157,7 +158,84 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 | `NestedArray` | `Attributes` | `#[NestedArray(ItemDTO::class)]` — array of nested DTO instances |
 | `Collection` | `Attributes` | `#[Collection(ItemDTO::class)]` — DtoCollection-wrapped nested DTOs |
 | `MakeDtoTestCommand` | `Console\Commands` | `php artisan zeroboiler:dto-test` — generates Pest test file for a DTO |
-| `MakeDtoSchemaCommand` | `Console\Commands` | `php artisan zeroboiler:dto-schema` — generates OpenAPI schema for a DTO |
+| `MakeDtoSchemaCommand` | `Console\\Commands` | `php artisan zeroboiler:dto-schema` — generates OpenAPI schema for a DTO |
+
+## Quick Start
+
+Create your first type-safe DTO in under a minute:
+
+```php
+// app/DTO/CreateUserDTO.php
+use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class CreateUserDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[Required, Min(8)]
+        public readonly string $password,
+    ) {}
+}
+
+// In your controller
+$dto = CreateUserDTO::fromRequest($request);
+// $dto->email, $dto->name, $dto->password — all typed, all validated
+
+// Serialize to JSON
+$dto->toArray();  // ['email' => '...', 'name' => '...', 'password' => '...']
+$dto->toJson();   // '{"email":"...","name":"...","password":"..."}'
+
+// Validation rules (auto-generated from attributes)
+CreateUserDTO::rules();
+// ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
+```
+
+## Architecture
+
+```
+┌────────────────────────────────────────────────────┐
+│              Your DTO                              │
+│  class UserDTO extends DataTransferObject          │
+│  {                                                  │
+│      public function __construct(                   │
+│          #[Required, Email]                          │
+│          public readonly string $email,              │
+│      ) {}                                           │
+│  }                                                  │
+└──────────┬─────────────────────────────────────-─┘
+           │ resolves metadata via
+           ▼
+┌────────────────────────────────────────────────────┐
+│  DtoMetadataResolver                               │
+│  ├─ Reads constructor parameters (ReflectionClass) │
+│  ├─ Detects attribute types (VO, Enum, nested DTO)  │
+│  ├─ Infers base rules from PHP types                │
+│  ├─ Collects validation attribute rules            │
+│  └─ Returns: {properties, rules, messages}         │
+└──────────┬─────────────────────────────────────────┘
+           │ caches in
+           ▼
+┌────────────────────────────────────────────────────┐
+│  DataTransferObject (static cache per class)        │
+│  ├─ $_zbMetadataCache — per-class TTL-based cache   │
+│  ├─ TTL = 0 in production (disabled)               │
+│  └─ TTL = 2s in local/testing (auto-invalidation)  │
+└────────────────────────────────────────────────────┘
+
+Hydration Pipeline (per property):
+  Raw value → MapFrom key mapping → DefaultValue fallback
+           → Cast type conversion → Enum/VO auto-casting
+           → Nested DTO/Collection hydration → Final value
+```
 
 ## Quick Reference Card
 
