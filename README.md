@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 247](https://img.shields.io/badge/Tests-247-brightgreen)]()|
-|[![Version 1.1.13](https://img.shields.io/badge/Version-1.1.13-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Tests: 250](https://img.shields.io/badge/Tests-250-brightgreen)]()|
+|[![Version 1.1.14](https://img.shields.io/badge/Version-1.1.14-green)](https://github.com/zeroboiler/dto/releases)|
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -121,7 +121,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-|- 247 test files in `tests/` (39 fixtures)
+|- 250 test files in `tests/` (39 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -3148,3 +3148,62 @@ This package is production-ready. Every source file passes the following checks:
 | Octane/Swoole safe | ✅ | Listens for `octane.terminate` and `laravel.flush` events to flush static metadata cache |
 | Dev cache invalidation | ✅ | TTL-based (2s) in local/testing environments, 0 (disabled) in production |
 | Laravel auto-discovery | ✅ | Service provider auto-registered, facade alias `DTO` auto-registered |
+
+## Error Handling Strategy
+
+ZeroBoiler DTO uses a consistent, predictable error handling approach:
+
+| Method | Error Behavior | Exception Type |
+|--------|---------------|----------------|
+| `fromArray()` | Validates then hydrates | `ValidationException` (Laravel) |
+| `fromJson()` | Throws on invalid JSON or sequential array | `DTOException::invalidJson()` |
+| `fromPartialArray()` | Validates present fields only | `ValidationException` (Laravel) |
+| `with()` | Always validates merged data | `ValidationException` (Laravel) |
+| `validateArray()` | Validates data against rules | `ValidationException` (Laravel) |
+| `DtoCollection::__clone()` | Prevents external cloning | `RuntimeException` |
+| `DtoCollection::__construct()` | Rejects non-DTO items | `InvalidArgumentException` |
+| `DTOCast::set()` | Rejects non-DTO/non-array/null values | `InvalidArgumentException` |
+| `OpenApiSchemaGenerator::generate()` | Throws on nested DTO refs | `LogicException` |
+| `castValueToEnum()` | Throws on uncastable value | `InvalidArgumentException` |
+| `castToDate()` | Throws on unsupported type | `InvalidArgumentException` |
+| `castValueToValueObject()` | Throws on uncastable value | `InvalidArgumentException` |
+
+### Exception Hierarchy
+
+```
+Exception
+└── DTOException                  # Package-specific, final
+    ├── ::invalidCast()           # Property cast failure
+    └── ::invalidJson()           # JSON decode failure
+```
+
+All other errors use standard PHP exceptions (`LogicException`, `InvalidArgumentException`,
+`RuntimeException`, `ValidationException`) — no custom exception proliferation.
+
+**Design principle:** Validation failures always throw Laravel's `ValidationException`
+(which carries structured error messages). Structural/type failures throw standard
+PHP exceptions. Only JSON and cast-specific failures use the custom `DTOException`.
+
+## Concurrency & Thread Safety
+
+| Component | Thread Safety | Notes |
+|-----------|--------------|-------|
+| `DataTransferObject` static cache | **Per-process** | Static `$_zbMetadataCache` lives per PHP process. Each worker has its own. |
+| `DtoMetadataResolver` | **Stateless** | Pure static methods — no mutable instance state. Thread-safe. |
+| `DTOManager` | **Stateless** | `final readonly` — delegates to DTO statics. Thread-safe. |
+| `DtoCollection` | **Mutable per-instance** | Each collection is an isolated object. `push()` mutates in-place, `append()`/`merge()` return new instances. |
+| `DTOCast` | **Stateless** | `final readonly` — no mutable state. Thread-safe. |
+| `OpenApiSchemaGenerator` | **Stateless** | Pure static methods. Thread-safe. |
+
+### Octane / Swoole / RoadRunner
+
+The service provider registers event listeners for long-lived processes:
+
+```php
+// Automatic static cache flush at end of each request cycle
+$events->listen('octane.terminate', fn () => DataTransferObject::flushMetadataCache());
+$events->listen('laravel.flush', fn () => DataTransferObject::flushMetadataCache());
+```
+
+In dev environments, a 2-second TTL ensures code changes are picked up automatically.
+In production, TTL is disabled (0) — metadata is resolved once per request and reused.

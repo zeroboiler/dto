@@ -2,6 +2,17 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.14] - 2026-08-14
+
+### Added
+- `DtoProductionStructuralAndContractIntegrityTest`: comprehensive contract verification covering hydration contract (fromArray/fromJson), partial update (PATCH) semantics, serialization contract, selective output, immutable update, equality, isEmpty semantics, rules contract, full DtoCollection contract (make/push/append/merge/filter/first/last/pluck/pluckKey/map/toArrayBy/toDictionary/items/allValues/ArrayAccess/foreach/jsonSerialize/__clone/offsetUnset), DTOCast contract, DTOException factory, metadata cache lifecycle, DTOManager delegation, interface compliance, cast type pipeline, and null handling (~85 test methods)
+
+### Changed
+- Added **Error Handling Strategy** section to README — comprehensive table of all method error behaviors, exception types, exception hierarchy, design principles
+- Added **Concurrency & Thread Safety** section to README — per-component thread safety matrix, Octane/Swoole/RoadRunner event listener documentation
+- Updated README test count badge (247 → 250) and Package Statistics
+- Version bump to 1.1.14
+
 ## [1.1.13] - 2026-08-14
 
 ### Changed
