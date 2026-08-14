@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-[![Tests: 224](https://img.shields.io/badge/Tests-224-brightgreen)]()
+[![Tests: 257](https://img.shields.io/badge/Tests-257-brightgreen)]()
 [![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -119,8 +119,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-- 224 test files in `tests/` (33 fixtures)
+|- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
+|- 257 test files in `tests/` (33 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1395,6 +1395,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
 | 1.1.2 | 2025-08-14 | Test count update (240 files), new facade contract tests, README accuracy fix |
 | 1.1.3 | 2025-08-14 | CHANGELOG.md added, README test count accuracy, full source audit — production ready |
+| 1.1.4 | 2025-08-14 | Test count update (257 files), badge accuracy, README documentation pass |
 
 ## Internal Components
 
@@ -1604,7 +1605,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **223 test files** (190 unit tests + 33 fixtures) covering:
+The test suite includes **257 test files** (224 unit tests + 33 fixtures) covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
