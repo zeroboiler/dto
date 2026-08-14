@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 242](https://img.shields.io/badge/Tests-242-brightgreen)]()|
-|[![Version 1.1.9](https://img.shields.io/badge/Version-1.1.9-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Tests: 243](https://img.shields.io/badge/Tests-243-brightgreen)]()|
+|[![Version 1.1.10](https://img.shields.io/badge/Version-1.1.10-green)](https://github.com/zeroboiler/dto/releases)|
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -121,7 +121,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-|- 242 test files in `tests/` (39 fixtures)
+|- 243 test files in `tests/` (39 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1776,6 +1776,10 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.3 | 2025-08-14 | CHANGELOG.md added, README test count accuracy, full source audit — production ready |
 | 1.1.4 | 2025-08-14 | Test count update (257 files), badge accuracy, README documentation pass |
 | 1.1.6 | 2025-08-14 | Full hydration/serialization contract tests (271 files), README accuracy |
+| 1.1.7 | 2025-08-14 | Comprehensive edge-case tests, DtoCollection mutation edge cases |
+| 1.1.8 | 2025-08-14 | fromJson error handling, DtoCollection immutability edge-case tests |
+| 1.1.9 | 2025-08-14 | Test count badge fix, version bump |
+| 1.1.10 | 2025-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
 
 ## Internal Components
 
@@ -1985,7 +1989,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **227 test files** (227 unit tests + 33 fixtures) covering:
+The test suite includes **243 test files** (243 unit tests + 39 fixtures) covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|

@@ -2,6 +2,16 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.10] - 2026-08-14
+
+### Added
+- Production readiness V7 test: full attribute hydration (Required, Email, Max, Between, Boolean, Hidden, ArrayRule, Nullable, Pattern, MapFrom, Cast, DefaultValue), conditional validation (RequiredIf), isEmpty/isNotEmpty, equals/with, only/except, rules/rulesFor, DTOException factories, DtoCollection operations (filter, append, merge, toArray, offset, clone, push), fromPartialArray, toJson, metadata cache flush
+- Updated test count (242 → 243)
+
+### Changed
+- README test count badge and Package Statistics updated to 243 tests
+- Version bump to 1.1.10
+
 ## [1.1.9] - 2026-08-14
 
 ### Changed
