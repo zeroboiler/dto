@@ -88,6 +88,38 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
+     * Prevent cloning of the collection.
+     *
+     * Use {@see append()} or {@see merge()} for immutable collection operations.
+     * Internal clone is allowed via {@see cloneCollection()} for append/merge.
+     *
+     * @throws \RuntimeException Always
+     * @internal Magic method intercepted — call append() or merge() instead
+     */
+    public function __clone(): never
+    {
+        throw new \RuntimeException(
+            'DtoCollection is immutable. Use append(), merge(), or filter() to create a new collection.'
+        );
+    }
+
+    /**
+     * Internal clone helper for immutable operations (append, merge).
+     *
+     * Bypasses the __clone() restriction to enable the shallow copy
+     * needed by {@see append()} and other immutable methods.
+     *
+     * @internal Not part of the public API.
+     */
+    private function cloneCollection(): self
+    {
+        $clone = new self;
+        $clone->items = $this->items;
+
+        return $clone;
+    }
+
+    /**
      * Count the number of DTOs in the collection.
      *
      * @return int The number of items
@@ -362,7 +394,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      */
     public function append(DataTransferObject $dto): self
     {
-        $clone = clone $this;
+        $clone = $this->cloneCollection();
         $clone->items[] = $dto;
 
         return $clone;

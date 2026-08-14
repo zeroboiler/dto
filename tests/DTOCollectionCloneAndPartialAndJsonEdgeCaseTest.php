@@ -74,7 +74,7 @@ describe('DtoCollection clone and immutability semantics', function () {
         expect($filtered->count())->toBe(1);
     });
 
-    it('clone produces a deep copy that shares DTO instances (DTOs are immutable)', function () {
+    it('clone throws RuntimeException — use append/merge instead', function () {
         $dto = CreateUserDTO::fromArray([
             'email' => 'a@b.com',
             'name' => 'Alice',
@@ -82,22 +82,8 @@ describe('DtoCollection clone and immutability semantics', function () {
         ], validate: false);
 
         $original = new DtoCollection([$dto]);
-        $cloned = clone $original;
 
-        // Both should have the same item count
-        expect($cloned->count())->toBe($original->count());
-
-        // Appending to clone should not affect original
-        $dto2 = CreateUserDTO::fromArray([
-            'email' => 'b@c.com',
-            'name' => 'Bob',
-            'status' => 'active',
-        ], validate: false);
-
-        $cloned->push($dto2);
-
-        expect($original->count())->toBe(1);
-        expect($cloned->count())->toBe(2);
+        expect(fn () => clone $original)->toThrow(\RuntimeException::class);
     });
 });
 

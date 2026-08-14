@@ -29,28 +29,15 @@ describe('DtoCollection clone isolation', function (): void {
         expect($appended)->not->toBe($original);
     });
 
-    it('clone creates an independent copy', function (): void {
+    it('clone throws RuntimeException — use append/merge instead', function (): void {
         $dto1 = CreateUserDTO::fromArray([
             'email' => 'clone@example.com',
             'name' => 'Clone',
         ], validate: false);
 
         $original = new DtoCollection([$dto1]);
-        $cloned = clone $original;
 
-        // Both should have the same count
-        expect($cloned->count())->toBe($original->count());
-
-        // Mutating clone should not affect original
-        $dto2 = CreateUserDTO::fromArray([
-            'email' => 'new@example.com',
-            'name' => 'New',
-        ], validate: false);
-
-        $cloned[] = $dto2;
-
-        expect($original->count())->toBe(1);
-        expect($cloned->count())->toBe(2);
+        expect(fn (): mixed => clone $original)->toThrow(\RuntimeException::class);
     });
 
     it('merge returns a new collection without modifying originals', function (): void {

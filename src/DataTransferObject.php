@@ -585,6 +585,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @deprecated The $validate parameter has no effect and will be removed in 2.0.0.
      *             Validation always runs in with() to prevent invalid state.
      */
+    #[\Deprecated(message: 'The $validate parameter has no effect and will be removed in 2.0.0.', since: '1.1.0')]
     public function with(array $overrides, bool $validate = true): static
     {
         $data = array_merge($this->allValues(), $overrides);
