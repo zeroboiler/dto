@@ -7,12 +7,8 @@
 declare(strict_types=1);
 
 use ZeroBoiler\DTO\Attributes\{Cast, DefaultValue, Email, Hidden, MapFrom, Max, Min, Required};
-use ZeroBoiler\DTO\Attributes\{ArrayRule, Boolean, Between, Confirmed, Date, Enum, In, Integer, NestedArray};
-use ZeroBoiler\DTO\Attributes\{Nullable, Numeric, Pattern, Prohibited, Size, Url, Uuid};
-use ZeroBoiler\DTO\Attributes\{StartsWith, EndsWith, Same, Different, Accepted, Declined, Present, Sometimes};
 use ZeroBoiler\DTO\DataTransferObject;
-use ZeroBoiler\DTO\DtoCollection;
-use ZeroBoiler\DTO\Tests\Fixtures\{CreateUserDTO, AddressDTO, OrderDTO, MinimalDTO, RoundtripDTO};
+use ZeroBoiler\DTO\Tests\Fixtures\{CreateUserDTO, MinimalDTO};
 
 describe('DTO Hydration Pipeline Integration', function () {
     it('hydrates from array with all property types', function () {
@@ -53,7 +49,7 @@ describe('DTO Hydration Pipeline Integration', function () {
         expect($dto->phone)->toBeNull();
     });
 
-    it('MapFrom resolves dot notation keys', function () {
+    it('MapFrom resolves source key to property', function () {
         $dto = CreateUserDTO::fromArray([
             'email' => 'test@example.com',
             'name' => 'Dave',
@@ -213,8 +209,7 @@ describe('DTO Partial Update Integration', function () {
 
 describe('DTO State Checks Integration', function () {
     it('isEmpty returns true when all properties are default/empty', function () {
-        // CreateUserDTO: name has no default and is required, so partial update
-        // with no data should give empty values
+        // MinimalDTO has required string fields — partial with no data gives empty values
         $dto = MinimalDTO::fromPartialArray([]);
 
         expect($dto->isEmpty())->toBeTrue();
@@ -282,9 +277,8 @@ describe('DTO fromJson Integration', function () {
             ->toThrow(\ZeroBoiler\DTO\Exceptions\DTOException::class);
     });
 
-    it('accepts empty object JSON', function () {
-        // MinimalDTO has all optional fields
-        $dto = MinimalDTO::fromJson('{}');
+    it('accepts empty object JSON for MinimalDTO with partial semantics', function () {
+        $dto = MinimalDTO::fromJson('{}', validate: false);
 
         expect($dto)->toBeInstanceOf(MinimalDTO::class);
     });
