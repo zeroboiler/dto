@@ -1393,7 +1393,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 |---------|------|------------|
 | 1.0.0 | 2025-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
 | 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
-| 1.1.1 | 2025-08 | README enrichment, corrected test counts, production audit pass |
+| 1.1.1 | 2025-08 | Production readiness audit, test count alignment (208 files), README accuracy fix |
 
 ## Internal Components
 
@@ -1593,7 +1593,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **206 test files** covering:
+The test suite includes **208 test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
