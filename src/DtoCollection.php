@@ -144,6 +144,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @param  T  $value  The DTO instance to store
      *
      * @throws \InvalidArgumentException If value is not a DataTransferObject instance
+     * @return void
      */
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
@@ -168,6 +169,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * to prevent gaps that would break last(), map(), and count() consistency.
      *
      * @param  mixed  $offset  The index to remove (0-based)
+     * @return void
      */
     #[\Override]
     public function offsetUnset(mixed $offset): void

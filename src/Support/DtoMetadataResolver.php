@@ -125,7 +125,7 @@ final class DtoMetadataResolver
      * - `rules`: Laravel validation rules per property
      * - `messages`: custom validation messages keyed as `"{field}.{rule}"`
      *
-     * @param  class-string  $class  The DTO class to resolve metadata for
+     * @param  class-string<DataTransferObject>  $class  The DTO class to resolve metadata for
      * @return DtoResolvedMetadata Associative array with properties, rules, and messages
      *
      * @throws \ReflectionException If the class does not exist
@@ -208,6 +208,7 @@ final class DtoMetadataResolver
      * @param  array<string, string>  $messages  Custom validation messages (modified by reference)
      * @param  array<string, array<int, mixed>>  $extraRules  Wildcard rules for array elements (modified by reference)
      * @param  string  $name  Property name for rule key generation
+     * @return void
      */
     private static function resolveAttributes(
         ReflectionProperty $propReflection,
@@ -239,6 +240,7 @@ final class DtoMetadataResolver
 
     /**
      * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
+     * @return void
      */
     private static function applyValidationAttribute(object $instance, array &$propRules): void
     {
@@ -286,6 +288,7 @@ final class DtoMetadataResolver
 
     /**
      * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
+     * @return void
      */
     private static function applyRequiredIfRule(RequiredIf $instance, array &$propRules): void
     {
@@ -298,6 +301,7 @@ final class DtoMetadataResolver
 
     /**
      * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
+     * @return void
      */
     private static function applyRequiredUnlessRule(RequiredUnless $instance, array &$propRules): void
     {
@@ -312,6 +316,7 @@ final class DtoMetadataResolver
      * Apply array validation rule with optional min/max count.
      *
      * @param  list<string|\Illuminate\Validation\Rules\Enum>  $propRules
+     * @return void
      */
     private static function applyArrayRule(ArrayRule $instance, array &$propRules): void
     {
@@ -333,6 +338,7 @@ final class DtoMetadataResolver
 
     /**
      * @param  array<string, mixed>  $propMeta
+     * @return void
      */
     private static function applyMetaAttribute(object $instance, array &$propMeta): void
     {
@@ -368,6 +374,7 @@ final class DtoMetadataResolver
      * via reflection to avoid PHPStan level 9 warnings on dynamic property access.
      *
      * @param  array<string, string>  $messages
+     * @return void
      */
     private static function collectMessage(object $instance, array &$messages, string $name): void
     {

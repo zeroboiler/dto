@@ -70,7 +70,8 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Called by the service provider when APP_ENV is local or testing.
      * Pass 0 to disable TTL-based invalidation (production default).
      *
-     * @param  float  $seconds  Cache TTL in seconds (0 = disabled)
+     * @param  float  $seconds  Cache TTL in seconds (0 = disabled, negative values have no effect)
+     * @return void
      */
     public static function setMetadataCacheTtl(float $seconds): void
     {
@@ -86,6 +87,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Used by the service provider for Octane/Swoole cache flush.
      *
      * @param  string|null  $class  Specific class to flush, or null for all
+     * @return void
      */
     public static function flushMetadataCache(?string $class = null): void
     {
@@ -574,9 +576,14 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * The original DTO instance remains unchanged — a new instance is returned.
      *
      * @param  array<string, mixed>  $overrides  Properties to merge into the DTO
-     * @param  bool  $validate  @deprecated Has no effect. Validation always runs to prevent invalid state.
+     * @param  bool  $validate  Has no effect. Validation always runs to prevent invalid state.
+     *
+     * @return static A new DTO instance with the merged data
      *
      * @throws ValidationException If the merged data fails validation
+     *
+     * @deprecated The $validate parameter has no effect and will be removed in 2.0.0.
+     *             Validation always runs in with() to prevent invalid state.
      */
     public function with(array $overrides, bool $validate = true): static
     {

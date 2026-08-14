@@ -58,6 +58,8 @@ final class DTOSServiceProvider extends ServiceProvider
      * Default TTL: 2 seconds — long enough to benefit from caching
      * within a single request, short enough to detect code changes
      * on the next page load.
+     *
+     * @return void
      */
     private function configureDevCacheInvalidation(): void
     {
@@ -77,6 +79,8 @@ final class DTOSServiceProvider extends ServiceProvider
      *
      * Silently catches BindingResolutionException if the events dispatcher
      * is not available (e.g., in testing environments without full Laravel).
+     *
+     * @return void
      */
     private function registerCacheFlush(): void
     {
