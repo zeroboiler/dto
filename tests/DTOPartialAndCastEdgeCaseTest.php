@@ -12,11 +12,11 @@ use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\Attributes\MapFrom;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
-use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\ProductDTO;
 
 describe('DTO fromPartialArray edge cases and type safety', function () {
     it('creates DTO from empty partial array using all defaults', function () {

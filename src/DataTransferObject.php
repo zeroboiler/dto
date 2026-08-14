@@ -49,7 +49,7 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject;
  */
 abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSerializable, ValidatableDTO
 {
-    /** @var array<string, DtoResolvedMetadata> Cache for reflection metadata per class */
+    /** @var array<string, array{properties: array<string, array<string, mixed>>, rules: array<string, mixed>, messages: array<string, string>}> Cache for resolved reflection metadata per class */
     private static array $_zbMetadataCache = [];
 
     /** @var array<string, float> Cache creation timestamps per class */
@@ -672,7 +672,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * so code changes are picked up automatically. In production, TTL is 0
      * (caching disabled) — metadata is resolved once per request and reused.
      *
-     * @return DtoResolvedMetadata
+     * @return array{properties: array<string, array<string, mixed>>, rules: array<string, mixed>, messages: array<string, string>}
      *
      * @throws \ReflectionException If the class cannot be reflected
      */
@@ -690,13 +690,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         if (! isset(self::$_zbMetadataCache[$class])) {
-            /** @var DtoResolvedMetadata $resolved */
             $resolved = DtoMetadataResolver::resolve($class);
             self::$_zbMetadataCache[$class] = $resolved;
             self::$_zbMetadataCacheTimestamps[$class] = microtime(true);
         }
 
-        /** @var DtoResolvedMetadata $metadata */
         $metadata = self::$_zbMetadataCache[$class];
 
         return $metadata;
