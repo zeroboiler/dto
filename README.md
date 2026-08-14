@@ -121,7 +121,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-|- 271 test files in `tests/` (36 fixtures)
+|- 272 test files in `tests/` (36 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
