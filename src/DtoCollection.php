@@ -443,6 +443,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * is keyed by the value of the specified property. Items with null
      * key values are silently skipped (PHP converts null keys to empty string).
      *
+     * Delegates to {@see pluckKey()} internally.
+     *
      * Useful for building ID-keyed maps for frontend state or lookup tables:
      *
      *   $keyed = $collection->toArrayBy('id');
@@ -450,6 +452,9 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @param  string  $keyField  The DTO property to use as the array key
      * @return array<int|string, array<string, mixed>>
+     *
+     * @see pluckKey() For the underlying implementation
+     * @see toDictionary() For key-value pair extraction
      */
     public function toArrayBy(string $keyField): array
     {
@@ -470,6 +475,9 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @param  string  $keyField  The DTO property to use as the array key
      * @param  string  $valueField  The DTO property to use as the value
      * @return array<int|string, mixed>
+     *
+     * @see pluckKey() For key-to-array mapping
+     * @see toArrayBy() For key-to-full-array mapping
      */
     public function toDictionary(string $keyField, string $valueField): array
     {

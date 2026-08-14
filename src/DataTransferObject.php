@@ -673,9 +673,13 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * so code changes are picked up automatically. In production, TTL is 0
      * (caching disabled) — metadata is resolved once per request and reused.
      *
-     * @return array{properties: array<string, array<string, mixed>>, rules: array<string, mixed>, messages: array<string, string>}
+     * @return DtoResolvedMetadata Associative array with properties, rules, and messages
      *
-     * @throws \ReflectionException If the class cannot be reflected
+     * @throws \\ReflectionException If the class cannot be reflected
+     *
+     * @see DtoMetadataResolver::resolve() For the reflection-based metadata builder
+     * @see setMetadataCacheTtl() For configuring cache TTL
+     * @see flushMetadataCache() For clearing cached entries
      */
     private static function resolveMetadata(): array
     {
