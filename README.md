@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 248](https://img.shields.io/badge/Tests-248-brightgreen)]()|
+|[![Tests: 287](https://img.shields.io/badge/Tests-287-brightgreen)]()|
 |[![Version 1.1.12](https://img.shields.io/badge/Version-1.1.12-green)](https://github.com/zeroboiler/dto/releases)|
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -121,7 +121,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-|- 248 test files in `tests/` (39 fixtures)
+|- 287 test files in `tests/` (39 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1989,7 +1989,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **243 test files** (243 unit tests + 39 fixtures) covering:
+The test suite includes **287 test files** (287 unit tests + 39 fixtures) covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
