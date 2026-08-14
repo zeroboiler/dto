@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 208](https://img.shields.io/badge/Tests-208-brightgreen)]()
-[![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
+|[![Tests: 240](https://img.shields.io/badge/Tests-240-brightgreen)]()
+|[![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -120,7 +120,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-- 208 test files in `tests/` (31 fixtures)
+- 240 test files in `tests/` (31 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1393,7 +1393,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 |---------|------|------------|
 | 1.0.0 | 2025-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
 | 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
-| 1.1.1 | 2025-08 | Production readiness audit, test count alignment (208 files), README accuracy fix |
+| 1.1.2 | 2025-08-14 | Test count update (240 files), new facade contract tests, README accuracy fix |
 
 ## Internal Components
 
@@ -1593,7 +1593,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **208 test files** covering:
+The test suite includes **240 test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
