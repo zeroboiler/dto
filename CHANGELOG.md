@@ -5,6 +5,14 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2026-08-14
+
+### Added
+- `DtoFromJsonAndCollectionHelperEdgeCaseTest` — tests fromJson rejection paths (sequential arrays, invalid JSON, empty arrays), only/except with single string keys, with() immutable update, DtoCollection toArrayBy/toDictionary with null key skipping, filter/map operations, DTOException factory methods, equals/isEmpty, and toJson serialization
+
+### Fixed
+- Corrected README test count badge (247→215) to match actual test file count
+
 ## [1.1.4] - 2026-08-14
 
 ### Added
