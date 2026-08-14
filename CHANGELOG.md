@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Fixed `CHANGELOG.md` — moved `[Unreleased]` section to top per Keep a Changelog convention
+- Updated README test count badge to reflect 239 test files (was 206)
 
 ## [1.1.0] - 2025-08-11
 
