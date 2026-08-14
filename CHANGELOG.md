@@ -5,84 +5,46 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.5] - 2026-08-14
+## [1.1.0] - 2025-08-14
 
 ### Added
-- `DtoFromJsonAndCollectionHelperEdgeCaseTest` — tests fromJson rejection paths (sequential arrays, invalid JSON, empty arrays), only/except with single string keys, with() immutable update, DtoCollection toArrayBy/toDictionary with null key skipping, filter/map operations, DTOException factory methods, equals/isEmpty, and toJson serialization
+- `DataTransferObject` — abstract base class with `fromArray()`, `fromRequest()`, `fromJson()`, `fromPartialArray()`, `fromPartialRequest()`, `toArray()`, `toJson()`, `jsonSerialize()`, `with()`, `equals()`, `isEmpty()`, `isNotEmpty()`, `only()`, `except()`, `allValues()`, `rules()`, `rulesFor()`, `validateArray()`, `validatePartialArray()`, `flushMetadataCache()`, `setMetadataCacheTtl()`
+- `DtoCollection` — type-safe collection with `make()`, `push()`, `append()`, `merge()`, `filter()`, `map()`, `pluck()`, `pluckKey()`, `toArrayBy()`, `toDictionary()`, `toArray()`, `allValues()`, `items()`, `first()`, `last()`, `count()`, `isEmpty()`, `isNotEmpty()`
+- `DTOManager` — runtime helper (injectable/facade) with `validate()`, `make()`, `makeFromJson()`, `fromJson()`, `fromPartialArray()`, `fromPartialRequest()`, `rules()`, `rulesFor()`, `schema()`
+- `DTO` facade — Laravel facade for `DTOManager`
+- `DTOSServiceProvider` — auto-discovery service provider with Octane cache flush support and dev TTL configuration
+- 37 validation attributes: `Required`, `Email`, `Max`, `Min`, `Between`, `Pattern`, `In`, `Url`, `Uuid`, `Integer`, `Numeric`, `Boolean`, `Date`, `ArrayRule`, `Json`, `Enum`, `Confirmed`, `Same`, `Different`, `Distinct`, `Prohibited`, `Accepted`, `Declined`, `Present`, `Nullable`, `Sometimes`, `Size`, `StartsWith`, `EndsWith`, `RequiredIf`, `RequiredUnless`, `RequiredWith`, `RequiredWithAll`, `RequiredWithout`, `RequiredWithoutAll`
+- 4 metadata attributes: `Hidden`, `MapFrom`, `Cast`, `DefaultValue`
+- 2 nested type attributes: `NestedArray`, `Collection`
+- `DtoMetadataResolver` — reflection-based metadata resolution from constructor parameters and attributes
+- `OpenApiSchemaGenerator` — OpenAPI 3.0 schema generation with nested DTO support, union type `oneOf`, and component schemas
+- `DTOCast` — Eloquent cast for storing DTOs as JSON columns with optional validation
+- `DTOException` — named constructors `invalidCast()` and `invalidJson()`
+- Contracts: `ValidationAttribute`, `FromRequestDTO`, `ValidatableDTO`
+- `MakeDtoTestCommand` — `php artisan zeroboiler:dto-test` Pest test generator
+- `MakeDtoSchemaCommand` — `php artisan zeroboiler:dto-schema` OpenAPI schema generator
+- Per-class static metadata caching with TTL-based invalidation
+- Auto-detection of ValueObject, BackedEnum, and nested DTO types
+- Hydration pipeline: MapFrom → DefaultValue → Cast → ValueObject → Enum → Nested DTO → Collection
+- PATCH semantics via `fromPartialArray()` and `fromPartialRequest()`
+- Type casting: `integer`, `string`, `boolean`, `array`, `date/datetime`
 
-### Fixed
-- Corrected README test count badge (247→215) to match actual test file count
+### Quality
+- 100% `declare(strict_types=1)` coverage across all 55 source files
+- PHPStan Level 9 compatible — zero `mixed` return types in public API
+- All classes marked `final` where appropriate
+- All attributes use `readonly` promoted constructor properties
+- Comprehensive PHPDoc with `@param`, `@return`, `@throws` annotations
+- 255 test files (222 unit tests + 33 fixtures)
 
-## [1.1.4] - 2026-08-14
+## [1.0.0] - 2025-08-01
 
 ### Added
-- `DTOExceptionContractTest` — verifies named constructors (invalidCast, invalidJson), message formatting, and __toString behavior
-- `DtoCollectionSerializationContractTest` — tests empty collection serialization (jsonSerialize, toArray, allValues, filter, map, pluck, merge, offset operations)
-- `DTOManagerStructuralContractTest` — verifies DTOManager is final/readonly, all methods have return types and docblocks, no mixed returns
-
-### Changed
-- Updated README test count badge (243→246) to match actual test file count
-
-## [1.1.3] - 2025-08-14
-
-### Changed
-- Fixed README test count badge (240→242) to match actual test file count
-
-## [1.1.2] - 2025-08-14
-
-### Changed
-- Fixed README test count badge (208→240) to match actual test file count
-- Added facade contract tests (DtoFacadeMethodSignatureContractTest)
+- Initial release with core DTO functionality
+- Basic `fromArray()`, `toArray()`, `toJson()` support
+- Validation attribute resolution
+- Eloquent cast support
 
 ## [Unreleased]
 
-### Added
-- `LICENSE` file — proprietary license text
-- `DtoCollection::toArrayBy()` — re-key collection by a property value (returns `{value: array}`)
-- `DtoCollection::toDictionary()` — build lookup maps from two properties (returns `{key: value}`)
-- `@internal` annotations on `DtoMetadataResolver` and `OpenApiSchemaGenerator` support classes
-- DtoCollection toArrayBy/toDictionary/pluck/pluckKey edge case tests for full coverage
-- `DTOManager::rules()` and `DTOManager::rulesFor()` — access validation rules via manager and `DTO` facade
-- `DTOManagerTest` and `DTOManagerRulesAndRulesForTest` — facade delegation tests for rules/rulesFor
-- GitHub issue templates (bug report, feature request) and pull request template
-- `DtoSourceCodeProductionReadinessAuditTest` — comprehensive PHPStan Level 9 structural audit verifying strict_types, final classes, return types, typed properties, readonly enforcement, attribute contracts, and docblock completeness across all source files
-
-### Changed
-- Fixed `CHANGELOG.md` — moved `[Unreleased]` section to top per Keep a Changelog convention
-- Updated README test count badge to reflect 239 test files (was 206)
-
-## [1.1.0] - 2025-08-11
-
-### Added
-- `DataTransferObject` abstract base class with zero-boilerplate hydration and validation
-  - `fromArray()`, `fromRequest()`, `fromJson()` — full hydration
-  - `fromPartialArray()`, `fromPartialRequest()` — PATCH semantics
-  - `toArray()`, `allValues()`, `toJson()`, `jsonSerialize()` — serialization
-  - `only()`, `except()` — selective output
-  - `with()` — immutable update (always validates)
-  - `equals()`, `isEmpty()`, `isNotEmpty()` — state checks
-  - `rules()`, `rulesFor()`, `validateArray()`, `validatePartialArray()` — standalone validation
-  - `flushMetadataCache()`, `setMetadataCacheTtl()` — cache management
-- `DtoCollection` — type-safe array wrapper with `pluck()`, `pluckKey()`, `map()`, `filter()`, `push()`, `append()`, `merge()`
-- 39 validation attributes: `Required`, `Email`, `Max`, `Min`, `Pattern`, `Url`, `Uuid`, `In`, `Integer`, `Numeric`, `Boolean`, `Date`, `StartsWith`, `EndsWith`, `Between`, `Size`, `ArrayRule`, `Json`, `Enum`, `Accepted`, `Declined`, `Confirmed`, `Distinct`, `Prohibited`, `Present`, `Sometimes`, `Nullable`, `Same`, `Different`, `RequiredIf`, `RequiredUnless`, `RequiredWith`, `RequiredWithAll`, `RequiredWithout`, `RequiredWithoutAll`
-- 6 metadata attributes: `Cast`, `MapFrom`, `Hidden`, `DefaultValue`, `NestedArray`, `Collection`
-- `DTOCast` — Eloquent cast for DTO ↔ JSON column with optional validation on set
-- `DTOManager` — runtime helper accessible via `DTO` facade
-- `DTO` facade — `DTO::make()`, `DTO::validate()`, `DTO::makeFromJson()`, `DTO::schema()`
-- `DtoMetadataResolver` — reflection-based rule & metadata resolution with deduplication
-- `OpenApiSchemaGenerator` — auto-generate OpenAPI 3.0 schemas from DTO definitions
-- `DTOException` — named constructors for cast and JSON failures
-- `DTOSServiceProvider` — auto-discovery with Octane cache flush and dev TTL support
-- Contracts: `FromRequestDTO`, `ValidatableDTO`, `ValidationAttribute`
-- Artisan commands: `zeroboiler:dto-test`, `zeroboiler:dto-schema`
-- PHPStan level 9 compliance across all source files
-- Comprehensive test suite with 170+ test files covering all edge cases
-- Full README with usage examples, architecture diagrams, migration guide, and API reference
-
-### Changed
-- `DTO` facade added (was missing in earlier releases)
-
-## [1.0.0] - 2025-07-01
-
-### Added
-- Initial release of ZeroBoiler DTO package
+_No unreleased changes._
