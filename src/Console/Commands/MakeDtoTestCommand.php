@@ -468,7 +468,8 @@ PHP;
             } elseif (is_float($value)) {
                 $lines[] = "    '{$key}' => {$value},";
             } elseif (is_bool($value)) {
-                $lines[] = "    '{$key}' => ".($value ? 'true' : 'false').',';
+                $boolStr = $value ? 'true' : 'false';
+                $lines[] = "    '{$key}' => {$boolStr},";
             } elseif ($value instanceof \BackedEnum) {
                 $backedValue = $value->value;
                 if (is_int($backedValue)) {
