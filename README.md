@@ -1593,7 +1593,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **130+ test files** covering:
+The test suite includes **206 test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
