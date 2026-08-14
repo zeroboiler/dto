@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-[![Tests: 239](https://img.shields.io/badge/Tests-239-brightgreen)]()
+|[![Tests: 206](https://img.shields.io/badge/Tests-206-brightgreen)]()
 [![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -165,7 +165,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 | `NestedArray` | `Attributes` | `#[NestedArray(ItemDTO::class)]` — array of nested DTO instances |
 | `Collection` | `Attributes` | `#[Collection(ItemDTO::class)]` — DtoCollection-wrapped nested DTOs |
 | `MakeDtoTestCommand` | `Console\Commands` | `php artisan zeroboiler:dto-test` — generates Pest test file for a DTO |
-| `MakeDtoSchemaCommand` | `Console\\Commands` | `php artisan zeroboiler:dto-schema` — generates OpenAPI schema for a DTO |
+| `MakeDtoSchemaCommand` | `Console\Commands` | `php artisan zeroboiler:dto-schema` — generates OpenAPI schema for a DTO |
 
 ## Quick Start
 
