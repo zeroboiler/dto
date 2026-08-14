@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-[![Tests: 195+](https://img.shields.io/badge/Tests-195%2B-brightgreen)]()
+[![Tests: 228+](https://img.shields.io/badge/Tests-228%2B-brightgreen)]()
 [![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -82,7 +82,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Running PHPStan](#running-phpstan)
 - [Quick Start Integration](#quick-start-integration)
 - [Source Code Audit — Attribute Contract Compliance](#source-code-audit--attribute-contract-compliance)
-  - [Validation Attributes (39 total)](#validation-attributes-39-total)
+  - [Validation Attributes (35 total)](#validation-attributes-35-total)
   - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
   - [Service & Infrastructure Classes](#service--infrastructure-classes)
 - [Source Code Structure](#source-code-structure)
@@ -119,8 +119,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-- 53 source files in `src/` (39 validation attributes, 6 metadata attributes, 8 infrastructure)
-- 195 test files in `tests/` (31 fixtures)
+- 55 source files in `src/` (35 validation attributes, 6 metadata attributes, 14 infrastructure)
+- 228 test files in `tests/` (31 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1940,7 +1940,7 @@ and no baseline suppressions. The following checklist is maintained manually:
 
 ## Source Code Audit — Attribute Contract Compliance
 
-### Validation Attributes (39 total)
+### Validation Attributes (35 total)
 
 All validation attributes are `final`, implement `ValidationAttribute`, and have
 `#[Attribute(Attribute::TARGET_PROPERTY)]` targeting. Every attribute has
