@@ -82,8 +82,8 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Running PHPStan](#running-phpstan)
 - [Quick Start Integration](#quick-start-integration)
 - [Source Code Audit — Attribute Contract Compliance](#source-code-audit--attribute-contract-compliance)
-  - [Validation Attributes (35 total)](#validation-attributes-35-total)
-  - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
+  - [Validation Attributes (37 total)](#validation-attributes-37-total)
+  - [Metadata Attributes (4 total)](#metadata-attributes-4-total)
   - [Service & Infrastructure Classes](#service--infrastructure-classes)
 - [Source Code Structure](#source-code-structure)
   - [Attribute Type Signatures](#attribute-type-signatures)
@@ -119,7 +119,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-- 55 source files in `src/` (35 validation attributes, 6 metadata attributes, 14 infrastructure)
+- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
 - 206 test files in `tests/` (31 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
@@ -1830,8 +1830,8 @@ and no baseline suppressions. The following checklist is maintained manually:
 | `FromRequestDTO.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
 | `ValidatableDTO.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
 | `ValidationAttribute.php` (Interface) | ✅ | N/A | N/A | ✅ | ✅ |
-| 39 Validation Attributes | ✅ | ✅ all | ✅ readonly | ✅ `ruleKey()` | ✅ |
-| 6 Metadata Attributes | ✅ | ✅ all | ✅ readonly | N/A | ✅ |
+| 37 Validation Attributes | ✅ | ✅ all | ✅ readonly | ✅ `ruleKey()` | ✅ |
+| 4 Metadata Attributes | ✅ | ✅ all | ✅ readonly | N/A | ✅ |
 | CLI Commands (2) | ✅ | ✅ | N/A | ✅ | ✅ |
 
 ### Code Quality Checklist
@@ -1866,7 +1866,7 @@ and no baseline suppressions. The following checklist is maintained manually:
 
 ## Source Code Audit — Attribute Contract Compliance
 
-### Validation Attributes (35 total)
+### Validation Attributes (37 total)
 
 All validation attributes are `final`, implement `ValidationAttribute`, and have
 `#[Attribute(Attribute::TARGET_PROPERTY)]` targeting. Every attribute has
@@ -1910,8 +1910,10 @@ error messages and implements `ruleKey()`.
 | `RequiredWithAll` | ✅ | ✅ | `required_with_all:...` | `list<string> $fields`, `?string $message` |
 | `RequiredWithout` | ✅ | ✅ | `required_without:...` | `list<string> $fields`, `?string $message` |
 | `RequiredWithoutAll` | ✅ | ✅ | `required_without_all:...` | `list<string> $fields`, `?string $message` |
+| `NestedArray` | ✅ | ✅ | `array` | `string $dtoClass`, `?string $message` |
+| `Collection` | ✅ | ✅ | `array` | `string $dtoClass`, `?string $message` |
 
-### Metadata Attributes (6 total)
+### Metadata Attributes (4 total)
 
 Metadata attributes provide hydration and serialization behavior, not validation:
 
@@ -1921,8 +1923,6 @@ Metadata attributes provide hydration and serialization behavior, not validation
 | `MapFrom` | ✅ | ✅ | `TARGET_PROPERTY` | Source key aliasing (supports dot notation) |
 | `Hidden` | ✅ | — (no props) | `TARGET_PROPERTY` | Exclude from `toArray()`/`toJson()` |
 | `DefaultValue` | ✅ | ✅ | `TARGET_PROPERTY \| TARGET_PARAMETER` | Default when source key is absent |
-| `NestedArray` | ✅ | ✅ | `TARGET_PROPERTY` | Array of nested DTO instances |
-| `Collection` | ✅ | ✅ | `TARGET_PROPERTY` | DtoCollection of DTO instances |
 
 ### Service & Infrastructure Classes
 
