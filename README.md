@@ -31,6 +31,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Collection Helpers](#collection-helpers)
   - [Partial Updates (PATCH)](#partial-updates-patch)
   - [Validation Rules](#validation-rules)
+  - [Complete Attribute Examples](#complete-attribute-examples)
   - [Nested DTOs](#nested-dtos)
   - [DTO Collections](#dto-collections)
   - [Value Object Integration](#value-object-integration)
@@ -620,6 +621,302 @@ $validated = CreateUserDTO::validatePartialArray($data);
 // Action-scoped rules (override per action in subclass)
 CreateUserDTO::rulesFor('update');
 // Returns rules() by default; override in subclass for action-specific logic
+```
+
+### Complete Attribute Examples
+
+Below are real-world DTO definitions showcasing every validation and metadata attribute
+in context. Each example is a complete, self-contained DTO that can be used as-is.
+
+#### String Validation DTO — Email, Max, Min, Pattern, Url, Uuid, StartsWith, EndsWith
+
+```php
+use ZeroBoiler\DTO\Attributes\{Email, EndsWith, Max, Min, Pattern, Required, StartsWith, Url, Uuid};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class ContactDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email, Max(255)]
+        public readonly string $email,
+
+        #[Required, Url, Max(500)]
+        public readonly string $website,
+
+        #[Uuid]
+        public readonly ?string $inviteId = null,
+
+        #[Required, Min(2), Max(100)]
+        #[StartsWith('+'), EndsWith(suffix: 'X')]  // phone must start with + and end with X
+        public readonly string $phone,
+
+        #[Pattern('/^[A-Z]{3}\d{4}$/')]  // e.g. "ABC1234"
+        public readonly ?string $referenceCode = null,
+    ) {}
+}
+
+// Usage
+$contact = ContactDTO::fromArray([
+    'email' => 'user@example.com',
+    'website' => 'https://example.com',
+    'phone' => '+905551234X',
+    'referenceCode' => 'ABC1234',
+]);
+```
+
+#### Numeric & Boolean Validation DTO — Integer, Numeric, Between, Size, Boolean
+
+```php
+use ZeroBoiler\DTO\Attributes\{Between, Boolean, Integer, Max, Min, Required, Size};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class ProductDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Min(1), Max(200)]
+        public readonly string $name,
+
+        #[Required, Numeric, Between(min: 0.01, max: 99999.99)]
+        public readonly float $price,
+
+        #[Required, Integer, Min(0)]
+        public readonly int $stock,
+
+        #[Required, Integer, Size(value: 13)]  // exactly 13-digit ISBN
+        public readonly string $isbn,
+
+        #[Required, Boolean]
+        public readonly bool $isActive,
+
+        #[Required, Integer, Between(min: 1, max: 5)]
+        public readonly int $rating,
+    ) {}
+}
+
+// Usage
+$product = ProductDTO::fromArray([
+    'name' => 'Widget',
+    'price' => 29.99,
+    'stock' => 150,
+    'isbn' => '9783161484100',
+    'isActive' => true,
+    'rating' => 4,
+]);
+```
+
+#### Constraint & Cross-Field DTO — In, Different, Same, Confirmed, Distinct
+
+```php
+use ZeroBoiler\DTO\Attributes\{Confirmed, Different, Distinct, In, Max, Required, Same};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class RegistrationDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Email]
+        public readonly string $email,
+
+        #[Required, Confirmed]  // requires 'password_confirmation' field
+        public readonly string $password,
+
+        #[Required, Different(field: 'password')]  // must differ from password
+        public readonly string $username,
+
+        #[Required, Same(field: 'email')]  // must match email exactly
+        public readonly string $emailConfirmation,
+
+        #[Required, In(values: ['admin', 'editor', 'viewer'])]
+        public readonly string $role,
+
+        #[Max(10)]
+        #[Distinct]  // each tag must be unique
+        public readonly array $tags = [],
+    ) {}
+}
+
+// Usage
+$reg = RegistrationDTO::fromArray([
+    'email' => 'user@example.com',
+    'emailConfirmation' => 'user@example.com',
+    'password' => 'secret123',
+    'password_confirmation' => 'secret123',
+    'username' => 'johndoe',
+    'role' => 'admin',
+    'tags' => ['php', 'laravel', 'api'],
+]);
+```
+
+#### Field Presence & Value Control DTO — Nullable, Present, Prohibited, Accepted, Declined, Sometimes
+
+```php
+use ZeroBoiler\DTO\Attributes\{Accepted, Declined, Nullable, Present, Prohibited, Required, Sometimes};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class AccountDeletionDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $accountId,
+
+        #[Accepted]  // must be "yes", "on", "1", or true
+        public readonly string $confirmDelete,
+
+        #[Declined]  // must be "no", "off", "0", or false
+        public readonly string $keepNewsletter,
+
+        #[Prohibited]  // must NOT be present in the request
+        public readonly ?string $forceDelete = null,
+
+        #[Nullable]
+        public readonly ?string $reason = null,
+
+        #[Present]  // must be present in the request (even if empty)
+        public readonly string $captchaToken,
+
+        #[Sometimes]  // only validate if field is present
+        public readonly ?string $note = null,
+    ) {}
+}
+```
+
+#### Conditional Requirement DTO — RequiredIf, RequiredUnless, RequiredWith, RequiredWithout
+
+```php
+use ZeroBoiler\DTO\Attributes\{Email, Max, Min, Nullable, Required, RequiredIf, RequiredUnless, RequiredWith, RequiredWithout};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class ShipmentDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly string $recipientName,
+
+        #[Required, Email]
+        public readonly string $recipientEmail,
+
+        #[RequiredIf(field: 'shippingMethod', value: 'courier')]
+        #[Max(100)]
+        public readonly ?string $trackingNumber = null,
+
+        #[RequiredUnless(field: 'shippingMethod', value: 'pickup')]
+        public readonly ?string $shippingAddress = null,
+
+        #[RequiredWith(fields: 'billingAddress')]
+        public readonly ?string $billingCity = null,
+
+        #[RequiredWithout(field: 'shippingAddress')]
+        public readonly ?string $pickupLocation = null,
+
+        #[Nullable]
+        public readonly ?string $shippingMethod = null,
+    ) {}
+}
+```
+
+#### JSON & Array Validation DTO — Json, ArrayRule, NestedArray, Collection
+
+```php
+use ZeroBoiler\DTO\Attributes\{ArrayRule, Collection, Json, Max, Min, NestedArray, Required};
+use ZeroBoiler\DTO\DataTransferObject;
+use ZeroBoiler\DTO\DtoCollection;
+use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\ItemDTO;
+
+class WebhookPayloadDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Json]
+        public readonly string $payload,  // must be valid JSON string
+
+        #[Required, ArrayRule(min: 1, max: 10)]
+        public readonly array $eventIds = [],  // array with 1-10 elements
+
+        #[NestedArray(AddressDTO::class)]
+        public readonly array $addresses = [],  // array of AddressDTO instances
+
+        #[Collection(ItemDTO::class)]
+        public readonly DtoCollection $items,  // DtoCollection of ItemDTO instances
+    ) {}
+}
+```
+
+#### Hidden & MapFrom DTO — DefaultValue, Cast, Hidden, MapFrom
+
+```php
+use ZeroBoiler\DTO\Attributes\{Cast, DefaultValue, Hidden, MapFrom, Max, Required};
+use ZeroBoiler\DTO\DataTransferObject;
+
+class ProfileDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Max(50)]
+        public readonly string $firstName,
+
+        #[MapFrom('last_name')]  // maps source key 'last_name' to $lastName
+        #[Required, Max(50)]
+        public readonly string $lastName,
+
+        #[MapFrom('display_name')]
+        public readonly ?string $displayName = null,
+
+        #[DefaultValue('active')]
+        public readonly string $status = 'active',
+
+        #[Cast('integer')]
+        public readonly int $loginCount = 0,
+
+        #[Cast('date')]
+        public readonly ?\Carbon\Carbon $lastLoginAt = null,
+
+        #[Hidden]
+        public readonly ?string $apiKey = null,  // excluded from toArray/toJson
+    ) {}
+}
+
+// Usage — source keys are mapped
+$profile = ProfileDTO::fromArray([
+    'firstName' => 'Alice',
+    'last_name' => 'Smith',
+    'display_name' => 'asmith',
+    'login_count' => '42',       // cast to integer
+    'lastLoginAt' => '2024-01-15', // cast to Carbon
+    'apiKey' => 'secret-key-123',
+]);
+
+$profile->toArray();
+// ['firstName' => 'Alice', 'lastName' => 'Smith', 'displayName' => 'asmith',
+//  'status' => 'active', 'loginCount' => 42, 'lastLoginAt' => '2024-01-15T00:00:00+00:00']
+// apiKey is excluded
+```
+
+#### Enum Property DTO — Backed Enum validation & auto-casting
+
+```php
+use ZeroBoiler\DTO\Attributes\{Enum as EnumAttr, Max, Required};
+use ZeroBoiler\DTO\DataTransferObject;
+use App\Enums\UserStatus;  // any backed enum from zeroboiler/enums
+
+class UserUpdateDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Max(50)]
+        public readonly string $name,
+
+        #[EnumAttr(UserStatus::class)]  // validates against backed values, auto-casts
+        public readonly UserStatus $status,
+
+        #[EnumAttr(UserStatus::class)]
+        public readonly ?UserStatus $previousStatus = null,
+    ) {}
+}
+
+// Usage — accepts raw backed values, auto-casts to enum instances
+$user = UserUpdateDTO::fromArray([
+    'name' => 'Alice',
+    'status' => 'active',              // string → UserStatus::ACTIVE
+]);
+$user->status;                         // UserStatus::ACTIVE instance
+$user->toArray()['status'];            // 'active' (serialized to backed value)
 ```
 
 ### Nested DTOs
