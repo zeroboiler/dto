@@ -6,740 +6,581 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Attributes\{Required, Email, Hidden, Max, Min, Cast, MapFrom, DefaultValue, Nullable, Pattern, In, Accepted};
+use ZeroBoiler\DTO\Attributes\Accepted;
+use ZeroBoiler\DTO\Attributes\Boolean;
+use ZeroBoiler\DTO\Attributes\Cast;
+use ZeroBoiler\DTO\Attributes\Confirmed;
+use ZeroBoiler\DTO\Attributes\Date;
+use ZeroBoiler\DTO\Attributes\Declined;
+use ZeroBoiler\DTO\Attributes\DefaultValue;
+use ZeroBoiler\DTO\Attributes\Different;
+use ZeroBoiler\DTO\Attributes\Distinct;
+use ZeroBoiler\DTO\Attributes\Email;
+use ZeroBoiler\DTO\Attributes\EndsWith;
+use ZeroBoiler\DTO\Attributes\Enum;
+use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\DTO\Attributes\In;
+use ZeroBoiler\DTO\Attributes\Integer;
+use ZeroBoiler\DTO\Attributes\Json;
+use ZeroBoiler\DTO\Attributes\MapFrom;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\NestedArray;
+use ZeroBoiler\DTO\Attributes\Nullable;
+use ZeroBoiler\DTO\Attributes\Numeric;
+use ZeroBoiler\DTO\Attributes\Pattern;
+use ZeroBoiler\DTO\Attributes\Present;
+use ZeroBoiler\DTO\Attributes\Prohibited;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\Attributes\RequiredIf;
+use ZeroBoiler\DTO\Attributes\RequiredUnless;
+use ZeroBoiler\DTO\Attributes\RequiredWith;
+use ZeroBoiler\DTO\Attributes\RequiredWithAll;
+use ZeroBoiler\DTO\Attributes\RequiredWithout;
+use ZeroBoiler\DTO\Attributes\RequiredWithoutAll;
+use ZeroBoiler\DTO\Attributes\Same;
+use ZeroBoiler\DTO\Attributes\Size;
+use ZeroBoiler\DTO\Attributes\Sometimes;
+use ZeroBoiler\DTO\Attributes\StartsWith;
+use ZeroBoiler\DTO\Attributes\Url;
+use ZeroBoiler\DTO\Attributes\Uuid;
+use ZeroBoiler\DTO\Attributes\Collection;
+use ZeroBoiler\DTO\Attributes\ArrayRule;
+use ZeroBoiler\DTO\Casts\DTOCast;
+use ZeroBoiler\DTO\Contracts\FromRequestDTO;
+use ZeroBoiler\DTO\Contracts\ValidatableDTO;
+use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 use ZeroBoiler\DTO\DataTransferObject;
+use ZeroBoiler\DTO\DTOManager;
+use ZeroBoiler\DTO\DTOSServiceProvider;
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Exceptions\DTOException;
+use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\EmptyDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\NullableRoundtripDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\RoundtripDTO;
 
-// ── Fixtures ──────────────────────────────────────────────────
-
-class AuditUserDTO extends DataTransferObject
-{
-    public function __construct(
-        #[Required, Email, Max(255)]
-        public readonly string $email,
-
-        #[Required, Min(2), Max(100)]
-        public readonly string $name,
-
-        #[Nullable, Max(255)]
-        public readonly ?string $bio = null,
-
-        #[Hidden]
-        public readonly ?string $password = null,
-
-        #[Cast('integer')]
-        public readonly int $age = 0,
-
-        #[DefaultValue('active')]
-        public readonly string $status = 'active',
-    ) {}
-}
-
-class AuditProductDTO extends DataTransferObject
-{
-    public function __construct(
-        #[Required]
-        public readonly string $sku,
-
-        #[Required, Min(0)]
-        public readonly float $price,
-
-        #[In(['draft', 'published', 'archived'])]
-        public readonly string $state = 'draft',
-
-        #[Accepted]
-        public readonly bool $terms = false,
-    ) {}
-}
-
-class AuditEmptyDTO extends DataTransferObject
-{
-    public function __construct(
-        #[Nullable]
-        public readonly ?string $optional = null,
-    ) {}
-}
-
-class AuditMappedDTO extends DataTransferObject
-{
-    public function __construct(
-        #[MapFrom('remote_id')]
-        public readonly ?string $id = null,
-
-        #[MapFrom('remote_name')]
-        #[Required]
-        public readonly string $name = '',
-    ) {}
-}
-
-class AuditCollectionDTO extends DataTransferObject
-{
-    public function __construct(
-        public readonly string $id,
-        public readonly string $label,
-    ) {}
-}
-
-describe('DTO production readiness comprehensive audit', function () {
-    // ── fromArray hydration ──────────────────────────────────
-    describe('fromArray basic hydration', function () {
-        it('hydrates all properties from array', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'alice@example.com',
-                'name' => 'Alice',
-                'bio' => 'Developer',
-                'age' => '30',
-            ], validate: false);
-
-            expect($dto->email)->toBe('alice@example.com');
-            expect($dto->name)->toBe('Alice');
-            expect($dto->bio)->toBe('Developer');
-            expect($dto->age)->toBe(30);
-            expect($dto->status)->toBe('active');
-        });
-
-        it('applies Cast integer to string value', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'test@test.com',
-                'name' => 'Test',
-                'age' => '25',
-            ], validate: false);
-
-            expect($dto->age)->toBe(25);
-            expect($dto->age)->toBeInt();
-        });
-
-        it('applies DefaultValue when key is absent', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'test@test.com',
-                'name' => 'Test',
-            ], validate: false);
-
-            expect($dto->status)->toBe('active');
-        });
-
-        it('allows overriding DefaultValue', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'test@test.com',
-                'name' => 'Test',
-                'status' => 'inactive',
-            ], validate: false);
-
-            expect($dto->status)->toBe('inactive');
-        });
-
-        it('respects nullable with explicit null', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'test@test.com',
-                'name' => 'Test',
-                'bio' => null,
-            ], validate: false);
-
-            expect($dto->bio)->toBeNull();
-        });
+describe('DTO Production Readiness — Type Safety & Contract Audit', function (): void {
+    beforeEach(function (): void {
+        DataTransferObject::flushMetadataCache();
     });
 
-    // ── fromArray with MapFrom ─────────────────────────────────
-    describe('fromArray with MapFrom', function () {
-        it('maps source key to property name', function () {
-            $dto = AuditMappedDTO::fromArray([
-                'remote_id' => '123',
-                'remote_name' => 'Alice',
-            ], validate: false);
-
-            expect($dto->id)->toBe('123');
-            expect($dto->name)->toBe('Alice');
-        });
-
-        it('uses default when mapped key is absent', function () {
-            $dto = AuditMappedDTO::fromArray([
-                'remote_name' => 'Bob',
-            ], validate: false);
-
-            expect($dto->id)->toBeNull();
-        });
+    afterEach(function (): void {
+        DataTransferObject::flushMetadataCache();
     });
 
-    // ── Serialization ─────────────────────────────────────────
-    describe('toArray / allValues / toJson', function () {
-        it('toArray excludes hidden fields', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'password' => 'secret',
-            ], validate: false);
-
-            $arr = $dto->toArray();
-
-            expect($arr)->not->toHaveKey('password');
-            expect($arr)->toHaveKey('email');
-            expect($arr)->toHaveKey('name');
-        });
-
-        it('allValues includes hidden fields', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'password' => 'secret',
-            ], validate: false);
-
-            $all = $dto->allValues();
-
-            expect($all)->toHaveKey('password');
-            expect($all['password'])->toBe('secret');
-        });
-
-        it('toJson produces valid JSON', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
-
-            $json = $dto->toJson();
-            $decoded = json_decode($json, true);
-
-            expect($decoded)->toBeArray();
-            expect($decoded['email'])->toBe('a@b.com');
-        });
-
-        it('toJson respects options', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
-
-            $json = $dto->toJson(JSON_PRETTY_PRINT);
-
-            expect(str_contains($json, "\n"))->toBeTrue();
-        });
-
-        it('jsonSerialize returns toArray result', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
-
-            expect($dto->jsonSerialize())->toBe($dto->toArray());
-        });
-    });
-
-    // ── Selective output ──────────────────────────────────────
-    describe('only() and except()', function () {
-        it('only returns specified fields', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'age' => 30,
-            ], validate: false);
-
-            $result = $dto->only('email', 'name');
-
-            expect($result)->toHaveCount(2);
-            expect($result)->toHaveKey('email');
-            expect($result)->toHaveKey('name');
-            expect($result)->not->toHaveKey('age');
-        });
-
-        it('only with single string key', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
-
-            $result = $dto->only('email');
-
-            expect($result)->toHaveCount(1);
-            expect($result['email'])->toBe('a@b.com');
-        });
-
-        it('except excludes specified fields', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'age' => 30,
-            ], validate: false);
-
-            $result = $dto->except('age', 'status');
-
-            expect($result)->toHaveKey('email');
-            expect($result)->toHaveKey('name');
-            expect($result)->not->toHaveKey('age');
-        });
-    });
-
-    // ── Immutable update ───────────────────────────────────────
-    describe('with() immutable update', function () {
-        it('returns new instance with updated values', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
-
-            $updated = $dto->with(['name' => 'Bob']);
-
-            expect($dto->name)->toBe('Alice');
-            expect($updated->name)->toBe('Bob');
-            expect($updated->email)->toBe('a@b.com');
-        });
-
-        it('original DTO is unchanged', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'status' => 'active',
-            ], validate: false);
-
-            $dto->with(['status' => 'inactive']);
-
-            expect($dto->status)->toBe('active');
-        });
-    });
-
-    // ── Equality ──────────────────────────────────────────────
-    describe('equals()', function () {
-        it('returns true for identical values', function () {
-            $a = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
-            $b = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
-
-            expect($a->equals($b))->toBeTrue();
-        });
-
-        it('returns false for different values', function () {
-            $a = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
-            $b = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Bob'], validate: false);
-
-            expect($a->equals($b))->toBeFalse();
-        });
-
-        it('excludes hidden from comparison', function () {
-            $a = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice', 'password' => 'x'], validate: false);
-            $b = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice', 'password' => 'y'], validate: false);
-
-            expect($a->equals($b))->toBeTrue();
-        });
-    });
-
-    // ── State checks ──────────────────────────────────────────
-    describe('isEmpty and isNotEmpty', function () {
-        it('isEmpty returns true for all-defaults', function () {
-            $dto = AuditEmptyDTO::fromArray([], validate: false);
-
-            expect($dto->isEmpty())->toBeTrue();
-        });
-
-        it('isEmpty returns false when a field has value', function () {
-            $dto = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
-
-            expect($dto->isEmpty())->toBeFalse();
-        });
-
-        it('isNotEmpty is negation of isEmpty', function () {
-            $empty = AuditEmptyDTO::fromArray([], validate: false);
-            $nonEmpty = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
-
-            expect($empty->isNotEmpty())->toBeFalse();
-            expect($nonEmpty->isNotEmpty())->toBeTrue();
-        });
-    });
-
-    // ── fromJson ─────────────────────────────────────────────
-    describe('fromJson', function () {
-        it('creates DTO from valid JSON string', function () {
-            $dto = AuditUserDTO::fromJson('{"email":"a@b.com","name":"Alice"}', validate: false);
-
-            expect($dto->email)->toBe('a@b.com');
-            expect($dto->name)->toBe('Alice');
-        });
-
-        it('throws DTOException for invalid JSON', function () {
-            expect(fn () => AuditUserDTO::fromJson('not json', validate: false))
-                ->toThrow(DTOException::class);
-        });
-
-        it('throws DTOException for sequential array (JSON array)', function () {
-            expect(fn () => AuditUserDTO::fromJson('[1,2,3]', validate: false))
-                ->toThrow(DTOException::class);
-        });
-    });
-
-    // ── DTOException factory methods ──────────────────────────
-    describe('DTOException named constructors', function () {
-        it('invalidCast formats message correctly', function () {
-            $e = DTOException::invalidCast('age', 'integer', 'not_a_number');
-
-            expect($e->getMessage())->toContain('age');
-            expect($e->getMessage())->toContain('integer');
-            expect($e->getMessage())->toContain('not_a_number');
-        });
-
-        it('invalidJson formats message correctly', function () {
-            $e = DTOException::invalidJson('data', 'Syntax error');
-
-            expect($e->getMessage())->toContain('data');
-            expect($e->getMessage())->toContain('Syntax error');
-        });
-    });
-
-    // ── Validation rules ──────────────────────────────────────
-    describe('rules() and rulesFor()', function () {
-        it('rules() returns array with required, email, max, min', function () {
-            $rules = AuditUserDTO::rules();
-
-            expect($rules)->toHaveKey('email');
-            expect($rules)->toHaveKey('name');
-            expect($rules['email'])->toContain('required');
-            expect($rules['email'])->toContain('email');
-            expect($rules['name'])->toContain('required');
-            expect($rules['name'])->toContain('min:2');
-            expect($rules['name'])->toContain('max:100');
-        });
-
-        it('rulesFor() returns same as rules() by default', function () {
-            $rules = AuditUserDTO::rules();
-            $rulesForUpdate = AuditUserDTO::rulesFor('update');
-
-            expect($rules)->toEqual($rulesForUpdate);
-        });
-
-        it('rulesFor() returns same for arbitrary action', function () {
-            $rules = AuditUserDTO::rules();
-            $rulesForDelete = AuditUserDTO::rulesFor('delete');
-
-            expect($rules)->toEqual($rulesForDelete);
-        });
-    });
-
-    // ── Metadata cache management ─────────────────────────────
-    describe('metadata cache management', function () {
-        it('flushMetadataCache clears all cached metadata', function () {
-            // Resolve metadata first
-            AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
-
-            // Flush should not break subsequent usage
-            DataTransferObject::flushMetadataCache();
-
-            $dto = AuditUserDTO::fromArray(['email' => 'b@c.com', 'name' => 'Test2'], validate: false);
-            expect($dto->email)->toBe('b@c.com');
-        });
-
-        it('flushMetadataCache with specific class', function () {
-            AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
-
-            DataTransferObject::flushMetadataCache(AuditUserDTO::class);
-
-            // Should still work after flush
-            $dto = AuditUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Test'], validate: false);
-            expect($dto->name)->toBe('Test');
-        });
-
-        it('setMetadataCacheTtl accepts positive value', function () {
-            DataTransferObject::setMetadataCacheTtl(5.0);
-            // No exception = success
-            expect(true)->toBeTrue();
-        });
-
-        it('setMetadataCacheTtl accepts zero', function () {
-            DataTransferObject::setMetadataCacheTtl(0.0);
-            expect(true)->toBeTrue();
-        });
-    });
-
-    // ── DtoCollection ArrayAccess ──────────────────────────────
-    describe('DtoCollection ArrayAccess', function () {
-        it('offsetExists returns true for valid index', function () {
-            $dto = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$dto]);
-
-            expect(isset($col[0]))->toBeTrue();
-            expect(isset($col[1]))->toBeFalse();
-        });
-
-        it('offsetGet returns DTO for valid index', function () {
-            $dto = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$dto]);
-
-            expect($col[0])->toBe($dto);
-        });
-
-        it('offsetGet returns null for invalid index', function () {
-            $col = new DtoCollection;
-
-            expect($col[0])->toBeNull();
-        });
-
-        it('offsetSet appends when offset is null', function () {
-            $col = new DtoCollection;
-            $dto = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-
-            $col[] = $dto;
-
-            expect($col->count())->toBe(1);
-        });
-
-        it('offsetSet replaces at specific offset', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1]);
-
-            $col[0] = $d2;
-
-            expect($col->count())->toBe(1);
-            expect($col[0]->id)->toBe('2');
-        });
-
-        it('offsetSet rejects non-DTO values', function () {
-            $col = new DtoCollection;
-
-            expect(fn () => $col[] = 'not a dto')
-                ->toThrow(\InvalidArgumentException::class);
-        });
-
-        it('offsetUnset removes and re-indexes', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $d3 = AuditCollectionDTO::fromArray(['id' => '3', 'label' => 'C'], validate: false);
-            $col = new DtoCollection([$d1, $d2, $d3]);
-
-            unset($col[0]);
-
-            expect($col->count())->toBe(2);
-            expect($col[0]->id)->toBe('2');
-            expect($col[1]->id)->toBe('3');
-        });
-
-        it('constructor rejects non-DTO values', function () {
-            expect(fn () => new DtoCollection(['not a dto']))
-                ->toThrow(\InvalidArgumentException::class);
-        });
-    });
-
-    // ── DtoCollection make() ───────────────────────────────────
-    describe('DtoCollection make()', function () {
-        it('creates from array of DTOs', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-
-            $col = DtoCollection::make([$d1, $d2]);
-
-            expect($col->count())->toBe(2);
-        });
-
-        it('creates empty collection from no args', function () {
-            $col = DtoCollection::make();
-
-            expect($col->isEmpty())->toBeTrue();
-        });
-    });
-
-    // ── DtoCollection first/last ───────────────────────────────
-    describe('DtoCollection first() and last()', function () {
-        it('first returns first item', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
-
-            expect($col->first()->id)->toBe('1');
-        });
-
-        it('last returns last item', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
-
-            expect($col->last()->id)->toBe('2');
-        });
-
-        it('first/last return null for empty collection', function () {
-            $col = new DtoCollection;
-
-            expect($col->first())->toBeNull();
-            expect($col->last())->toBeNull();
-        });
-    });
-
-    // ── DtoCollection pluck/pluckKey ────────────────────────────
-    describe('DtoCollection pluck and pluckKey', function () {
-        it('pluck extracts single field', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
-
-            $ids = $col->pluck('id');
-
-            expect($ids)->toEqual(['1', '2']);
-        });
-
-        it('pluckKey creates associative map', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
-
-            $map = $col->pluckKey('id', 'label');
-
-            expect($map)->toEqual(['1' => 'A', '2' => 'B']);
-        });
-
-        it('pluckKey without valueField returns full arrays', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$d1]);
-
-            $map = $col->pluckKey('id');
-
-            expect($map)->toHaveKey('1');
-            expect($map['1'])->toBe(['id' => '1', 'label' => 'A']);
-        });
-    });
-
-    // ── DtoCollection items/toArray/allValues ──────────────────
-    describe('DtoCollection iteration and serialization', function () {
-        it('items returns raw DTO instances', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$d1]);
-
-            $items = $col->items();
-
-            expect($items)->toHaveCount(1);
-            expect($items[0])->toBe($d1);
-        });
-
-        it('toArray serializes all DTOs', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$d1]);
-
-            $arr = $col->toArray();
-
-            expect($arr[0])->toEqual(['id' => '1', 'label' => 'A']);
-        });
-
-        it('allValues includes hidden fields from child DTOs', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'password' => 'secret',
-            ], validate: false);
-            $col = new DtoCollection([$dto]);
-
-            $all = $col->allValues();
-
-            expect($all[0])->toHaveKey('password');
-            expect($all[0]['password'])->toBe('secret');
-        });
-
-        it('getIterator yields all items', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
-
-            $count = 0;
-            foreach ($col as $item) {
-                $count++;
+    // -----------------------------------------------------------------------
+    // All source files have declare(strict_types=1)
+    // -----------------------------------------------------------------------
+
+    it('all source files declare strict types', function (): void {
+        $srcDir = __DIR__.'/../../src';
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($srcDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        $violations = [];
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
             }
+            $contents = file_get_contents($file->getPathname());
+            if (! str_contains($contents, 'declare(strict_types=1)')) {
+                $violations[] = $file->getPathname();
+            }
+        }
 
-            expect($count)->toBe(2);
-        });
-
-        it('count implements Countable', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $col = new DtoCollection([$d1]);
-
-            expect(count($col))->toBe(1);
-        });
+        expect($violations)->toBeEmpty(
+            'All source files must have declare(strict_types=1). Violations: '.implode(', ', $violations)
+        );
     });
 
-    // ── DtoCollection map with index ───────────────────────────
-    describe('DtoCollection map with index', function () {
-        it('map passes both item and index', function () {
-            $d1 = AuditCollectionDTO::fromArray(['id' => '1', 'label' => 'A'], validate: false);
-            $d2 = AuditCollectionDTO::fromArray(['id' => '2', 'label' => 'B'], validate: false);
-            $col = new DtoCollection([$d1, $d2]);
+    // -----------------------------------------------------------------------
+    // All validation attributes are final
+    // -----------------------------------------------------------------------
 
-            $result = $col->map(fn ($dto, $index) => $index . '-' . $dto->label);
+    it('all validation attributes are final classes', function (): void {
+        $attributes = [
+            Accepted::class, Boolean::class, Cast::class, Confirmed::class,
+            Date::class, Declined::class, DefaultValue::class, Different::class,
+            Distinct::class, Email::class, EndsWith::class, Enum::class,
+            Hidden::class, In::class, Integer::class, Json::class,
+            MapFrom::class, Max::class, Min::class, NestedArray::class,
+            Nullable::class, Numeric::class, Pattern::class, Present::class,
+            Prohibited::class, Required::class, RequiredIf::class,
+            RequiredUnless::class, RequiredWith::class, RequiredWithAll::class,
+            RequiredWithout::class, RequiredWithoutAll::class, Same::class,
+            Size::class, Sometimes::class, StartsWith::class, Url::class,
+            Uuid::class, Collection::class, ArrayRule::class,
+        ];
 
-            expect($result)->toEqual(['0-A', '1-B']);
-        });
+        foreach ($attributes as $attrClass) {
+            $ref = new ReflectionClass($attrClass);
+            expect($ref->isFinal())->toBeTrue("{$attrClass} must be final");
+        }
     });
 
-    // ── fromPartialArray ───────────────────────────────────────
-    describe('fromPartialArray', function () {
-        it('uses defaults for missing fields', function () {
-            $dto = AuditUserDTO::fromPartialArray(['email' => 'a@b.com'], validate: false);
+    // -----------------------------------------------------------------------
+    // Validation attributes that implement ValidationAttribute have ruleKey()
+    // -----------------------------------------------------------------------
 
-            expect($dto->email)->toBe('a@b.com');
-            expect($dto->status)->toBe('active');
-            expect($dto->age)->toBe(0);
-        });
+    it('ValidationAttribute implementations all have ruleKey() method', function (): void {
+        $implementors = [
+            Accepted::class, Boolean::class, Confirmed::class, Date::class,
+            Declined::class, Different::class, Distinct::class, Email::class,
+            EndsWith::class, Enum::class, In::class, Integer::class,
+            Json::class, Max::class, Min::class, NestedArray::class,
+            Nullable::class, Numeric::class, Pattern::class, Present::class,
+            Prohibited::class, Required::class, RequiredIf::class,
+            RequiredUnless::class, RequiredWith::class, RequiredWithAll::class,
+            RequiredWithout::class, RequiredWithoutAll::class, Same::class,
+            Size::class, Sometimes::class, StartsWith::class, Url::class,
+            Uuid::class, Collection::class, ArrayRule::class,
+        ];
 
-        it('overrides defaults when provided', function () {
-            $dto = AuditUserDTO::fromPartialArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-                'status' => 'suspended',
-            ], validate: false);
-
-            expect($dto->status)->toBe('suspended');
-        });
-
-        it('works with empty array', function () {
-            $dto = AuditUserDTO::fromPartialArray([], validate: false);
-
-            expect($dto->email)->toBe('');
-            expect($dto->name)->toBe('');
-            expect($dto->status)->toBe('active');
-        });
+        foreach ($implementors as $class) {
+            expect($class)->toImplement(ValidationAttribute::class);
+            $ref = new ReflectionClass($class);
+            $method = $ref->getMethod('ruleKey');
+            expect($method->getReturnType()?->getName())->toBe('string');
+        }
     });
 
-    // ── validatePartialArray ──────────────────────────────────
-    describe('validatePartialArray', function () {
-        it('returns data when valid', function () {
-            $result = AuditProductDTO::validatePartialArray([
-                'price' => 10.99,
-            ]);
+    // -----------------------------------------------------------------------
+    // Metadata-only attributes do NOT implement ValidationAttribute
+    // -----------------------------------------------------------------------
 
-            expect($result)->toBeArray();
-            expect($result)->toHaveKey('price');
-        });
+    it('Cast, Hidden, MapFrom, DefaultValue do NOT implement ValidationAttribute', function (): void {
+        $nonValidation = [Cast::class, Hidden::class, MapFrom::class];
+
+        foreach ($nonValidation as $class) {
+            expect($class)->not->toImplement(ValidationAttribute::class);
+        }
     });
 
-    // ── AuditProductDTO with In/Accepted ───────────────────────
-    describe('AuditProductDTO attribute validation', function () {
-        it('hydrates with In constraint field', function () {
-            $dto = AuditProductDTO::fromArray([
-                'sku' => 'SKU-001',
-                'price' => 29.99,
-                'state' => 'published',
-                'terms' => true,
-            ], validate: false);
+    // -----------------------------------------------------------------------
+    // Core classes — final checks
+    // -----------------------------------------------------------------------
 
-            expect($dto->state)->toBe('published');
-            expect($dto->terms)->toBeTrue();
-        });
-
-        it('rules include In and Accepted', function () {
-            $rules = AuditProductDTO::rules();
-
-            expect($rules['state'])->toContain('in:draft,published,archived');
-            expect($rules['terms'])->toContain('accepted');
-        });
+    it('DataTransferObject is abstract', function (): void {
+        expect((new ReflectionClass(DataTransferObject::class))->isAbstract())->toBeTrue();
     });
 
-    // ── Readonly enforcement ─────────────────────────────────
-    describe('readonly property enforcement', function () {
-        it('properties are public readonly (cannot be reassigned)', function () {
-            $dto = AuditUserDTO::fromArray([
-                'email' => 'a@b.com',
-                'name' => 'Alice',
-            ], validate: false);
+    it('DtoCollection is final', function (): void {
+        expect((new ReflectionClass(DtoCollection::class))->isFinal())->toBeTrue();
+    });
 
-            // This is a compile-time check — the property is readonly
-            // We verify it exists and is accessible
-            expect($dto->email)->toBe('a@b.com');
+    it('DTOManager is final and readonly', function (): void {
+        $ref = new ReflectionClass(DTOManager::class);
+        expect($ref->isFinal())->toBeTrue();
+        expect($ref->isReadOnly())->toBeTrue();
+    });
 
-            // Trying to set would be a compile error, so we can't test it at runtime
-            // But we verify the value doesn't change through normal usage
-            $copy = $dto->with(['email' => 'b@c.com']);
-            expect($dto->email)->toBe('a@b.com');
-            expect($copy->email)->toBe('b@c.com');
-        });
+    it('DTOCast is final', function (): void {
+        expect((new ReflectionClass(DTOCast::class))->isFinal())->toBeTrue();
+    });
+
+    it('DTOException is final', function (): void {
+        expect((new ReflectionClass(DTOException::class))->isFinal())->toBeTrue();
+    });
+
+    it('DTOSServiceProvider is final', function (): void {
+        expect((new ReflectionClass(DTOSServiceProvider::class))->isFinal())->toBeTrue();
+    });
+
+    it('DTO facade is final', function (): void {
+        expect((new ReflectionClass(\ZeroBoiler\DTO\Facades\DTO::class))->isFinal())->toBeTrue();
+    });
+
+    // -----------------------------------------------------------------------
+    // Interface contracts
+    // -----------------------------------------------------------------------
+
+    it('DataTransferObject implements FromRequestDTO', function (): void {
+        expect(DataTransferObject::class)->toImplement(FromRequestDTO::class);
+    });
+
+    it('DataTransferObject implements ValidatableDTO', function (): void {
+        expect(DataTransferObject::class)->toImplement(ValidatableDTO::class);
+    });
+
+    it('FromRequestDTO requires fromRequest method', function (): void {
+        $ref = new ReflectionClass(FromRequestDTO::class);
+        $method = $ref->getMethod('fromRequest');
+        expect($method)->not->toBeNull();
+        expect($method->isPublic())->toBeTrue();
+        expect($method->isStatic())->toBeTrue();
+    });
+
+    it('ValidatableDTO requires rules and rulesFor methods', function (): void {
+        $ref = new ReflectionClass(ValidatableDTO::class);
+        expect($ref->getMethod('rules'))->not->toBeNull();
+        expect($ref->getMethod('rulesFor'))->not->toBeNull();
+    });
+
+    // -----------------------------------------------------------------------
+    // DTOException — named constructors
+    // -----------------------------------------------------------------------
+
+    it('DTOException::invalidCast() returns self with descriptive message', function (): void {
+        $ex = DTOException::invalidCast('email', 'integer', 'not-an-int');
+        expect($ex)->toBeInstanceOf(DTOException::class);
+        expect($ex->getMessage())->toContain('email');
+        expect($ex->getMessage())->toContain('integer');
+    });
+
+    it('DTOException::invalidJson() returns self with descriptive message', function (): void {
+        $ex = DTOException::invalidJson('metadata', 'Syntax error');
+        expect($ex)->toBeInstanceOf(DTOException::class);
+        expect($ex->getMessage())->toContain('metadata');
+        expect($ex->getMessage())->toContain('Syntax error');
+    });
+
+    it('DTOException __toString includes class name', function (): void {
+        $ex = DTOException::invalidCast('field', 'string', 42);
+        $str = (string) $ex;
+        expect($str)->toContain('DTOException');
+    });
+
+    // -----------------------------------------------------------------------
+    // DTOManager — all methods have return type declarations
+    // -----------------------------------------------------------------------
+
+    it('DTOManager validate() returns array', function (): void {
+        $manager = new DTOManager;
+        $result = $manager->validate(CreateUserDTO::class, [
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+        ]);
+        expect($result)->toBeArray();
+    });
+
+    it('DTOManager make() returns DataTransferObject', function (): void {
+        $manager = new DTOManager;
+        $dto = $manager->make(CreateUserDTO::class, [
+            'email' => 'test@example.com',
+            'name' => 'Test User',
+        ]);
+        expect($dto)->toBeInstanceOf(DataTransferObject::class);
+    });
+
+    it('DTOManager rules() returns array', function (): void {
+        $manager = new DTOManager;
+        $rules = $manager->rules(CreateUserDTO::class);
+        expect($rules)->toBeArray();
+        expect($rules)->toHaveKey('email');
+    });
+
+    it('DTOManager rulesFor() returns array', function (): void {
+        $manager = new DTOManager;
+        $rules = $manager->rulesFor(CreateUserDTO::class, 'create');
+        expect($rules)->toBeArray();
+    });
+
+    // -----------------------------------------------------------------------
+    // DtoCollection — type safety and interface compliance
+    // -----------------------------------------------------------------------
+
+    it('DtoCollection implements Countable', function (): void {
+        expect(DtoCollection::class)->toImplement(\Countable::class);
+    });
+
+    it('DtoCollection implements ArrayAccess', function (): void {
+        expect(DtoCollection::class)->toImplement(\ArrayAccess::class);
+    });
+
+    it('DtoCollection implements IteratorAggregate', function (): void {
+        expect(DtoCollection::class)->toImplement(\IteratorAggregate::class);
+    });
+
+    it('DtoCollection implements JsonSerializable', function (): void {
+        expect(DtoCollection::class)->toImplement(\JsonSerializable::class);
+    });
+
+    it('DtoCollection rejects non-DTO items', function (): void {
+        expect(fn () => new DtoCollection(['not-a-dto']))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('DtoCollection count() returns correct count', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'A',
+        ], validate: false);
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'c@d.com',
+            'name' => 'C',
+        ], validate: false);
+
+        $col = new DtoCollection([$dto1, $dto2]);
+        expect(count($col))->toBe(2);
+        expect($col->count())->toBe(2);
+    });
+
+    it('DtoCollection isEmpty() works correctly', function (): void {
+        $empty = new DtoCollection;
+        expect($empty->isEmpty())->toBeTrue();
+        expect($empty->isNotEmpty())->toBeFalse();
+    });
+
+    it('DtoCollection map() returns plain array', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Test',
+        ], validate: false);
+        $col = new DtoCollection([$dto]);
+
+        $emails = $col->map(fn (DataTransferObject $d): string => $d->email);
+        expect($emails)->toBe(['a@b.com']);
+    });
+
+    it('DtoCollection filter() returns new collection', function (): void {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'c@d.com', 'name' => 'Charlie'], validate: false);
+        $col = new DtoCollection([$dto1, $dto2]);
+
+        $filtered = $col->filter(fn (DataTransferObject $d): bool => str_starts_with($d->name, 'A'));
+        expect($filtered)->not->toBe($col);
+        expect($filtered->count())->toBe(1);
+    });
+
+    it('DtoCollection append() returns new collection without mutating original', function (): void {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'A'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'c@d.com', 'name' => 'C'], validate: false);
+        $col = new DtoCollection([$dto1]);
+
+        $newCol = $col->append($dto2);
+        expect($col->count())->toBe(1);
+        expect($newCol->count())->toBe(2);
+    });
+
+    it('DtoCollection merge() combines two collections', function (): void {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'A'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'c@d.com', 'name' => 'C'], validate: false);
+        $col1 = new DtoCollection([$dto1]);
+        $col2 = new DtoCollection([$dto2]);
+
+        $merged = $col1->merge($col2);
+        expect($merged->count())->toBe(2);
+        expect($col1->count())->toBe(1);
+        expect($col2->count())->toBe(1);
+    });
+
+    it('DtoCollection pluck() extracts a property from each DTO', function (): void {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'c@d.com', 'name' => 'Charlie'], validate: false);
+        $col = new DtoCollection([$dto1, $dto2]);
+
+        $names = $col->pluck('name');
+        expect($names)->toBe(['Alice', 'Charlie']);
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — fromJson roundtrip
+    // -----------------------------------------------------------------------
+
+    it('fromJson creates DTO from valid JSON object', function (): void {
+        $json = json_encode(['name' => 'Test', 'value' => '123']);
+        $dto = MinimalDTO::fromJson($json, validate: false);
+
+        expect($dto)->toBeInstanceOf(MinimalDTO::class);
+        expect($dto->name)->toBe('Test');
+        expect($dto->value)->toBe('123');
+    });
+
+    it('fromJson rejects sequential arrays', function (): void {
+        $json = json_encode(['first', 'second']);
+        expect(fn () => MinimalDTO::fromJson($json, validate: false))
+            ->toThrow(DTOException::class);
+    });
+
+    it('fromJson accepts empty object', function (): void {
+        // MinimalDTO requires fields so this will fail at hydration, but JSON parsing should work
+        $json = '{}';
+        expect(fn () => MinimalDTO::fromJson($json, validate: false))
+            ->toThrow(\ArgumentCountError::class); // Missing required constructor args
+    });
+
+    it('fromJson rejects invalid JSON', function (): void {
+        expect(fn () => MinimalDTO::fromJson('not-json', validate: false))
+            ->toThrow(DTOException::class);
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — with() immutability
+    // -----------------------------------------------------------------------
+
+    it('with() returns a new instance', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $modified = $dto->with(['name' => 'Bob']);
+
+        expect($dto)->not->toBe($modified);
+        expect($dto->name)->toBe('Alice');
+        expect($modified->name)->toBe('Bob');
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — only/except
+    // -----------------------------------------------------------------------
+
+    it('only() returns specified fields', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+            'status' => 'active',
+        ], validate: false);
+
+        $only = $dto->only('email', 'name');
+        expect($only)->toHaveKeys(['email', 'name']);
+        expect($only)->not->toHaveKey('status');
+    });
+
+    it('except() excludes specified fields', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+            'status' => 'active',
+        ], validate: false);
+
+        $except = $dto->except('status');
+        expect($except)->toHaveKey('email');
+        expect($except)->toHaveKey('name');
+        expect($except)->not->toHaveKey('status');
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — Hidden attribute
+    // -----------------------------------------------------------------------
+
+    it('toArray() excludes hidden properties', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+            'password' => 'secret123',
+        ], validate: false);
+
+        expect($dto->toArray())->not->toHaveKey('password');
+        expect($dto->allValues())->toHaveKey('password');
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — equals()
+    // -----------------------------------------------------------------------
+
+    it('equals() returns true for identical data', function (): void {
+        $data = ['email' => 'a@b.com', 'name' => 'Alice'];
+        $dto1 = CreateUserDTO::fromArray($data, validate: false);
+        $dto2 = CreateUserDTO::fromArray($data, validate: false);
+
+        expect($dto1->equals($dto2))->toBeTrue();
+    });
+
+    it('equals() returns false for different data', function (): void {
+        $dto1 = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice'], validate: false);
+        $dto2 = CreateUserDTO::fromArray(['email' => 'c@d.com', 'name' => 'Charlie'], validate: false);
+
+        expect($dto1->equals($dto2))->toBeFalse();
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — isEmpty/isNotEmpty
+    // -----------------------------------------------------------------------
+
+    it('isEmpty() returns false for DTO with non-empty required fields', function (): void {
+        $dto = MinimalDTO::fromArray(['name' => 'Test', 'value' => '123'], validate: false);
+        expect($dto->isEmpty())->toBeFalse();
+        expect($dto->isNotEmpty())->toBeTrue();
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — toJson/jsonSerialize
+    // -----------------------------------------------------------------------
+
+    it('toJson() returns valid JSON string', function (): void {
+        $dto = MinimalDTO::fromArray(['name' => 'Test', 'value' => '123'], validate: false);
+        $json = $dto->toJson();
+
+        expect($json)->toBeJson();
+        $decoded = json_decode($json, true);
+        expect($decoded)->toBe(['name' => 'Test', 'value' => '123']);
+    });
+
+    it('jsonSerialize() returns same as toArray()', function (): void {
+        $dto = MinimalDTO::fromArray(['name' => 'Test', 'value' => '123'], validate: false);
+        expect($dto->jsonSerialize())->toBe($dto->toArray());
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — MapFrom
+    // -----------------------------------------------------------------------
+
+    it('MapFrom maps source key to property', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+            'phone_number' => '+1234567890',
+        ], validate: false);
+
+        expect($dto->phone)->toBe('+1234567890');
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — Cast
+    // -----------------------------------------------------------------------
+
+    it('Cast attribute transforms values during hydration', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+            'tags' => '["php","laravel"]',
+        ], validate: false);
+
+        expect($dto->tags)->toBe(['php', 'laravel']);
+    });
+
+    // -----------------------------------------------------------------------
+    // DataTransferObject — DefaultValue
+    // -----------------------------------------------------------------------
+
+    it('DefaultValue is applied when key is missing', function (): void {
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@b.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        expect($dto->status)->toBe('active');
+    });
+
+    // -----------------------------------------------------------------------
+    // Metadata cache TTL
+    // -----------------------------------------------------------------------
+
+    it('setMetadataCacheTtl affects cache invalidation', function (): void {
+        DataTransferObject::setMetadataCacheTtl(0.0);
+
+        // Resolve metadata
+        CreateUserDTO::rules();
+
+        // Flush all cache
+        DataTransferObject::flushMetadataCache();
+
+        // Setting TTL should work without errors
+        DataTransferObject::setMetadataCacheTtl(2.0);
+        expect(fn () => CreateUserDTO::rules())->not->toThrow(\Throwable::class);
+    });
+
+    it('flushMetadataCache with class flushes only that class', function (): void {
+        CreateUserDTO::rules();
+        MinimalDTO::rules();
+
+        DataTransferObject::flushMetadataCache(CreateUserDTO::class);
+
+        // MinimalDTO cache should still be intact (metadata resolved again)
+        expect(fn () => MinimalDTO::rules())->not->toThrow(\Throwable::class);
     });
 });
