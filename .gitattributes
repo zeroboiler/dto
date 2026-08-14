@@ -1,0 +1,24 @@
+# Auto-detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Source code
+*.php text diff=php
+*.json text
+
+# Binary files
+*.phar binary
+
+# Generated files
+/composer.lock -diff
+/vendor/ export-ignore
+
+# Test files
+/tests/ export-ignore
+/phpunit.xml export-ignore
+/phpstan.neon export-ignore
+/phpstan.neon.dist export-ignore
+/.editorconfig export-ignore
+
+# Development files
+/.gitattributes export-ignore
+/.gitignore export-ignore

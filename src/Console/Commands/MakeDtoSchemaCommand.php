@@ -88,7 +88,7 @@ final class MakeDtoSchemaCommand extends Command
         /** @var string|null $optDir */
         $optDir = $this->option('output');
         $dir = $optDir ?? $defaultDir;
-        $path = rtrim($dir, '/')."/{$shortName}Schema.json";
+        $path = rtrim($dir, '/\\')."/{$shortName}Schema.json";
 
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);

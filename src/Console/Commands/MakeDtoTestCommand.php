@@ -50,7 +50,7 @@ final class MakeDtoTestCommand extends Command
         /** @var string|null $optDir */
         $optDir = $this->option('dir');
         $dir = $optDir ?? $defaultDir;
-        $path = rtrim($dir, '/')."/{$shortName}Test.php";
+        $path = rtrim($dir, '/\\')."/{$shortName}Test.php";
 
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
