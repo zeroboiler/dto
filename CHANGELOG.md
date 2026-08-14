@@ -2,6 +2,12 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.9] - 2026-08-14
+
+### Changed
+- Production readiness audit: verified all 55 source files for PHPStan Level 9 compliance (strict types, typed properties, return type declarations, comprehensive docblocks, strict comparisons)
+- Fixed README test count badge (244 → 242 tests) to match actual test file count
+
 ## [1.1.8] - 2026-08-14
 
 ### Added
