@@ -436,6 +436,25 @@ Validation runs **before** hydration to reject invalid data early.
 - **Value Object integration** — auto-hydrate and serialize zeroboiler/value-objects
 - **CLI tools** — `zeroboiler:dto-test`, `zeroboiler:dto-schema`
 
+## PHP 8.5 Features
+
+This package leverages modern PHP 8.5 features for maximum type safety and
+developer experience:
+
+| Feature | Where Used |
+|---|---|
+| `readonly` classes | `DTOManager` |
+| `readonly` promoted properties | All 41 attribute classes, `DTOCast`, `DataTransferObject` subclasses |
+| `#[\Override]` attribute | `DTOCast::get()`, `DTOCast::set()`, `DTOException::__toString()`, `DtoCollection::count()`, `DtoCollection::getIterator()`, `DtoCollection::offsetExists()`, `DtoCollection::offsetGet()`, `DtoCollection::offsetSet()`, `DtoCollection::offsetUnset()`, `DtoCollection::jsonSerialize()`, `DTOSServiceProvider::register()`, `DTOSServiceProvider::boot()`, `DTO` facade |
+| `#[\Deprecated]` attribute | `DataTransferObject::with()` `$validate` parameter (since 1.1.0) |
+| `never` return type | `DtoCollection::__clone()` |
+| Named arguments | `DTOCast` constructor, `OpenApiSchemaGenerator` methods |
+| `match` expressions | `DataTransferObject::castValue()`, `DataTransferObject::emptyValueForType()`, `DtoMetadataResolver::applyValidationAttribute()`, `OpenApiSchemaGenerator::applyValidationAttributes()` |
+| `static` return types | `DataTransferObject::fromArray()`, `fromPartialArray()`, `fromRequest()`, `fromJson()`, `with()` |
+| Constructor property promotion | All attribute classes, `DTOCast` |
+| Intersection types | Not used (duck typing preferred for ValueObject/Enum detection) |
+| `get_debug_type()` | `DTOCast::set()`, `DtoCollection::__construct()`, `DTOException::invalidCast()`, `DataTransferObject::fromJson()`, `castValueToEnum()`, `castValueToValueObject()` |
+
 ## Usage
 
 ### Basic DTO
