@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ReflectionProperty;
 use ZeroBoiler\DTO\Attributes\Accepted;
 use ZeroBoiler\DTO\Attributes\ArrayRule;
 use ZeroBoiler\DTO\Attributes\Between;
