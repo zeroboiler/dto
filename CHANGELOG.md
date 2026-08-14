@@ -5,6 +5,16 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-08-14
+
+### Added
+- `DTOExceptionContractTest` — verifies named constructors (invalidCast, invalidJson), message formatting, and __toString behavior
+- `DtoCollectionSerializationContractTest` — tests empty collection serialization (jsonSerialize, toArray, allValues, filter, map, pluck, merge, offset operations)
+- `DTOManagerStructuralContractTest` — verifies DTOManager is final/readonly, all methods have return types and docblocks, no mixed returns
+
+### Changed
+- Updated README test count badge (243→246) to match actual test file count
+
 ## [1.1.3] - 2025-08-14
 
 ### Changed
