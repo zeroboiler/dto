@@ -49,7 +49,7 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject;
  */
 abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSerializable, ValidatableDTO
 {
-    /** @var array<string, array<string, mixed>> Cache for reflection metadata per class */
+    /** @var array<string, DtoResolvedMetadata> Cache for reflection metadata per class */
     private static array $_zbMetadataCache = [];
 
     /** @var array<string, float> Cache creation timestamps per class */
@@ -673,7 +673,6 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * (caching disabled) — metadata is resolved once per request and reused.
      *
      * @return DtoResolvedMetadata
-     * @phpstan-return DtoResolvedMetadata
      *
      * @throws \ReflectionException If the class cannot be reflected
      */
@@ -691,7 +690,9 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         }
 
         if (! isset(self::$_zbMetadataCache[$class])) {
-            self::$_zbMetadataCache[$class] = DtoMetadataResolver::resolve($class);
+            /** @var DtoResolvedMetadata $resolved */
+            $resolved = DtoMetadataResolver::resolve($class);
+            self::$_zbMetadataCache[$class] = $resolved;
             self::$_zbMetadataCacheTimestamps[$class] = microtime(true);
         }
 
