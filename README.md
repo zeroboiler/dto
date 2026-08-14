@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 218](https://img.shields.io/badge/Tests-218-brightgreen)]()
+|[![Tests: 216](https://img.shields.io/badge/Tests-216-brightgreen)]()
 |[![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -82,8 +82,8 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Running PHPStan](#running-phpstan)
 - [Quick Start Integration](#quick-start-integration)
 - [Source Code Audit — Attribute Contract Compliance](#source-code-audit--attribute-contract-compliance)
-  - [Validation Attributes (37 total)](#validation-attributes-37-total)
-  - [Metadata Attributes (4 total)](#metadata-attributes-4-total)
+  - [Validation Attributes (35 total)](#validation-attributes-35-total)
+  - [Metadata Attributes (6 total)](#metadata-attributes-6-total)
   - [Service & Infrastructure Classes](#service--infrastructure-classes)
 - [Source Code Structure](#source-code-structure)
   - [Attribute Type Signatures](#attribute-type-signatures)
@@ -119,8 +119,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-- 218 test files in `tests/` (33 fixtures)
+- 55 source files in `src/` (35 validation attributes, 6 metadata attributes, 14 infrastructure)
+- 216 test files in `tests/` (33 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1866,7 +1866,7 @@ and no baseline suppressions. The following checklist is maintained manually:
 
 ## Source Code Audit — Attribute Contract Compliance
 
-### Validation Attributes (37 total)
+### Validation Attributes (35 total)
 
 All validation attributes are `final`, implement `ValidationAttribute`, and have
 `#[Attribute(Attribute::TARGET_PROPERTY)]` targeting. Every attribute has
@@ -1913,7 +1913,7 @@ error messages and implements `ruleKey()`.
 | `NestedArray` | ✅ | ✅ | `array` | `string $dtoClass`, `?string $message` |
 | `Collection` | ✅ | ✅ | `array` | `string $dtoClass`, `?string $message` |
 
-### Metadata Attributes (4 total)
+### Metadata Attributes (6 total)
 
 Metadata attributes provide hydration and serialization behavior, not validation:
 
@@ -1923,6 +1923,8 @@ Metadata attributes provide hydration and serialization behavior, not validation
 | `MapFrom` | ✅ | ✅ | `TARGET_PROPERTY` | Source key aliasing (supports dot notation) |
 | `Hidden` | ✅ | — (no props) | `TARGET_PROPERTY` | Exclude from `toArray()`/`toJson()` |
 | `DefaultValue` | ✅ | ✅ | `TARGET_PROPERTY \| TARGET_PARAMETER` | Default when source key is absent |
+| `NestedArray` | ✅ | ✅ | `TARGET_PROPERTY` | Array of nested DTO instances |
+| `Collection` | ✅ | ✅ | `TARGET_PROPERTY` | DtoCollection-wrapped nested DTOs |
 
 ### Service & Infrastructure Classes
 
@@ -1930,7 +1932,7 @@ Metadata attributes provide hydration and serialization behavior, not validation
 |-------|------|:-------:|:----------:|-------------|
 | `DataTransferObject` | `abstract class` | — | — (static cache) | `fromArray()`, `fromRequest()`, `fromJson()`, `fromPartialArray()`, `toArray()`, `toJson()`, `only()`, `except()`, `with()`, `equals()`, `isEmpty()`, `rules()`, `rulesFor()`, `validateArray()`, `validatePartialArray()`, `flushMetadataCache()`, `setMetadataCacheTtl()` |
 | `DtoCollection` | `final class` | ✅ | — | `make()`, `push()`, `append()`, `merge()`, `first()`, `last()`, `map()`, `filter()`, `pluck()`, `pluckKey()`, `items()`, `toArray()`, `allValues()`, `count()`, `isEmpty()`, `isNotEmpty()`, `offsetExists/Get/Set/Unset()`, `getIterator()`, `jsonSerialize()` |
-| `DTOManager` | `final readonly class` | ✅ | ✅ | `validate()`, `make()`, `makeFromJson()`, `schema()` |
+| `DTOManager` | `final readonly class` | ✅ | ✅ | `validate()`, `make()`, `makeFromJson()`, `fromJson()`, `fromPartialArray()`, `fromPartialRequest()`, `rules()`, `rulesFor()`, `schema()` |
 | `DTOCast` | `final class` | ✅ | ✅ | `get()`, `set()`, `serialize()` |
 | `DTOException` | `final class` | ✅ | — | `invalidCast()`, `invalidJson()` |
 | `DTO` (Facade) | `final class` | ✅ | — | `getFacadeAccessor()` |
