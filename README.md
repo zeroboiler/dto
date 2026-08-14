@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-[![Tests: 239](https://img.shields.io/badge/Tests-239-brightgreen)]()
+[![Tests: 206](https://img.shields.io/badge/Tests-206-brightgreen)]()
 [![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -120,7 +120,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 - 55 source files in `src/` (35 validation attributes, 6 metadata attributes, 14 infrastructure)
-- 239 test files in `tests/` (31 fixtures)
+- 206 test files in `tests/` (31 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1393,6 +1393,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 |---------|------|------------|
 | 1.0.0 | 2025-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
 | 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
+| 1.1.1 | 2025-08 | README enrichment, corrected test counts, production audit pass |
 
 ## Internal Components
 
