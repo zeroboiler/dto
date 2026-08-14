@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-[![Tests: 228+](https://img.shields.io/badge/Tests-228%2B-brightgreen)]()
+[![Tests: 195+](https://img.shields.io/badge/Tests-195%2B-brightgreen)]()
 [![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -120,7 +120,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 - 55 source files in `src/` (35 validation attributes, 6 metadata attributes, 14 infrastructure)
-- 228 test files in `tests/` (31 fixtures)
+- 195 test files in `tests/` (31 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -204,44 +204,6 @@ $dto->toJson();   // '{"email":"...","name":"...","password":"..."}'
 // Validation rules (auto-generated from attributes)
 CreateUserDTO::rules();
 // ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
-```
-
-## Architecture
-
-```
-┌────────────────────────────────────────────────────┐
-│              Your DTO                              │
-│  class UserDTO extends DataTransferObject          │
-│  {                                                  │
-│      public function __construct(                   │
-│          #[Required, Email]                          │
-│          public readonly string $email,              │
-│      ) {}                                           │
-│  }                                                  │
-└──────────┬─────────────────────────────────────-─┘
-           │ resolves metadata via
-           ▼
-┌────────────────────────────────────────────────────┐
-│  DtoMetadataResolver                               │
-│  ├─ Reads constructor parameters (ReflectionClass) │
-│  ├─ Detects attribute types (VO, Enum, nested DTO)  │
-│  ├─ Infers base rules from PHP types                │
-│  ├─ Collects validation attribute rules            │
-│  └─ Returns: {properties, rules, messages}         │
-└──────────┬─────────────────────────────────────────┘
-           │ caches in
-           ▼
-┌────────────────────────────────────────────────────┐
-│  DataTransferObject (static cache per class)        │
-│  ├─ $_zbMetadataCache — per-class TTL-based cache   │
-│  ├─ TTL = 0 in production (disabled)               │
-│  └─ TTL = 2s in local/testing (auto-invalidation)  │
-└────────────────────────────────────────────────────┘
-
-Hydration Pipeline (per property):
-  Raw value → MapFrom key mapping → DefaultValue fallback
-           → Cast type conversion → Enum/VO auto-casting
-           → Nested DTO/Collection hydration → Final value
 ```
 
 ## Quick Reference Card
@@ -334,51 +296,6 @@ DTO::schema(UserDTO::class);
 php artisan zeroboiler:dto-test "App\DTOs\UserDTO"
 php artisan zeroboiler:dto-schema "App\DTOs\UserDTO" --json
 php artisan zeroboiler:dto-schema "App\DTOs\UserDTO" --with-components --json
-```
-
-## Quick Start
-
-Create your first DTO in under a minute:
-
-```php
-// app/DTOs/CreateUserDTO.php
-use ZeroBoiler\DTO\Attributes\Email;
-use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\Max;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Required;
-use ZeroBoiler\DTO\DataTransferObject;
-
-class CreateUserDTO extends DataTransferObject
-{
-    public function __construct(
-        #[Required, Email]
-        public readonly string $email,
-
-        #[Required, Min(2), Max(50)]
-        public readonly string $name,
-
-        #[Hidden]
-        public readonly ?string $password = null,
-    ) {}
-}
-
-// Hydrate from request (auto-validates)
-$dto = CreateUserDTO::fromRequest($request);
-
-// Or from array
-$dto = CreateUserDTO::fromArray(['email' => 'test@example.com', 'name' => 'Doruk']);
-
-// Serialize (hidden fields excluded)
-$dto->toArray();
-// ['email' => 'test@example.com', 'name' => 'Doruk']
-
-// Get validation rules (for Form Requests or API docs)
-CreateUserDTO::rules();
-// ['email' => ['required', 'email'], 'name' => ['required', 'min:2', 'max:50'], ...]
-
-// OpenAPI schema
-php artisan zeroboiler:dto-schema "App\DTOs\CreateUserDTO" --json
 ```
 
 ## Type System
