@@ -6,6 +6,8 @@
 
 declare(strict_types=1);
 
+namespace ZeroBoiler\DTO\Tests;
+
 use ZeroBoiler\DTO\Attributes\Cast;
 use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Hidden;
