@@ -3,7 +3,7 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 256](https://img.shields.io/badge/Tests-256-brightgreen)]()
+|[![Tests: 223](https://img.shields.io/badge/Tests-223-brightgreen)]()
 |[![Version 1.1.0](https://img.shields.io/badge/Version-1.1.0-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -120,7 +120,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
-- 256 test files in `tests/` (33 fixtures)
+- 223 test files in `tests/` (33 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -1551,7 +1551,17 @@ features and edge cases:
 | `RegistrationDTO` | `Required`, `Email`, `Min`, `Max`, `Confirmed`, `Accepted`, `Same` | Registration flow validation |
 | `TaskListDTO` | `Required`, `ArrayRule`, `Collection` | Array + collection integration |
 | `VoUserDTO` | ValueObject properties (`Email`, `Url`, `Money`) | ValueObject auto-instantiation and serialization |
-| `WithBypassDTO` | `validate: false` usage | Validation bypass paths |
+| `BypassTestDTO` (inline in `WithBypassTest`) | `Required`, `Email`, `Min`, `Max` | Validation bypass paths |
+| `PartialDefaultValueDTO` | `DefaultValue`, `Required` | Partial update with default values |
+| `DotNotationDTO` | `MapFrom` with dot notation | Nested source key mapping |
+| `ArticleDTO` | `Required`, `Nullable`, nested DTO | Nullable nested DTO edge cases |
+| `ItemDTO` | `Required`, `Min` | Used with DtoCollection |
+| `RoundtripDTO` | Various, used for roundtrip tests | toArray/fromArray roundtrip integrity |
+| `NullableRoundtripDTO` | `Nullable`, `DefaultValue` | Nullable value roundtrip serialization |
+| `NoConstructorDTO` | No properties | Edge case: no-constructor DTO |
+| `InteractionEdgeCaseDTO` | Complex attribute interactions | Validation attribute interaction edge cases |
+| `ComprehensiveValidationDTO` | All attribute types | Full attribute surface coverage |
+| `StrictValidationDTO` | `Required`, `Integer`, `Between` | Strict type validation |
 
 ```php
 // Example: MixedAttributesDTO exercises the full attribute surface
@@ -1594,7 +1604,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **256 test files** (223 unit tests + 33 fixtures) covering:
+The test suite includes **223 test files** (190 unit tests + 33 fixtures) covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
