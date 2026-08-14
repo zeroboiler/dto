@@ -2,6 +2,12 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.6] - 2026-08-14
+
+### Changed
+- Updated test count badge (233 → 267 tests, 36 fixtures)
+- Updated Package Statistics section with accurate test and fixture counts
+
 ## [1.1.5] - 2026-08-14
 
 ### Changed
