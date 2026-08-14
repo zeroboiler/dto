@@ -2,6 +2,17 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.12] - 2026-08-14
+
+### Added
+- `DtoCollectionMutabilityTest`: push() in-place mutation, append() immutability, merge() isolation, offsetSet/offsetUnset, type guard rejection, isEmpty/isNotEmpty, make() factory, first/last, map/filter, serialization (20 test methods)
+- `DtoPartialArrayEmptyValueTest`: fromPartialArray empty value inference, nullable null defaults, explicit null respect, zero/false/empty-string handling, MapFrom in partial context, Cast('integer') in partial, toArray/allValues consistency, JSON roundtrip, equals comparison (20 test methods)
+
+### Changed
+- Full production-ready audit of all 55 source files: verified `declare(strict_types=1)`, return type declarations, readonly typed properties, PHPStan L9 compliance (no mixed types in public API, strict comparisons), complete docblocks
+- Updated README test count badge and Package Statistics (244 → 248 tests)
+- Version bump to 1.1.12
+
 ## [1.1.11] - 2026-08-14
 
 ### Changed
