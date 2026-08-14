@@ -4,7 +4,7 @@
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
 |[![Tests: 249](https://img.shields.io/badge/Tests-249-brightgreen)]()|
-|[![Version 1.1.15](https://img.shields.io/badge/Version-1.1.15-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Version 1.1.16](https://img.shields.io/badge/Version-1.1.16-green)](https://github.com/zeroboiler/dto/releases)|
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -1780,6 +1780,8 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.8 | 2025-08-14 | fromJson error handling, DtoCollection immutability edge-case tests |
 | 1.1.9 | 2025-08-14 | Test count badge fix, version bump |
 | 1.1.10 | 2025-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
+| 1.1.11-15 | 2025-08-14 | README documentation pass, edge-case tests, badge accuracy, structural compliance |
+| 1.1.16 | 2025-08-14 | Fix OpenApiSchemaGenerator::componentName() backslash search bug, version bump |
 
 ## Internal Components
 

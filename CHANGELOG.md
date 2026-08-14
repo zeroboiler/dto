@@ -2,6 +2,17 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.16] - 2026-08-14
+
+### Fixed
+- `OpenApiSchemaGenerator::componentName()`: Fixed backslash separator search — was searching for double backslash (`\\`) instead of single `\`, causing FQCN component names to never be truncated (e.g., `ZeroBoiler\DTO\AddressDTO` was returned as-is instead of `AddressDTO`)
+
+## [1.1.15] - 2026-08-14
+
+### Changed
+- Fixed README test count badge (250 → 249) to match actual test file count
+- Version bump to 1.1.15
+
 ## [1.1.14] - 2026-08-14
 
 ### Added
