@@ -8,9 +8,8 @@ declare(strict_types=1);
 
 namespace ZeroBoiler\DTO\Tests\Fixtures;
 
-use ZeroBoiler\DTO\Attributes\Cast;
+use ZeroBoiler\DTO\Attributes\Collection;
 use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\Max;
 use ZeroBoiler\DTO\Attributes\Min;
 use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\Attributes\NestedArray;

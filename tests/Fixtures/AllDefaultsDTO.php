@@ -10,8 +10,6 @@ namespace ZeroBoiler\DTO\Tests\Fixtures;
 
 use ZeroBoiler\DTO\Attributes\DefaultValue;
 use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Required;
 use ZeroBoiler\DTO\DataTransferObject;
 
 /**

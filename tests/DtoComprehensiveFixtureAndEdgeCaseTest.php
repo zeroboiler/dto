@@ -6,10 +6,8 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Attributes\Hidden;
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Tests\Fixtures\AllDefaultsDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\ComprehensiveDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\NestedCollectionDTO;
