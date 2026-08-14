@@ -2,6 +2,12 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [1.1.7] - 2026-08-14
+
+### Added
+- OpenApiSchemaGenerator advanced type inference tests (union types, VOT inference, pattern constraints, starts_with/ends_with, between/min/max, hidden properties, structural integrity)
+- Updated test count (271 → 272)
+
 ## [1.1.6] - 2026-08-14
 
 ### Changed
