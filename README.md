@@ -43,6 +43,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
 - [Attributes Reference](#attributes-reference)
   - [Validation Attributes](#validation-attributes)
   - [Metadata Attributes](#metadata-attributes)
+  - [Hydration Attributes](#hydration-attributes)
 - [API Quick Reference](#api-quick-reference)
   - [DataTransferObject (abstract base)](#datatransferobject-abstract-base)
   - [DtoCollection](#dtocollection)
@@ -120,7 +121,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-|- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 14 infrastructure)
+|- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 14 infrastructure)
 |- 305 test files in `tests/` (41 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
@@ -3128,8 +3129,16 @@ hydration, serialization, and source key mapping behavior.
 | `Cast` | `(string $type)` | Type casting during hydration: `int`, `integer`, `string`, `bool`, `boolean`, `float`, `double`, `array`, `date`, `datetime` |
 | `DefaultValue` | `(mixed $value)` | Default value when source key is absent |
 | `Hidden` | `()` | Excludes property from `toArray()`, `toJson()`, `jsonSerialize()`, OpenAPI schema |
-| `Collection` | `(string $dtoClass, ?string $message = null)` | Array of nested DTOs wrapped in `DtoCollection` |
-| `NestedArray` | `(string $dtoClass, ?string $message = null)` | Array of nested DTO instances (plain array, not DtoCollection) |
+
+### Hydration Attributes (2 total)
+
+Hydration attributes implement `ValidationAttribute` (generate an `array` rule)
+and additionally control nested DTO hydration behavior.
+
+| Attribute | Constructor Signature | Generated Rule | Rule Key | Purpose |
+|-----------|----------------------|----------------|----------|---------|
+| `NestedArray` | `(string $dtoClass, ?string $message = null)` | `array` | `array` | Array of nested DTO instances (plain PHP array) |
+| `Collection` | `(string $dtoClass, ?string $message = null)` | `array` | `array` | Array of nested DTOs wrapped in `DtoCollection` |
 
 ### PHP 8.5 Features Used
 
@@ -3139,7 +3148,7 @@ hydration, serialization, and source key mapping behavior.
 | `#[\Override]` | `DataTransferObject`, `DtoCollection`, `DTOSServiceProvider`, `DTO` facade, `DTOException`, `DTOCast` | Explicit override intent, catches base class method signature changes |
 | Promoted `readonly` properties | All DTO properties, all Attribute constructors | Language-level immutability guarantee |
 | `readonly` modifier on constructor promotion | `public readonly string $email` | Single-keyword immutability in DTO definitions |
-| `never` return type | N/A (no never-return methods) | — |
+| `never` return type | `DtoCollection::__clone()` | Prevents external cloning — immutable collection guarantee |
 | Match expressions | `DataTransferObject::castValue()`, `emptyValueForType()`, `DtoMetadataResolver::applyValidationAttribute()`, `OpenApiSchemaGenerator` | Exhaustive pattern matching with compiler optimization |
 | Named arguments | Test generators, Attribute instantiation | Improves readability of complex constructor calls |
 | Union types in generics | `DtoCollection<T>`, `CastsAttributes<T\|null, ...>` | Type-safe generic wrappers |
