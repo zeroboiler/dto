@@ -2,6 +2,11 @@
 
 All notable changes to the ZeroBoiler DTO package will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Fixed README test count badge (305 → 263) and package statistics to match actual test file count
+
 ## [1.1.16] - 2026-08-14
 
 ### Fixed

@@ -480,6 +480,8 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @see pluckKey() For key-to-array mapping
      * @see toArrayBy() For key-to-full-array mapping
+     *
+     * @phpstan-return array<int|string, mixed>
      */
     public function toDictionary(string $keyField, string $valueField): array
     {
