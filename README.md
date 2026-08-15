@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 267](https://img.shields.io/badge/Tests-267-brightgreen)]()
-|[![Version 1.1.26](https://img.shields.io/badge/Version-1.1.26-green)](https://github.com/zeroboiler/dto/releases)
+|[![Tests: 312](https://img.shields.io/badge/Tests-312-brightgreen)]()
+|[![Version 1.1.27](https://img.shields.io/badge/Version-1.1.27-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -122,7 +122,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 14 infrastructure)
-|- 263 test files in `tests/` (41 fixtures)
+|- 312 test files in `tests/` (41 fixtures)
 - PHPStan Level 9 (`phpstan.neon`)
 - 100% `declare(strict_types=1)` coverage
 - Zero `mixed` return types in public API
@@ -3239,6 +3239,11 @@ In dev environments, a 2-second TTL ensures code changes are picked up automatic
 In production, TTL is disabled (0) — metadata is resolved once per request and reused.
 
 ## Changelog
+
+### [1.1.27] - 2026-08-15
+
+- **Test**: Add V22 comprehensive edge-case tests — nested DTO hydration/serialization, fromJson edge cases, with() immutable update, MapFrom dot notation, Cast type coercion, Hidden property filtering, DtoCollection operations (pluck/pluckKey/map/filter/append/merge), DTOException factory methods
+- **Docs**: Fix README test count badge (267→312), package statistics (263→312), accurate file counts
 
 ### [1.1.26] - 2026-08-15
 
