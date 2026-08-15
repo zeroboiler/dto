@@ -675,7 +675,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      *
      * @return DtoResolvedMetadata Associative array with properties, rules, and messages
      *
-     * @throws \\ReflectionException If the class cannot be reflected
+     * @throws \ReflectionException If the class cannot be reflected
      *
      * @see DtoMetadataResolver::resolve() For the reflection-based metadata builder
      * @see setMetadataCacheTtl() For configuring cache TTL
