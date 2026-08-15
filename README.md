@@ -1790,18 +1790,18 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.0.0 | 2025-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
-| 1.1.0 | 2025-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
-| 1.1.2 | 2025-08-14 | Test count update (240 files), new facade contract tests, README accuracy fix |
-| 1.1.3 | 2025-08-14 | CHANGELOG.md added, README test count accuracy, full source audit — production ready |
-| 1.1.4 | 2025-08-14 | Test count update (257 files), badge accuracy, README documentation pass |
-| 1.1.6 | 2025-08-14 | Full hydration/serialization contract tests (271 files), README accuracy |
-| 1.1.7 | 2025-08-14 | Comprehensive edge-case tests, DtoCollection mutation edge cases |
-| 1.1.8 | 2025-08-14 | fromJson error handling, DtoCollection immutability edge-case tests |
-| 1.1.9 | 2025-08-14 | Test count badge fix, version bump |
-| 1.1.10 | 2025-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
-| 1.1.11-15 | 2025-08-14 | README documentation pass, edge-case tests, badge accuracy, structural compliance |
-| 1.1.16 | 2025-08-14 | Fix OpenApiSchemaGenerator::componentName() backslash search bug, version bump |
+| 1.0.0 | 2026-08 | Initial release — DataTransferObject, DtoCollection, validation attributes, OpenAPI schema |
+| 1.1.0 | 2026-08 | Nested DTO hydration, Collection attribute, fromPartialArray, ValueObject integration, extended test suite |
+| 1.1.2 | 2026-08-14 | Test count update (240 files), new facade contract tests, README accuracy fix |
+| 1.1.3 | 2026-08-14 | CHANGELOG.md added, README test count accuracy, full source audit — production ready |
+| 1.1.4 | 2026-08-14 | Test count update (257 files), badge accuracy, README documentation pass |
+| 1.1.6 | 2026-08-14 | Full hydration/serialization contract tests (271 files), README accuracy |
+| 1.1.7 | 2026-08-14 | Comprehensive edge-case tests, DtoCollection mutation edge cases |
+| 1.1.8 | 2026-08-14 | fromJson error handling, DtoCollection immutability edge-case tests |
+| 1.1.9 | 2026-08-14 | Test count badge fix, version bump |
+| 1.1.10 | 2026-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
+| 1.1.11-15 | 2026-08-14 | README documentation pass, edge-case tests, badge accuracy, structural compliance |
+| 1.1.16 | 2026-08-14 | Fix OpenApiSchemaGenerator::componentName() backslash search bug, version bump |
 
 ## Internal Components
 
@@ -3240,14 +3240,14 @@ In production, TTL is disabled (0) — metadata is resolved once per request and
 
 ## Changelog
 
-### [1.1.26] - 2025-08-15
+### [1.1.26] - 2026-08-15
 
 - **Docs**: Full README audit — all 41 attribute signatures verified, fixture coverage confirmed, type system docs enriched
 - **Quality**: Manual PHPStan Level 9 compliance audit — no untyped mixed in public API, strict comparisons, `@phpstan-type` annotations validated
 - **Docs**: Production Readiness Checklist, Error Handling Strategy, and Concurrency sections validated
 - **Docs**: OpenAPI schema generation section updated with enum constraint handling
 
-### [1.1.25] - 2025-08-01
+### [1.1.25] - 2026-08-01
 
 - **Feature**: `ArrayRule` attribute with optional min/max count constraints
 - **Feature**: `StartsWith` / `EndsWith` attributes with multi-prefix/suffix support
