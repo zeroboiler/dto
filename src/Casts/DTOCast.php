@@ -27,6 +27,10 @@ use ZeroBoiler\DTO\DataTransferObject;
  *       return ['payload' => new DTOCast(CreateUserDTO::class, validate: false)];
  *   }
  *
+ * @see \ZeroBoiler\DTO\DTOSServiceProvider For auto-detection setup
+ * @see \ZeroBoiler\DTO\DataTransferObject For the base DTO class being cast
+ * @see \ZeroBoiler\DTO\Exceptions\DTOException For errors during JSON decode
+ *
  * @template T of \\ZeroBoiler\\DTO\\DataTransferObject
  *
  * @implements CastsAttributes<T|null, T|array<string, mixed>|null>
