@@ -36,9 +36,9 @@ done
 echo "=== Test file counts ==="
 EC=$(ls /opt/data/zeroboiler/enums/tests/*.php | wc -l | tr -d ' ')
 DC=$(ls /opt/data/zeroboiler/dto/tests/*.php | wc -l | tr -d ' ')
-echo "  enums=$EC (expect 235) dto=$DC (expect 260)"
-[ "$EC" -eq 235 ] || { echo "FAIL: enums count"; ERRORS=$((ERRORS+1)); }
-[ "$DC" -eq 260 ] || { echo "FAIL: dto count"; ERRORS=$((ERRORS+1)); }
+echo "  enums=$EC (expect 236) dto=$DC (expect 261)"
+[ "$EC" -eq 236 ] || { echo "FAIL: enums count"; ERRORS=$((ERRORS+1)); }
+[ "$DC" -eq 261 ] || { echo "FAIL: dto count"; ERRORS=$((ERRORS+1)); }
 echo ""
 [ "$ERRORS" -eq 0 ] && echo "ALL PASSED" || echo "FAILED: $ERRORS error(s)"
 exit $ERRORS
