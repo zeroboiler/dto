@@ -4,7 +4,7 @@
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
 |[![Tests: 305](https://img.shields.io/badge/Tests-305-brightgreen)]()
-|[![Version 1.1.25](https://img.shields.io/badge/Version-1.1.25-green)](https://github.com/zeroboiler/dto/releases)
+|[![Version 1.1.26](https://img.shields.io/badge/Version-1.1.26-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -3237,3 +3237,18 @@ $events->listen('laravel.flush', fn () => DataTransferObject::flushMetadataCache
 
 In dev environments, a 2-second TTL ensures code changes are picked up automatically.
 In production, TTL is disabled (0) — metadata is resolved once per request and reused.
+
+## Changelog
+
+### [1.1.26] - 2025-08-15
+
+- **Docs**: Full README audit — all 41 attribute signatures verified, fixture coverage confirmed, type system docs enriched
+- **Quality**: Manual PHPStan Level 9 compliance audit — no untyped mixed in public API, strict comparisons, `@phpstan-type` annotations validated
+- **Docs**: Production Readiness Checklist, Error Handling Strategy, and Concurrency sections validated
+- **Docs**: OpenAPI schema generation section updated with enum constraint handling
+
+### [1.1.25] - 2025-08-01
+
+- **Feature**: `ArrayRule` attribute with optional min/max count constraints
+- **Feature**: `StartsWith` / `EndsWith` attributes with multi-prefix/suffix support
+- **Refactor**: `DtoMetadataResolver` deduplicate rules for `EnumRule` instances via reflection
