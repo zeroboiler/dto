@@ -34,8 +34,8 @@ for pkg in enums dto; do
   [ -z "$s" ] && echo "OK: $pkg" || { echo "WARN: $pkg dirty (may be verify script itself)"; }
 done
 echo "=== Test file counts ==="
-EC=$(find /opt/data/zeroboiler/enums/tests -name '*.php' ! -path '*/Fixtures/*' ! -name 'Pest.php' ! -name 'bootstrap.php' | wc -l)
-DC=$(find /opt/data/zeroboiler/dto/tests -name '*.php' ! -path '*/Fixtures/*' ! -name 'Pest.php' ! -name 'bootstrap.php' | wc -l)
+EC=$(ls /opt/data/zeroboiler/enums/tests/*.php | wc -l | tr -d ' ')
+DC=$(ls /opt/data/zeroboiler/dto/tests/*.php | wc -l | tr -d ' ')
 echo "  enums=$EC (expect 233) dto=$DC (expect 258)"
 [ "$EC" -eq 233 ] || { echo "FAIL: enums count"; ERRORS=$((ERRORS+1)); }
 [ "$DC" -eq 258 ] || { echo "FAIL: dto count"; ERRORS=$((ERRORS+1)); }
