@@ -2010,7 +2010,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **261 test files** (259 unit tests + Pest.php + bootstrap.php) covering:
+The test suite includes **305 test files** (303 unit tests + Pest.php + bootstrap.php) covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|
@@ -2239,7 +2239,7 @@ and no baseline suppressions. The following checklist is maintained manually:
 | `DtoCollection.php` | ✅ | ✅ | ✅ | ✅ all | ✅ |
 | `DTOManager.php` | ✅ | ✅ | N/A (methods) | ✅ all | ✅ |
 | `DTOException.php` | ✅ | ✅ | N/A | ✅ all | ✅ |
-| `DTOCast.php` | ✅ | ✅ | ✅ readonly | ✅ all | ✅ |
+| `DTOCast.php` | ✅ | ✅ | ✅ (ctor) | ✅ all | ✅ |
 | `DtoMetadataResolver.php` | ✅ | ✅ | N/A (static) | ✅ all | ✅ |
 | `OpenApiSchemaGenerator.php` | ✅ | ✅ | N/A (static) | ✅ all | ✅ |
 | `DTOSServiceProvider.php` | ✅ | ✅ | N/A | ✅ all | ✅ |
@@ -3213,7 +3213,7 @@ PHP exceptions. Only JSON and cast-specific failures use the custom `DTOExceptio
 | `DtoMetadataResolver` | **Stateless** | Pure static methods — no mutable instance state. Thread-safe. |
 | `DTOManager` | **Stateless** | `final readonly` — delegates to DTO statics. Thread-safe. |
 | `DtoCollection` | **Mutable per-instance** | Each collection is an isolated object. `push()` mutates in-place, `append()`/`merge()` return new instances. |
-| `DTOCast` | **Stateless** | `final readonly` — no mutable state. Thread-safe. |
+| `DTOCast` | **Stateless** | `final` class with `readonly` constructor properties. Thread-safe. |
 | `OpenApiSchemaGenerator` | **Stateless** | Pure static methods. Thread-safe. |
 
 ### Octane / Swoole / RoadRunner
