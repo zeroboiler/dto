@@ -4,6 +4,13 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- `DtoV25FinalProductionHardeningStructuralAuditTest`: comprehensive structural audit — all core classes final verification, DTOManager readonly verification, DTO Facade/ServiceProvider contract, all 35 validation attributes implement ValidationAttribute interface with correct ruleKey() values, metadata-only attributes (Cast/MapFrom/Hidden/DefaultValue) do NOT implement ValidationAttribute, DTOException factory contracts, interface compliance (Arrayable/FromRequestDTO/JsonSerializable/ValidatableDTO/ArrayAccess/Countable/IteratorAggregate), DTOCast readonly properties, DTOManager method completeness, fixture roundtrip tests, DtoCollection operations (make/count/first/last/filter/clone/offsetSet/offsetUnset), metadata cache TTL, PHPStan L9 return type spot checks, equals/isEmpty edge cases, fromJson edge cases (~70 test methods)
+
+### Changed
+- Fixed README test count badge (271 → 312) and version (1.1.29 → 1.1.30)
+- Version bump to 1.1.30
+
 ### Fixed
 - Fixed README test count badge (263 → 267) to match actual test file count
 
