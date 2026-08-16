@@ -5,8 +5,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Changed
-- Updated README test count badge (320 → 327), version badge (1.1.41 → 1.1.42), and package statistics to match actual test file count
-- Version bump to 1.1.42
+- Updated README test count badge (285 → 287), version badge (1.1.44 → 1.1.45), and package statistics to match actual test file count
+
+### Added
+- `DtoV33TypeSystemAndNestedHydrationContractTest`: V33 type system and nested hydration contract — nested single DTO hydration (OrderDTO with AddressDTO), nested array DTO hydration (NestedArray with OrderItemDTO), recursive serialization (toArray preserves nested structure), DtoCollection with nested DTOs (toArray allValues), date casting from string (Carbon instance) and null, fromJson round-trip preserves all scalar data, fromArray with validate:false accepts invalid data, EmptyDTO from empty array, AllDefaultsDTO uses defaults, equals symmetry and reflexivity, with() preserves hidden in allValues, except() does not leak hidden fields, DtoCollection edge cases (filter empty, map empty, pluck empty, merge with empty, toArrayBy/toDictionary empty), metadata cache flush allows re-resolution, DTOException __toString format consistency, fromPartialArray single field update, nested DTO allValues includes nested structure (~28 test methods)
 
 ### Added
 |- `DtoV30ProductionBehaviorContractTest`: V30 production behavior contract — basic hydration and serialization (fromArray/toArray/toJson/fromJson roundtrip, allValues includes hidden, Hidden exclusion from toArray), MapFrom key aliasing (source→property mapping, serializes using property name), DefaultValue behavior (applies default for absent key, preserves explicit empty values), Cast type conversion (JSON string→array), selective output (only/except), immutable update (with), equality and state checks (equals/isEmpty/isNotEmpty), partial updates (fromPartialArray), validation rules generation (rules/rulesFor), DtoCollection operations (make/push/append/pluck/filter/toArray/first/last/map/jsonSerialize), DTOCast Eloquent integration (get/set/serialize/rejects invalid types), DTOException named constructors (invalidCast/invalidJson/__toString), DTOManager delegation (validate/make/rules/rulesFor), cross-fixture consistency (all extend DataTransferObject, roundtrip toArray↔fromArray) (~40 test methods)
