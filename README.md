@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|||[![Tests: 321](https://img.shields.io/badge/Tests-321-brightgreen)]()
-||||[![Version 1.1.37](https://img.shields.io/badge/Version-1.1.37-green)](https://github.com/zeroboiler/dto/releases)
+|||[![Tests: 324](https://img.shields.io/badge/Tests-324-brightgreen)]()
+||||[![Version 1.1.38](https://img.shields.io/badge/Version-1.1.38-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -122,7 +122,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 |- 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 14 infrastructure)
-|- 321 test files in `tests/` (41 fixtures)
+|- 324 test files in `tests/` (41 fixtures)
 |- PHPStan Level 9 (`phpstan.neon`)
 |- 100% `declare(strict_types=1)` coverage
 |- Zero `mixed` return types in public API
@@ -1803,6 +1803,8 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.11-15 | 2026-08-14 | README documentation pass, edge-case tests, badge accuracy, structural compliance |
 | 1.1.16 | 2026-08-14 | Fix OpenApiSchemaGenerator::componentName() backslash search bug, version bump |
 | 1.1.36 | 2026-08-16 | Refactor DTOManager::makeFromJson delegation, README test count update (277 → 319), badge accuracy, version bump |
+| 1.1.37 | 2026-08-16 | Structural contract test, README test count accuracy (321 → 322), version bump |
+| 1.1.38 | 2026-08-16 | V28 PHPStan L9 type safety audit + end-to-end hydration/serialization tests (324 files), README accuracy |
 
 ## Internal Components
 
@@ -2012,7 +2014,7 @@ All checks must pass before merging. The package targets PHPStan level 9 with a 
 
 ### Test Coverage
 
-The test suite includes **278 test files** (276 unit tests + Pest.php + bootstrap.php) covering:
+The test suite includes **324 test files** covering:
 
 | Category | Tests | What's Covered |
 |----------|-------|----------------|

@@ -13,6 +13,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 - Updated README test count badge (277 → 319) and package statistics to match actual test file count
 - Updated `DtoV27SourceCodeStructuralIntegrityAuditTest` composer.json version check (1.1.35 → 1.1.36)
 - Version bump to 1.1.36
+- Updated README test count accuracy (321 → 322), version history entry, badge update
+- Version bump to 1.1.38
+- Added DtoV28PHPStanL9StrictTypeSafetyAuditTest: strict_types enforcement, DTOManager final readonly + no mixed returns, DtoCollection final + 4 interfaces, DataTransferObject abstract + 5 interfaces, DTOCast/CastsAttributes override compliance, DTOException named constructors, all 37 validation attributes implement ValidationAttribute, metadata attributes final/readonly, service provider override compliance, contract interfaces, composer.json consistency
+- Added DtoV28EndToEndHydrationAndSerializationContractTest: full DTO lifecycle (fromArray/fromPartialArray/toArray/toJson), MapFrom key aliasing, Cast type casting, DefaultValue, Hidden exclusions, only/except selective output, with() immutable update, equals/isEmpty state checks, rules() generation, DtoCollection operations (pluck/pluckKey/map/filter/append/merge/push), ArrayAccess/Iterator, nested DTO hydration, conditional validation attributes (RequiredWith/RequiredWithout/etc.)
 
 ### Verified
 - Full production audit: All 55+ source files verified for `declare(strict_types=1)`, `final class`, complete return type declarations, comprehensive docblocks, typed properties, PHPStan Level 9 compliance, strict comparisons, `#[Override]` attributes on interface implementations
