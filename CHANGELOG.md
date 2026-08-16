@@ -4,6 +4,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Changed
+- Updated README test count badge (320 → 327), version badge (1.1.41 → 1.1.42), and package statistics to match actual test file count
+- Version bump to 1.1.42
+
 ### Added
 |- `DtoV30ProductionBehaviorContractTest`: V30 production behavior contract — basic hydration and serialization (fromArray/toArray/toJson/fromJson roundtrip, allValues includes hidden, Hidden exclusion from toArray), MapFrom key aliasing (source→property mapping, serializes using property name), DefaultValue behavior (applies default for absent key, preserves explicit empty values), Cast type conversion (JSON string→array), selective output (only/except), immutable update (with), equality and state checks (equals/isEmpty/isNotEmpty), partial updates (fromPartialArray), validation rules generation (rules/rulesFor), DtoCollection operations (make/push/append/pluck/filter/toArray/first/last/map/jsonSerialize), DTOCast Eloquent integration (get/set/serialize/rejects invalid types), DTOException named constructors (invalidCast/invalidJson/__toString), DTOManager delegation (validate/make/rules/rulesFor), cross-fixture consistency (all extend DataTransferObject, roundtrip toArray↔fromArray) (~40 test methods)
 - Version bump to 1.1.40 [dto]
