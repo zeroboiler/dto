@@ -1802,6 +1802,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.10 | 2026-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
 | 1.1.11-15 | 2026-08-14 | README documentation pass, edge-case tests, badge accuracy, structural compliance |
 | 1.1.16 | 2026-08-14 | Fix OpenApiSchemaGenerator::componentName() backslash search bug, version bump |
+| 1.1.36 | 2026-08-16 | Refactor DTOManager::makeFromJson delegation, README test count update (277 → 319), badge accuracy, version bump |
 
 ## Internal Components
 
