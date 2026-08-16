@@ -6,248 +6,332 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use ZeroBoiler\DTO\DtoCollection;
+use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 
-/**
- * Tests DtoCollection jsonSerialize and toArray contract.
- *
- * Verifies that serialization produces correct output for empty,
- * single-item, and multi-item collections, and that hidden fields
- * in nested DTOs are properly excluded.
- */
-final class DtoCollectionSerializationContractTest extends TestCase
-{
-    /**
-     * @test
-     */
-    public function json_serialize_empty_collection(): void
-    {
-        $collection = new DtoCollection();
+describe('DtoCollection serialization contract', function (): void {
+    it('serializes to JSON via jsonSerialize', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $result = $collection->jsonSerialize();
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-        $this->assertIsArray($result);
-        $this->assertEmpty($result);
-    }
+        $collection = new DtoCollection([$dto1, $dto2]);
+        $json = json_encode($collection);
 
-    /**
-     * @test
-     */
-    public function json_serialize_returns_toarray_output(): void
-    {
-        $collection = new DtoCollection();
+        expect($json)->toBeJson();
+        $decoded = json_decode($json, true);
+        expect($decoded)->toBeArray();
+        expect($decoded)->toHaveCount(2);
+        expect($decoded[0]['email'])->toBe('a@test.com');
+        expect($decoded[1]['email'])->toBe('b@test.com');
+    });
 
-        $this->assertSame($collection->toArray(), $collection->jsonSerialize());
-    }
+    it('toArray returns serialized DTOs', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function to_array_serializes_each_dto(): void
-    {
-        $dtoArray = $collection = new DtoCollection();
+        $collection = new DtoCollection([$dto1]);
+        $arr = $collection->toArray();
 
-        // jsonSerialize on an empty collection should return empty array
-        $this->assertSame([], (new DtoCollection())->jsonSerialize());
-    }
+        expect($arr)->toBeArray();
+        expect($arr[0])->toHaveKey('email');
+        expect($arr[0])->toHaveKey('name');
+    });
 
-    /**
-     * @test
-     */
-    public function all_values_includes_hidden_fields(): void
-    {
-        // Verify allValues() and toArray() return different shapes when DTOs have hidden props
-        // Since we can't instantiate a real DTO without Laravel, we test the structural contract
-        $collection = new DtoCollection();
+    it('allValues includes hidden properties', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+            'password' => 'secret',
+        ], validate: false);
 
-        $this->assertIsArray($collection->allValues());
-        $this->assertEmpty($collection->allValues());
-    }
+        $collection = new DtoCollection([$dto1]);
+        $all = $collection->allValues();
 
-    /**
-     * @test
-     */
-    public function items_returns_raw_dto_array(): void
-    {
-        $collection = new DtoCollection();
+        expect($all[0])->toHaveKey('password');
+        expect($all[0]['password'])->toBe('secret');
+    });
 
+    it('items returns raw DTO instances', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $collection = new DtoCollection([$dto1]);
         $items = $collection->items();
 
-        $this->assertIsArray($items);
-        $this->assertEmpty($items);
-    }
+        expect($items)->toHaveCount(1);
+        expect($items[0])->toBeInstanceOf(CreateUserDTO::class);
+    });
 
-    /**
-     * @test
-     */
-    public function make_creates_collection(): void
-    {
-        $collection = DtoCollection::make();
+    it('empty collection serializes to empty JSON array', function (): void {
+        $collection = new DtoCollection;
+        $json = json_encode($collection);
 
-        $this->assertInstanceOf(DtoCollection::class, $collection);
-        $this->assertCount(0, $collection);
-        $this->assertTrue($collection->isEmpty());
-    }
+        expect($json)->toBe('[]');
+    });
 
-    /**
-     * @test
-     */
-    public function is_empty_and_is_not_empty_are_mutually_exclusive(): void
-    {
-        $empty = new DtoCollection();
-        $this->assertTrue($empty->isEmpty());
-        $this->assertFalse($empty->isNotEmpty());
+    it('make creates collection from DTO instances', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        // With items, both would flip (need a DTO to test — but we verify the empty case)
-        $this->assertNotSame($empty->isEmpty(), $empty->isNotEmpty());
-    }
+        $collection = DtoCollection::make([$dto1]);
 
-    /**
-     * @test
-     */
-    public function count_implements_countable(): void
-    {
-        $collection = new DtoCollection();
+        expect($collection->count())->toBe(1);
+        expect($collection->first())->toBeInstanceOf(CreateUserDTO::class);
+    });
 
-        $this->assertSame(0, count($collection));
-        $this->assertSame(0, $collection->count());
-    }
+    it('filter returns new collection without mutating original', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function get_iterator_yields_nothing_for_empty(): void
-    {
-        $collection = new DtoCollection();
-        $yielded = [];
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-        foreach ($collection->getIterator() as $key => $value) {
-            $yielded[$key] = $value;
-        }
+        $collection = new DtoCollection([$dto1, $dto2]);
+        $filtered = $collection->filter(
+            fn (ZeroBoiler\DTO\DataTransferObject $d) => $d->name === 'Alice'
+        );
 
-        $this->assertEmpty($yielded);
-    }
+        expect($filtered->count())->toBe(1);
+        expect($collection->count())->toBe(2); // Original unchanged
+    });
 
-    /**
-     * @test
-     */
-    public function offset_exists_returns_false_for_empty(): void
-    {
-        $collection = new DtoCollection();
+    it('append returns new collection without mutating original', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $this->assertFalse($collection->offsetExists(0));
-        $this->assertFalse($collection->offsetExists(null));
-    }
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function offset_get_returns_null_for_empty(): void
-    {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection([$dto1]);
+        $appended = $collection->append($dto2);
 
-        $this->assertNull($collection->offsetGet(0));
-    }
+        expect($collection->count())->toBe(1);
+        expect($appended->count())->toBe(2);
+    });
 
-    /**
-     * @test
-     */
-    public function first_and_last_return_null_for_empty(): void
-    {
-        $collection = new DtoCollection();
+    it('merge combines two collections without mutating originals', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $this->assertNull($collection->first());
-        $this->assertNull($collection->last());
-    }
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function filter_empty_returns_empty_collection(): void
-    {
-        $collection = new DtoCollection();
-        $filtered = $collection->filter(static fn () => true);
+        $col1 = new DtoCollection([$dto1]);
+        $col2 = new DtoCollection([$dto2]);
+        $merged = $col1->merge($col2);
 
-        $this->assertInstanceOf(DtoCollection::class, $filtered);
-        $this->assertCount(0, $filtered);
-    }
+        expect($col1->count())->toBe(1);
+        expect($col2->count())->toBe(1);
+        expect($merged->count())->toBe(2);
+    });
 
-    /**
-     * @test
-     */
-    public function map_empty_returns_empty_array(): void
-    {
-        $collection = new DtoCollection();
-        $mapped = $collection->map(static fn ($dto) => $dto->toArray());
+    it('push mutates in place and returns same instance', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $this->assertIsArray($mapped);
-        $this->assertEmpty($mapped);
-    }
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function pluck_on_empty_returns_empty_array(): void
-    {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection([$dto1]);
+        $result = $collection->push($dto2);
 
-        $this->assertSame([], $collection->pluck('nonexistent'));
-    }
+        expect($collection->count())->toBe(2);
+        expect($result)->toBe($collection); // Same instance
+    });
 
-    /**
-     * @test
-     */
-    public function pluck_key_on_empty_returns_empty_array(): void
-    {
-        $collection = new DtoCollection();
+    it('pluck extracts a single property from all DTOs', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $this->assertSame([], $collection->pluckKey('id', 'name'));
-        $this->assertSame([], $collection->pluckKey('id'));
-    }
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function to_array_by_on_empty_returns_empty(): void
-    {
-        $collection = new DtoCollection();
+        $collection = new DtoCollection([$dto1, $dto2]);
+        $emails = $collection->pluck('email');
 
-        $this->assertSame([], $collection->toArrayBy('id'));
-    }
+        expect($emails)->toBe(['a@test.com', 'b@test.com']);
+    });
 
-    /**
-     * @test
-     */
-    public function to_dictionary_on_empty_returns_empty(): void
-    {
-        $collection = new DtoCollection();
+    it('pluckKey builds key-value dictionary', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        $this->assertSame([], $collection->toDictionary('id', 'name'));
-    }
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
 
-    /**
-     * @test
-     */
-    public function merge_empty_collections_returns_empty(): void
-    {
-        $a = new DtoCollection();
-        $b = new DtoCollection();
-        $merged = $a->merge($b);
+        $collection = new DtoCollection([$dto1, $dto2]);
+        $map = $collection->pluckKey('email', 'name');
 
-        $this->assertInstanceOf(DtoCollection::class, $merged);
-        $this->assertCount(0, $merged);
-    }
+        expect($map)->toBe([
+            'a@test.com' => 'Alice',
+            'b@test.com' => 'Bob',
+        ]);
+    });
 
-    /**
-     * @test
-     */
-    public function offset_unset_on_empty_does_not_throw(): void
-    {
-        $collection = new DtoCollection();
+    it('toArrayBy is alias for pluckKey with single key', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
 
-        // Should not throw even for non-existent offset
+        $collection = new DtoCollection([$dto1]);
+        $keyed = $collection->toArrayBy('email');
+
+        expect($keyed)->toHaveKey('a@test.com');
+    });
+
+    it('toDictionary extracts two properties as key-value', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $collection = new DtoCollection([$dto1]);
+        $dict = $collection->toDictionary('email', 'name');
+
+        expect($dict['a@test.com'])->toBe('Alice');
+    });
+
+    it('offsetGet returns null for out-of-bounds', function (): void {
+        $collection = new DtoCollection;
+
+        expect($collection->offsetGet(0))->toBeNull();
+        expect($collection->offsetGet(99))->toBeNull();
+    });
+
+    it('offsetSet and offsetUnset work with ArrayAccess', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
+
+        $collection = new DtoCollection;
+        $collection->offsetSet(null, $dto1);
+        $collection->offsetSet(0, $dto2); // Replace
+
+        expect($collection->count())->toBe(1);
+        expect($collection->offsetGet(0)->name)->toBe('Bob');
+
         $collection->offsetUnset(0);
-        $this->assertCount(0, $collection);
-    }
-}
+        expect($collection->count())->toBe(0);
+    });
+
+    it('rejects non-DTO in constructor', function (): void {
+        expect(fn () => new DtoCollection(['not a dto']))
+            ->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('rejects non-DTO in offsetSet', function (): void {
+        $collection = new DtoCollection;
+
+        expect(fn () => $collection->offsetSet(null, 'string'))
+            ->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('clone throws RuntimeException', function (): void {
+        $collection = new DtoCollection;
+
+        expect(fn () => clone $collection)
+            ->toThrow(\RuntimeException::class);
+    });
+
+    it('map returns plain array of results', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
+
+        $collection = new DtoCollection([$dto1, $dto2]);
+        $names = $collection->map(
+            fn (ZeroBoiler\DTO\DataTransferObject $d, int $i): string => $d->name
+        );
+
+        expect($names)->toBe(['Alice', 'Bob']);
+    });
+
+    it('first and last return correct items', function (): void {
+        $dto1 = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $dto2 = CreateUserDTO::fromArray([
+            'email' => 'b@test.com',
+            'name' => 'Bob',
+        ], validate: false);
+
+        $collection = new DtoCollection([$dto1, $dto2]);
+
+        expect($collection->first()->name)->toBe('Alice');
+        expect($collection->last()->name)->toBe('Bob');
+    });
+
+    it('first and last return null for empty collection', function (): void {
+        $collection = new DtoCollection;
+
+        expect($collection->first())->toBeNull();
+        expect($collection->last())->toBeNull();
+    });
+
+    it('isEmpty and isNotEmpty work correctly', function (): void {
+        $collection = new DtoCollection;
+        expect($collection->isEmpty())->toBeTrue();
+        expect($collection->isNotEmpty())->toBeFalse();
+
+        $dto = CreateUserDTO::fromArray([
+            'email' => 'a@test.com',
+            'name' => 'Alice',
+        ], validate: false);
+
+        $collection = new DtoCollection([$dto]);
+        expect($collection->isEmpty())->toBeFalse();
+        expect($collection->isNotEmpty())->toBeTrue();
+    });
+});
