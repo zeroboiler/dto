@@ -185,9 +185,19 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * repeated reflection on every partial update. Falls back to
      * cast type inference or reflection only as a last resort.
      *
+     * Resolution order:
+     * 1. If nullable → null
+     * 2. If cast type is set → type-appropriate default (0, 0.0, '', false, [])
+     * 3. If complex type (DTO, ValueObject, Enum, etc.) → null
+     * 4. Reflection on constructor parameter → type-appropriate default
+     * 5. Fallback → null
+     *
      * @param  string  $paramName  Property name (for error messages)
      * @param  bool  $nullable  Whether the property accepts null
-     * @param  array<string, mixed>  $propMeta  Cached property metadata
+     * @param  array<string, mixed>  $propMeta  Cached property metadata from resolveMetadata()
+     * @return mixed A type-appropriate empty/default value
+     *
+     * @throws \InvalidArgumentException When the type cannot provide a sensible empty value
      */
     private static function emptyValueForType(string $paramName, bool $nullable, array $propMeta): mixed
     {
