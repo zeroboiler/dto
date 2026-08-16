@@ -62,6 +62,9 @@ final readonly class DTOManager
     /**
      * Create a DTO instance from a JSON string.
      *
+     * Convenience alias for {@see fromJson()}. Both methods behave identically —
+     * `makeFromJson()` is provided for naming consistency with {@see make()}.
+     *
      * @param  class-string<DataTransferObject>  $dtoClass
      * @param  string  $json  JSON string to decode
      *
@@ -69,7 +72,7 @@ final readonly class DTOManager
      */
     public function makeFromJson(string $dtoClass, string $json): DataTransferObject
     {
-        return $dtoClass::fromJson($json);
+        return $this->fromJson($dtoClass, $json);
     }
 
     /**
