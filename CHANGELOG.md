@@ -4,6 +4,11 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- `DataTransferObject::__debugInfo()` — var_dump/print_r shows toArray() output (hidden properties excluded)
+- `DtoCollection::__debugInfo()` — var_dump/print_r shows item count and first 3 items (truncated for large collections)
+- V35 production readiness test suite for __debugInfo on DTO and DtoCollection
+
 ### Changed
 - Updated README test count badge (285 → 287), version badge (1.1.44 → 1.1.45), and package statistics to match actual test file count
 

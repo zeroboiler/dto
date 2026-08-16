@@ -463,6 +463,20 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     }
 
     /**
+     * Get debug output for var_dump/print_r.
+     *
+     * Shows all public properties with their values, excluding
+     * hidden properties marked with #[Hidden].
+     * Used by var_dump() and debuggers for cleaner output.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+        return $this->toArray();
+    }
+
+    /**
      * Check if all properties have their default or empty values.
      *
      * Useful for detecting DTOs that carry no meaningful data

@@ -120,6 +120,29 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     }
 
     /**
+     * Get debug output for var_dump/print_r.
+     *
+     * Shows item count and first 3 items (truncated) to avoid
+     * flooding the debugger with large collections.
+     *
+     * @return array{count: int, items: list<array<string, mixed>>}
+     */
+    public function __debugInfo(): array
+    {
+        return [
+            'count' => count($this->items),
+            'items' => array_slice(
+                array_map(
+                    static fn (DataTransferObject $dto): array => $dto->toArray(),
+                    $this->items
+                ),
+                0,
+                3
+            ),
+        ];
+    }
+
+    /**
      * Count the number of DTOs in the collection.
      *
      * @return int The number of items
