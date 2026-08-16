@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 332](https://img.shields.io/badge/Tests-332-brightgreen)]()
-|[![Version 1.1.52](https://img.shields.io/badge/Version-1.1.52-green)](https://github.com/zeroboiler/dto/releases)
+|[![Tests: 381](https://img.shields.io/badge/Tests-381-brightgreen)]()
+|[![Version 1.1.53](https://img.shields.io/badge/Version-1.1.53-green)](https://github.com/zeroboiler/dto/releases)
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
