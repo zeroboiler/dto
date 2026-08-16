@@ -524,4 +524,80 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
         return $result;
     }
+
+    /**
+     * Return a new collection with duplicate DTOs removed based on toArray() comparison.
+     *
+     * Uses strict array equality (`===`) on toArray() output to determine uniqueness.
+     * Preserves the first occurrence of each unique DTO and discards subsequent duplicates.
+     *
+     *   $unique = $collection->unique();  // removes items with identical toArray() output
+     *
+     * @return self A new DtoCollection with duplicates removed
+     *
+     * @phpstan-return DtoCollection<DataTransferObject>
+     */
+    public function unique(): self
+    {
+        $seen = [];
+        $uniqueItems = [];
+
+        foreach ($this->items as $item) {
+            $hash = serialize($item->toArray());
+            if (! isset($seen[$hash])) {
+                $seen[$hash] = true;
+                $uniqueItems[] = $item;
+            }
+        }
+
+        return new self($uniqueItems);
+    }
+
+    /**
+     * Check if the collection contains a DTO matching the given condition.
+     *
+     * Uses a callback that receives each DTO and returns true for matches.
+     * Short-circuits on the first match for efficiency.
+     *
+     *   $has = $collection->contains(fn ($dto) => $dto->email === 'a@b.com');
+     *
+     * @param  callable(T): bool  $callback  Match condition
+     * @return bool True if any DTO matches the callback
+     */
+    public function contains(callable $callback): bool
+    {
+        foreach ($this->items as $item) {
+            if ($callback($item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Find the first DTO matching a condition, or null if none match.
+     *
+     * Uses a callback that receives each DTO and returns true for matches.
+     * Short-circuits on the first match for efficiency.
+     *
+     *   $admin = $collection->search(fn ($dto) => $dto->role === 'admin');
+     *
+     * @template T
+     *
+     * @param  callable(T): bool  $callback  Search condition
+     * @return T|null The matching DTO, or null
+     *
+     * @phpstan-return T|null
+     */
+    public function search(callable $callback): ?DataTransferObject
+    {
+        foreach ($this->items as $item) {
+            if ($callback($item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
 }

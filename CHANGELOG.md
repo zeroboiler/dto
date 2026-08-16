@@ -4,8 +4,14 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- `DtoCollection::unique()` — returns a new collection with duplicate DTOs removed (based on toArray() strict equality)
+- `DtoCollection::contains()` — checks if any DTO in the collection matches a callback condition (short-circuits)
+- `DtoCollection::search()` — finds the first DTO matching a callback condition, or null
+
 ### Changed
-- Bumped version to 1.1.49, updated README test count badge (289 → 290)
+- Updated README test count badge (381 → 292) to match actual test file count
+- Bumped version to 1.1.54
 
 ### Added
 - `DtoV37PhpStanLevel9StrictTypeSafetyAuditTest` — comprehensive PHPStan L9 strict type safety audit covering: return type strictness (toArray/allValues/toJson/jsonSerialize/rules/rulesFor/only/except/equals/isEmpty/isNotEmpty), hydration type safety (fromArray/fromJson/fromPartialArray/with immutability), DtoCollection type safety (make/constructor/toArray/count/isEmpty/push/append/filter/first/last/map/pluck/pluckKey/merge/clone prevention/jsonSerialize/ArrayAccess), DTOManager delegation type safety (make/validate/rules/rulesFor/schema/fromPartialArray/fromJson/makeFromJson), DTOCast type strictness (get/set/serialize return types), DTOException named constructors, Hidden attribute behavior, MapFrom and Cast attribute behavior, ValidationAttribute interface contract compliance (all 37 attributes implement interface, all ruleKey() return non-empty strings), edge-case DTOs (NoConstructorDTO/AllDefaultsDTO/EmptyDTO), and cross-package type consistency (fromArray/toArray/fromJson/toJson/with roundtrips) (~80 test methods)
