@@ -5,8 +5,16 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Changed
+- Bumped version to 1.1.49, updated README test count badge (289 → 290)
+
+### Added
+- `DtoV37PhpStanLevel9StrictTypeSafetyAuditTest` — comprehensive PHPStan L9 strict type safety audit covering: return type strictness (toArray/allValues/toJson/jsonSerialize/rules/rulesFor/only/except/equals/isEmpty/isNotEmpty), hydration type safety (fromArray/fromJson/fromPartialArray/with immutability), DtoCollection type safety (make/constructor/toArray/count/isEmpty/push/append/filter/first/last/map/pluck/pluckKey/merge/clone prevention/jsonSerialize/ArrayAccess), DTOManager delegation type safety (make/validate/rules/rulesFor/schema/fromPartialArray/fromJson/makeFromJson), DTOCast type strictness (get/set/serialize return types), DTOException named constructors, Hidden attribute behavior, MapFrom and Cast attribute behavior, ValidationAttribute interface contract compliance (all 37 attributes implement interface, all ruleKey() return non-empty strings), edge-case DTOs (NoConstructorDTO/AllDefaultsDTO/EmptyDTO), and cross-package type consistency (fromArray/toArray/fromJson/toJson/with roundtrips) (~80 test methods)
+
+## [1.1.48] - 2026-08-15
+
+### Added
+- Type Safety Guarantees section in README
 - Fixed README test count badge (329 → 289), version badge (1.1.46 → 1.1.47), and package statistics to match actual test file count
-- Bumped version to 1.1.47
 
 ### Added
 - `DataTransferObject::__debugInfo()` — var_dump/print_r shows toArray() output (hidden properties excluded)
