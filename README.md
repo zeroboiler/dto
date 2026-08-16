@@ -4,7 +4,7 @@
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
 |[![Tests: 289](https://img.shields.io/badge/Tests-289-brightgreen)]()
-||||||||[![Version 1.1.47](https://img.shields.io/badge/Version-1.1.47-green)](https://github.com/zeroboiler/dto/releases)
+||||||||[![Version 1.1.48](https://img.shields.io/badge/Version-1.1.48-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -3242,7 +3242,80 @@ $events->listen('laravel.flush', fn () => DataTransferObject::flushMetadataCache
 In dev environments, a 2-second TTL ensures code changes are picked up automatically.
 In production, TTL is disabled (0) — metadata is resolved once per request and reused.
 
+## Type Safety Guarantees
+
+ZeroBoiler DTO provides compile-time and runtime type safety guarantees at every level:
+
+### Property Type Safety
+
+| Guarantee | Mechanism | Example |
+|-----------|-----------|---------|
+| **Immutability** | `public readonly` on all properties | `$dto->email = 'x'` → PHP error at compile time |
+| **Type enforcement** | PHP constructor type declarations | `new CreateUserDTO(email: 123)` → TypeError |
+| **Null safety** | Nullable types explicitly declared | `public readonly ?string $phone` — null is intentional |
+| **Validation before hydration** | Rules run before `fromArray()` constructs | Invalid email → `ValidationException` before DTO exists |
+| **Cast safety** | `#[Cast('integer')]` normalizes types | String `"42"` → int `42` during hydration |
+
+### Code-Level Guarantees
+
+| Guarantee | Enforcement |
+|-----------|-------------|
+| No untyped `mixed` in public API | PHPStan Level 9 strict mode |
+| All methods return typed | `string`, `array`, `bool`, `static`, `self` |
+| All parameters typed | `class-string<DataTransferObject>`, `array<string, mixed>` |
+| Strict comparisons | `===` throughout (never `==`) |
+| Collection immutability | `DtoCollection::__clone(): never`, `append()`/`merge()` return new |
+| Attribute finality | All 41 attribute classes are `final` |
+| Manager statelessness | `final readonly class DTOManager` — zero mutable state |
+| Metadata cache typed | `@phpstan-type DtoPropertyMeta`, `DtoResolvedMetadata` |
+
+### Runtime Validation Contract
+
+```php
+// ✅ Type-safe: compiler enforces correct usage
+$dto = CreateUserDTO::fromArray(['email' => 'a@b.com', 'name' => 'Alice']);
+$dto->email;          // string (always — readonly + typed)
+$dto->name;           // string (always)
+$dto->toArray();      // array<string, mixed> (always)
+$dto->equals($other); // bool (always)
+$dto->isEmpty();      // bool (always)
+
+// ✅ Type-safe: hydration validates before constructing
+CreateUserDTO::fromArray(['email' => 'not-an-email']); // throws ValidationException
+CreateUserDTO::fromJson('{"email":"a@b.com"}');        // throws DTOException on bad JSON
+
+// ✅ Type-safe: immutable update always validates
+$updated = $dto->with(['email' => 'invalid']); // throws ValidationException
+
+// ❌ Prevented at compile time:
+$dto->email = 'x';     // Error: Cannot modify readonly property
+$dto->unknown = 1;     // Error: Dynamic property creation disabled
+
+// ❌ Prevented at runtime:
+new DtoCollection([new \stdClass()]); // InvalidArgumentException
+```
+
+### Validation-to-Type Mapping
+
+The metadata resolver automatically infers validation rules from PHP types:
+
+| PHP Type | Inferred Rule | Notes |
+|----------|--------------|-------|
+| `string` | — | No additional rule |
+| `int` | `integer` | Added automatically |
+| `float` | `numeric` | Added automatically |
+| `bool` | `boolean` | Added automatically |
+| `array` | `array` | Added automatically |
+| `?\|string` | `nullable` | Added automatically |
+| `BackedEnum` | `Enum` rule | Laravel's `Rule::enum()` |
+| `ValueObject` | None | Auto-hydrated via `fromPrimitive()` |
+| `DataTransferObject` | None | Auto-hydrated via `fromArray()` |
+
 ## Changelog
+
+### [1.1.48] - 2026-08-16
+
+- **Docs**: Add Type Safety Guarantees section with property type safety, code-level guarantees, runtime validation contract, and validation-to-type mapping
 
 ### [1.1.27] - 2026-08-15
 
