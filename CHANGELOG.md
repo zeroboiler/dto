@@ -4,6 +4,10 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Changed
+- Fixed README test count badge (329 → 289), version badge (1.1.46 → 1.1.47), and package statistics to match actual test file count
+- Bumped version to 1.1.47
+
 ### Added
 - `DataTransferObject::__debugInfo()` — var_dump/print_r shows toArray() output (hidden properties excluded)
 - `DtoCollection::__debugInfo()` — var_dump/print_r shows item count and first 3 items (truncated for large collections)
