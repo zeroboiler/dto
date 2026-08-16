@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 290](https://img.shields.io/badge/Tests-290-brightgreen)]()
-|||||||||[![Version 1.1.49](https://img.shields.io/badge/Version-1.1.49-green)](https://github.com/zeroboiler/dto/releases)
+|[![Tests: 331](https://img.shields.io/badge/Tests-331-brightgreen)]()
+|||||||||[![Version 1.1.50](https://img.shields.io/badge/Version-1.1.50-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -121,8 +121,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-| - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 14 infrastructure)
-| - 289 test files in `tests/` (41 fixtures)
+| - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure)
+| - 331 test files in `tests/` (41 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
@@ -1806,6 +1806,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.37 | 2026-08-16 | Structural contract test, README test count accuracy (321 → 322), version bump |
 | 1.1.39 | 2026-08-16 | V29 full type safety & docblock audit test (attribute contracts, service classes, return types, DtoCollection, serialization, MapFrom, Cast, DefaultValue, cross-fixture consistency), README badge/stats update |
 | 1.1.40 | 2026-08-16 | V30 production behavior contract test (hydration/serialization roundtrip, MapFrom aliasing, DefaultValue, Cast conversion, selective output, with/equality/partial-update, DtoCollection operations, DTOCast Eloquent, DTOManager delegation, cross-fixture consistency) |
+| 1.1.50 | 2026-08-16 | README badge/stats update (290→331 tests), infrastructure count fix (14→12) |
 
 ## Internal Components
 

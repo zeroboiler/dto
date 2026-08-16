@@ -3,7 +3,7 @@
     "description": "Zero-boilerplate type-safe DTO system with attribute-based validation, serialization and request mapping for Laravel",
     "type": "library",
     "license": "proprietary",
-    "version": "1.1.49",
+    "version": "1.1.50",
     "keywords": ["laravel", "dto", "data-transfer-object", "validation", "attributes", "openapi", "zeroboiler"],
     "homepage": "https://github.com/zeroboiler/dto",
     "support": {
