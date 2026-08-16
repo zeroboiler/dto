@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 331](https://img.shields.io/badge/Tests-331-brightgreen)]()
-|||||||||[![Version 1.1.50](https://img.shields.io/badge/Version-1.1.50-green)](https://github.com/zeroboiler/dto/releases)
+|[![Tests: 290](https://img.shields.io/badge/Tests-290-brightgreen)]()
+||||||||||[![Version 1.1.51](https://img.shields.io/badge/Version-1.1.51-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -122,7 +122,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 | - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure)
-| - 331 test files in `tests/` (41 fixtures) |
+| - 290 test files in `tests/` (41 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
@@ -3313,6 +3313,11 @@ The metadata resolver automatically infers validation rules from PHP types:
 | `DataTransferObject` | None | Auto-hydrated via `fromArray()` |
 
 ## Changelog
+
+### [1.1.51] - 2026-08-16
+
+- **Docs**: Fix README test count badge (331→290), package statistics accurate
+- **Quality**: Full source code audit — strict types, return types, docblocks, PHPStan L9 compliance verified across all 55 source files
 
 ### [1.1.48] - 2026-08-16
 
