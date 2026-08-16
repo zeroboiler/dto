@@ -3,8 +3,8 @@
 [![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 [![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|||[![Tests: 325](https://img.shields.io/badge/Tests-325-brightgreen)]()
-||||[![Version 1.1.39](https://img.shields.io/badge/Version-1.1.39-green)](https://github.com/zeroboiler/dto/releases)
+|||[![Tests: 326](https://img.shields.io/badge/Tests-326-brightgreen)]()
+||||[![Version 1.1.40](https://img.shields.io/badge/Version-1.1.40-green)](https://github.com/zeroboiler/dto/releases)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -1805,6 +1805,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.36 | 2026-08-16 | Refactor DTOManager::makeFromJson delegation, README test count update (277 → 319), badge accuracy, version bump |
 | 1.1.37 | 2026-08-16 | Structural contract test, README test count accuracy (321 → 322), version bump |
 | 1.1.39 | 2026-08-16 | V29 full type safety & docblock audit test (attribute contracts, service classes, return types, DtoCollection, serialization, MapFrom, Cast, DefaultValue, cross-fixture consistency), README badge/stats update |
+| 1.1.40 | 2026-08-16 | V30 production behavior contract test (hydration/serialization roundtrip, MapFrom aliasing, DefaultValue, Cast conversion, selective output, with/equality/partial-update, DtoCollection operations, DTOCast Eloquent, DTOManager delegation, cross-fixture consistency) |
 
 ## Internal Components
 
