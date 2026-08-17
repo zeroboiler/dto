@@ -101,93 +101,93 @@ use {$dtoClass};
 
 describe('{$shortName}', function () {
     it('has validation rules', function () {
-        \\\$rules = {$shortName}::rules();
+        \$rules = {$shortName}::rules();
 
-        expect(\\\$rules)->toBeArray();
-        expect(\\\$rules)->not->toBeEmpty();
+        expect(\$rules)->toBeArray();
+        expect(\$rules)->not->toBeEmpty();
     });
 
     it('can be created from array', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
 
-        expect(\\\$dto)->toBeInstanceOf({$shortName}::class);
+        expect(\$dto)->toBeInstanceOf({$shortName}::class);
     });
 
     it('can be converted to array', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
 
-        expect(\\\$dto->toArray())->toBeArray();
+        expect(\$dto->toArray())->toBeArray();
     });
 
     it('can be serialized to JSON', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
 
-        expect(\\\$dto->toJson())->toBeJson();
+        expect(\$dto->toJson())->toBeJson();
     });
 
     it('round-trips through JSON serialization', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
-        \\\$json = \\\$dto->toJson();
-        \\\$restored = {$shortName}::fromJson(\\\$json, validate: false);
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
+        \$json = \$dto->toJson();
+        \$restored = {$shortName}::fromJson(\$json, validate: false);
 
-        expect(\\\$restored)->toBeInstanceOf({$shortName}::class);
+        expect(\$restored)->toBeInstanceOf({$shortName}::class);
     });
 
     it('supports equals() value comparison', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto1 = {$shortName}::fromArray(\\\$data, validate: false);
-        \\\$dto2 = {$shortName}::fromArray(\\\$data, validate: false);
+        \$data = {$fakeDataStr};
+        \$dto1 = {$shortName}::fromArray(\$data, validate: false);
+        \$dto2 = {$shortName}::fromArray(\$data, validate: false);
 
-        expect(\\\$dto1->equals(\\\$dto2))->toBeTrue();
+        expect(\$dto1->equals(\$dto2))->toBeTrue();
     });
 
     it('supports only() field filtering', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
-        \\\$filtered = \\\$dto->only('{$firstField}');
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
+        \$filtered = \$dto->only('{$firstField}');
 
-        expect(\\\$filtered)->toBeArray();
-        expect(\\\$filtered)->toHaveKey('{$firstField}');
+        expect(\$filtered)->toBeArray();
+        expect(\$filtered)->toHaveKey('{$firstField}');
     });
 
     it('supports except() field exclusion', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
-        \\\$filtered = \\\$dto->except('{$firstField}');
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
+        \$filtered = \$dto->except('{$firstField}');
 
-        expect(\\\$filtered)->toBeArray();
-        expect(\\\$filtered)->not->toHaveKey('{$firstField}');
+        expect(\$filtered)->toBeArray();
+        expect(\$filtered)->not->toHaveKey('{$firstField}');
     });
 
     it('supports with() immutable override', function () {
-        \\\$data = {$fakeDataStr};
-        \\\$dto = {$shortName}::fromArray(\\\$data, validate: false);
-        \\\$modified = \\\$dto->with(['{$firstField}' => \\\$data['{$firstField}']]);
+        \$data = {$fakeDataStr};
+        \$dto = {$shortName}::fromArray(\$data, validate: false);
+        \$modified = \$dto->with(['{$firstField}' => \$data['{$firstField}']]);
 
-        expect(\\\$modified)->toBeInstanceOf({$shortName}::class);
-        expect(\\\$modified)->not->toBe(\\\$dto);
+        expect(\$modified)->toBeInstanceOf({$shortName}::class);
+        expect(\$modified)->not->toBe(\$dto);
     });
 
     it('supports fromPartialArray for partial updates', function () {
-        \\\$partial = {$partialData};
-        \\\$dto = {$shortName}::fromPartialArray(\\\$partial, validate: false);
+        \$partial = {$partialData};
+        \$dto = {$shortName}::fromPartialArray(\$partial, validate: false);
 
-        expect(\\\$dto)->toBeInstanceOf({$shortName}::class);
+        expect(\$dto)->toBeInstanceOf({$shortName}::class);
     });
 
     it('rules match expected structure', function () {
-        \\\$rules = {$shortName}::rules();
+        \$rules = {$shortName}::rules();
 
-        \\\$expected = [
+        \$expected = [
 {$rulesStr}
         ];
 
-        foreach (\\\$expected as \\\$field => \\\$fieldRules) {
-            expect(\\\$rules)->toHaveKey(\\\$field);
+        foreach (\$expected as \$field => \$fieldRules) {
+            expect(\$rules)->toHaveKey(\$field);
         }
     });
 });
