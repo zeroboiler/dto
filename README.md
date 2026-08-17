@@ -3,8 +3,10 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 350](https://img.shields.io/badge/Tests-350-brightgreen)]()|
-|[![Version 1.1.65](https://img.shields.io/badge/Version-1.1.65-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Tests: 350](https://img.shields.io/badge/Tests-350-brightgreen)](tests)|
+|[![Version 1.1.66](https://img.shields.io/badge/Version-1.1.66-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Source: 55 files](https://img.shields.io/badge/Source-55%20files-informational)](src)|
+|[![Fixtures: 42 DTOs](https://img.shields.io/badge/Fixtures-42%20DTOs-blue)](tests/Fixtures)|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -1965,11 +1967,11 @@ src/
 
 ## Test Fixtures
 
-The test suite uses a set of representative DTO fixtures covering all supported
+The test suite uses 42 representative DTO fixtures covering all supported
 features and edge cases:
 
-| Fixture | Features | Tests |
-|---------|----------|-------|
+| Fixture | Features | Purpose |
+|---------|----------|---------|
 | `CreateUserDTO` | `Required`, `Email`, `Hidden`, `Min`, `Max` | Basic validation, hidden fields, serialization |
 | `AddressDTO` | `Required`, `Pattern`, `Min`, nested in OrderDTO | Nested DTO hydration, regex validation |
 | `OrderDTO` | `Required`, nested `AddressDTO`, `NestedArray` | Nested DTO auto-hydration, recursive `toArray()` |
@@ -1979,9 +1981,12 @@ features and edge cases:
 | `MixedAttributesDTO` | `Required`, `Min`, `Max`, `Pattern`, `MapFrom`, `Cast`, `DefaultValue`, `Hidden`, `array`, `bool` | Mixed attribute types integration |
 | `MinimalDTO` | `Required` only | Edge case: simplest possible DTO |
 | `EmptyDTO` | No properties | Edge case: empty DTO |
+| `NoConstructorDTO` | No properties | Edge case: no-constructor DTO |
 | `UnionTypeDTO` | `Required`, union type `int|string` | Union type support, OpenAPI `oneOf` |
 | `ValidationTestDTO` | `Required`, `Max`, `Email` | Validation rule generation |
 | `DeepNestedDTO` | Multi-level nesting | Deep nesting edge cases |
+| `NestedCollectionDTO` | `Required`, `NestedArray` | Array of nested DTOs |
+| `NestedWithHiddenDTO` | `Hidden`, nested DTO | Hidden field propagation in nested DTOs |
 | `DateCastDTO` | `Cast('date')`, `DateTime` | Date/datetime casting |
 | `DateTimeCastDTO` | `Cast('datetime')` | Datetime casting variant |
 | `ArrayCastDTO` | `Cast('array')`, `Json` | Array/JSON cast edge cases |
@@ -1992,17 +1997,22 @@ features and edge cases:
 | `RegistrationDTO` | `Required`, `Email`, `Min`, `Max`, `Confirmed`, `Accepted`, `Same` | Registration flow validation |
 | `TaskListDTO` | `Required`, `ArrayRule`, `Collection` | Array + collection integration |
 | `VoUserDTO` | ValueObject properties (`Email`, `Url`, `Money`) | ValueObject auto-instantiation and serialization |
-| `BypassTestDTO` (inline in `WithBypassTest`) | `Required`, `Email`, `Min`, `Max` | Validation bypass paths |
 | `PartialDefaultValueDTO` | `DefaultValue`, `Required` | Partial update with default values |
 | `DotNotationDTO` | `MapFrom` with dot notation | Nested source key mapping |
 | `ArticleDTO` | `Required`, `Nullable`, nested DTO | Nullable nested DTO edge cases |
 | `ItemDTO` | `Required`, `Min` | Used with DtoCollection |
 | `RoundtripDTO` | Various, used for roundtrip tests | toArray/fromArray roundtrip integrity |
+| `WithRoundtripDTO` | Various | with() roundtrip integrity |
 | `NullableRoundtripDTO` | `Nullable`, `DefaultValue` | Nullable value roundtrip serialization |
-| `NoConstructorDTO` | No properties | Edge case: no-constructor DTO |
 | `InteractionEdgeCaseDTO` | Complex attribute interactions | Validation attribute interaction edge cases |
 | `ComprehensiveValidationDTO` | All attribute types | Full attribute surface coverage |
 | `StrictValidationDTO` | `Required`, `Integer`, `Between` | Strict type validation |
+| `ComprehensiveDTO` | `Required`, `Email`, `Max`, `Min`, `Pattern`, `Hidden`, `Nullable` | Comprehensive field type coverage |
+| `EdgeCaseDTO` | Various edge cases | Boundary condition testing |
+| `CollectionItemDTO` | `Required`, `Min` | DtoCollection item type |
+| `AllDefaultsDTO` | All properties have defaults | Default value handling |
+| `AllScalarTypesDTO` | `string`, `int`, `float`, `bool`, `array` | Scalar type coverage |
+| `ValidationAttributeContractDTO` | Various validation attributes | ValidationAttribute contract testing |
 
 ```php
 // Example: MixedAttributesDTO exercises the full attribute surface
@@ -3354,6 +3364,12 @@ The metadata resolver automatically infers validation rules from PHP types:
 | `DataTransferObject` | None | Auto-hydrated via `fromArray()` |
 
 ## Changelog
+
+### [1.1.66] - 2026-08-17
+
+- **Docs**: Enrich README — add Source/Fixtures badges, complete fixture catalog (all 42 DTOs documented)
+- **Docs**: Fix badge links (Tests, Source, Fixtures now point to actual directories)
+- **Quality**: Manual PHPStan Level 9 compliance audit — all 55 source files verified (strict types, return types, docblocks, typed properties, no mixed)
 
 ### [1.1.63] - 2026-08-17
 
