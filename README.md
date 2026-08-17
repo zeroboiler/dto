@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 338](https://img.shields.io/badge/Tests-338-brightgreen)]()|
-|[![Version 1.1.56](https://img.shields.io/badge/Version-1.1.56-green)](https://github.com/zeroboiler/dto/releases)|
+|[![Tests: 336](https://img.shields.io/badge/Tests-336-brightgreen)]()|
+|[![Version 1.1.57](https://img.shields.io/badge/Version-1.1.57-green)](https://github.com/zeroboiler/dto/releases)|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -121,8 +121,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-| - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure)
-| - 292 test files in `tests/` (41 fixtures) |
+| - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure) |
+| - 336 test files in `tests/` (41 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
@@ -1819,6 +1819,13 @@ See [CHANGELOG.md](CHANGELOG.md) for a history of changes.
 | 1.1.4 | 2026-08-14 | Test count update (257 files), badge accuracy, README documentation pass |
 | 1.1.6 | 2026-08-14 | Full hydration/serialization contract tests (271 files), README accuracy |
 | 1.1.7 | 2026-08-14 | Comprehensive edge-case tests, DtoCollection mutation edge cases |
+
+### [1.1.57] - 2026-08-17
+
+- **Docs**: Fix test count badge (338→336), package statistics (292→336 test files) accurate
+- **Quality**: Full production readiness audit — all 55 source files verified: strict types, return types, docblocks, typed properties, PHPStan L9 compliance
+- **Audit**: DataTransferObject, DtoCollection, DTOManager, DtoMetadataResolver, DTOCast, DTOException, all 43 attributes, DTOSServiceProvider, console commands, facade, OpenApiSchemaGenerator, all 3 contracts — zero issues found
+
 | 1.1.8 | 2026-08-14 | fromJson error handling, DtoCollection immutability edge-case tests |
 | 1.1.9 | 2026-08-14 | Test count badge fix, version bump |
 | 1.1.10 | 2026-08-14 | Production readiness V7 test (full attribute hydration, conditional validation, isEmpty/isNotEmpty, equals/with, DtoCollection operations, fromPartialArray, metadata cache), version bump |
