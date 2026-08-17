@@ -583,8 +583,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      *   $admin = $collection->search(fn ($dto) => $dto->role === 'admin');
      *
-     * @template T
-     *
      * @param  callable(T): bool  $callback  Search condition
      * @return T|null The matching DTO, or null
      *
@@ -611,7 +609,7 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *   $sorted = $collection->sortBy('createdAt');
      *   $sorted = $collection->sortBy(fn ($dto) => $dto->priority->value);
      *
-     * @param  callable(T): int|float|string|null|string  $callback
+     * @param  callable(T): int|float|string|null  $callback
      * @return self A new sorted DtoCollection
      *
      * @phpstan-return DtoCollection<T>
