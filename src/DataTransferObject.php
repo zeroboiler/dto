@@ -145,10 +145,10 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * This is ideal for PATCH endpoints where only changed fields are submitted.
      * For merging onto an existing DTO, use {@see with()} instead.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $data  Partial input data (only present keys are processed)
      * @param  bool  $validatePresent  Run validation on fields present in $data
+     * @return static A new DTO instance with partial data merged with defaults
      *
-     * @return static
      * @throws \Illuminate\Validation\ValidationException If validation fails and $validatePresent is true
      */
     public static function fromPartialArray(array $data, bool $validatePresent = true): static
@@ -195,7 +195,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @param  string  $paramName  Property name (for error messages)
      * @param  bool  $nullable  Whether the property accepts null
      * @param  array<string, mixed>  $propMeta  Cached property metadata from resolveMetadata()
-     * @return mixed A type-appropriate empty/default value
+     * @return int|float|string|bool|array|null A type-appropriate empty/default value
      *
      * @throws \InvalidArgumentException When the type cannot provide a sensible empty value
      */
@@ -267,10 +267,12 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Converts 'required' to 'sometimes' for partial (PATCH) semantics.
      * Fields not present in $data are not validated.
      *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed> Validated data
+     * @param  array<string, mixed>  $data  Partial input data to validate
+     * @return array<string, mixed> Validated data (only present keys)
      *
      * @throws \Illuminate\Validation\ValidationException If validation fails on present fields
+     *
+     * @see fromPartialArray() For the full hydration method that uses this internally
      */
     public static function validatePartialArray(array $data): array
     {
@@ -600,11 +602,11 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * The original DTO instance remains unchanged — a new instance is returned.
      *
      * @param  array<string, mixed>  $overrides  Properties to merge into the DTO
-     * @param  bool  $validate  Has no effect. Validation always runs to prevent invalid state.
+     * @param  bool  $validate  **DEPRECATED** — has no effect. Validation always runs to prevent invalid state.
      *
      * @return static A new DTO instance with the merged data
      *
-     * @throws ValidationException If the merged data fails validation
+     * @throws \Illuminate\Validation\ValidationException If the merged data fails validation
      *
      * @deprecated The $validate parameter has no effect and will be removed in 2.0.0.
      *             Validation always runs in with() to prevent invalid state.
@@ -704,6 +706,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * @see DtoMetadataResolver::resolve() For the reflection-based metadata builder
      * @see setMetadataCacheTtl() For configuring cache TTL
      * @see flushMetadataCache() For clearing cached entries
+     * @see flushMetadataCache(null) For clearing all cached entries across classes
      */
     private static function resolveMetadata(): array
     {
