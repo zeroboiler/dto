@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-![Tests: 343](https://img.shields.io/badge/Tests-343-brightgreen)]()
-|[![Version 1.1.62](https://img.shields.io/badge/Version-1.1.62-green)](https://github.com/zeroboiler/dto/releases)]|
+![Tests: 301](https://img.shields.io/badge/Tests-301-brightgreen)]()
+|[![Version 1.1.63](https://img.shields.io/badge/Version-1.1.63-green)](https://github.com/zeroboiler/dto/releases)]|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -3354,6 +3354,11 @@ The metadata resolver automatically infers validation rules from PHP types:
 | `DataTransferObject` | None | Auto-hydrated via `fromArray()` |
 
 ## Changelog
+
+### [1.1.63] - 2026-08-17
+
+- **Docs**: Fix test count badge (343→301), accurate test/fixture counts
+- **Docs**: Production readiness audit — all source files verified for PHP 8.5 strict types, return type declarations, docblocks, PHPStan Level 9
 
 ### [1.1.62] - 2026-08-17
 
