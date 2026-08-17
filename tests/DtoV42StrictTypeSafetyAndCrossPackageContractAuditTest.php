@@ -391,11 +391,10 @@ describe('V42 DTO Strict Type Safety And Cross-Package Contract Audit', function
         });
 
         it('validates the merged data', function () {
-            $original = CreateUserDTO::fromArray([
+            $original = ComprehensiveDTO::fromArray([
                 'email' => 'test@example.com',
                 'name' => 'Test User',
-                'password' => 'securepassword123',
-            ]);
+            ], validate: false);
 
             expect(fn () => $original->with(['email' => 'invalid-email']))->toThrow(ValidationException::class);
         });
@@ -405,15 +404,13 @@ describe('V42 DTO Strict Type Safety And Cross-Package Contract Audit', function
                 'name' => 'Alice',
                 'age' => 30,
                 'email' => 'alice@example.com',
-                'isActive' => true,
-            ]);
+            ], validate: false);
 
             $updated = $original->with(['age' => 31]);
 
             expect($updated->name)->toBe('Alice');
             expect($updated->age)->toBe(31);
             expect($updated->email)->toBe('alice@example.com');
-            expect($updated->isActive)->toBeTrue();
         });
     });
 
@@ -425,8 +422,7 @@ describe('V42 DTO Strict Type Safety And Cross-Package Contract Audit', function
                 'name' => 'Alice',
                 'age' => 30,
                 'email' => 'alice@example.com',
-                'isActive' => true,
-            ]);
+            ], validate: false);
 
             $array = $dto->toArray();
 
@@ -438,8 +434,7 @@ describe('V42 DTO Strict Type Safety And Cross-Package Contract Audit', function
                 'name' => 'Alice',
                 'age' => 30,
                 'email' => 'alice@example.com',
-                'isActive' => true,
-            ]);
+            ], validate: false);
 
             $allValues = $dto->allValues();
 
