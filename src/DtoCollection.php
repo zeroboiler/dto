@@ -600,4 +600,103 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
 
         return null;
     }
+
+    /**
+     * Sort the collection by a DTO property or callback result.
+     *
+     * Returns a new collection with items sorted in ascending order.
+     * Accepts either a property name (string) to sort by, or a callback
+     * that receives each DTO and returns the value to sort by.
+     *
+     *   $sorted = $collection->sortBy('createdAt');
+     *   $sorted = $collection->sortBy(fn ($dto) => $dto->priority->value);
+     *
+     * @param  callable(T): int|float|string|null|string  $callback
+     * @return self A new sorted DtoCollection
+     *
+     * @phpstan-return DtoCollection<T>
+     */
+    public function sortBy(callable|string $callback): self
+    {
+        $items = $this->items;
+        $isString = is_string($callback);
+
+        usort($items, static function (DataTransferObject $a, DataTransferObject $b) use ($callback, $isString): int {
+            $valA = $isString ? $a->toArray()[$callback] ?? null : $callback($a);
+            $valB = $isString ? $b->toArray()[$callback] ?? null : $callback($b);
+
+            if ($valA === $valB) {
+                return 0;
+            }
+
+            if ($valA === null) {
+                return 1;
+            }
+
+            if ($valB === null) {
+                return -1;
+            }
+
+            return $valA <=> $valB;
+        });
+
+        return new self($items);
+    }
+
+    /**
+     * Return the first N items from the collection.
+     *
+     * Returns a new collection with at most the specified number of items.
+     * If $count exceeds the collection size, all items are returned.
+     *
+     *   $first5 = $collection->take(5);
+     *
+     * @param  int<1, max>  $count  Maximum number of items to return
+     * @return self A new DtoCollection with at most $count items
+     *
+     * @phpstan-return DtoCollection<T>
+     */
+    public function take(int $count): self
+    {
+        return new self(array_slice($this->items, 0, $count));
+    }
+
+    /**
+     * Skip the first N items and return the remaining items.
+     *
+     * Returns a new collection excluding the first N items.
+     * If $count exceeds the collection size, an empty collection is returned.
+     *
+     *   $remaining = $collection->skip(5);
+     *
+     * @param  int<0, max>  $count  Number of items to skip from the beginning
+     * @return self A new DtoCollection excluding the first $count items
+     *
+     * @phpstan-return DtoCollection<T>
+     */
+    public function skip(int $count): self
+    {
+        return new self(array_slice($this->items, $count));
+    }
+
+    /**
+     * Split the collection into chunks of the specified size.
+     *
+     * Returns an array of DtoCollections, each containing at most
+     * $size items (except possibly the last chunk).
+     *
+     *   $chunks = $collection->chunk(10);
+     *
+     * @param  int<1, max>  $size  Maximum items per chunk
+     * @return list<self> Array of DtoCollection chunks
+     *
+     * @phpstan-return list<DtoCollection<T>>
+     */
+    public function chunk(int $size): array
+    {
+        return array_map(
+            static fn (array $items): self => new self($items),
+            array_chunk($this->items, $size)
+        );
+    }
 }
