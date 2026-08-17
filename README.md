@@ -3,7 +3,7 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-![Tests: 344](https://img.shields.io/badge/Tests-344-brightgreen)]()
+![Tests: 345](https://img.shields.io/badge/Tests-345-brightgreen)]()
 [![Version 1.1.62](https://img.shields.io/badge/Version-1.1.62-green)](https://github.com/zeroboiler/dto/releases)]|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -121,8 +121,8 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 - `zeroboiler/value-objects` (installed automatically as a dependency)
 
 **Package Statistics:**
-| - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure) |
-| - 344 test files in `tests/` (43 fixtures) |
+| - 55 source files in `src/` (41 attributes, 4 contracts, 10 infrastructure) |
+| - 345 test files in `tests/` (42 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
