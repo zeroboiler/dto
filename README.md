@@ -3,7 +3,7 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|![Tests: 299](https://img.shields.io/badge/Tests-299-brightgreen)]()
+|![Tests: 300](https://img.shields.io/badge/Tests-300-brightgreen)]()
 [![Version 1.1.61](https://img.shields.io/badge/Version-1.1.61-green)](https://github.com/zeroboiler/dto/releases)|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -122,7 +122,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 | - 55 source files in `src/` (37 validation attributes, 4 metadata attributes, 2 hydration attributes, 12 infrastructure) |
-| - 299 test files in `tests/` (41 fixtures) |
+| - 300 test files in `tests/` (41 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
@@ -3359,7 +3359,7 @@ The metadata resolver automatically infers validation rules from PHP types:
 
 - **Tests**: V43 infrastructure, contract & attribute audit (+1 test file)
 - **Fix**: V42 ComprehensiveDTO fixture references (removed non-existent `isActive` property)
-- **Docs**: Fix test count badge (297→299), accurate file counts
+- **Docs**: Fix test count badge (297→300), accurate file counts
 
 ### [1.1.51] - 2026-08-16
 
