@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 350](https://img.shields.io/badge/Tests-350-brightgreen)](tests)|
-|[![Version 1.1.67](https://img.shields.io/badge/Version-1.1.67-green)](https://github.com/zeroboiler/dto/releases)|
+| [![Tests: 351](https://img.shields.io/badge/Tests-351-brightgreen)](tests)|
+| [![Version 1.1.68](https://img.shields.io/badge/Version-1.1.68-green)](https://github.com/zeroboiler/dto/releases) |
 |[![Source: 55 files](https://img.shields.io/badge/Source-55%20files-informational)](src)|
 |[![Fixtures: 42 DTOs](https://img.shields.io/badge/Fixtures-42%20DTOs-blue)](tests/Fixtures)|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
@@ -3606,6 +3606,11 @@ The metadata resolver automatically infers validation rules from PHP types:
 | `DataTransferObject` | None | Auto-hydrated via `fromArray()` |
 
 ## Changelog
+
+### [1.1.68] - 2026-08-17
+
+- **Test**: V50 final production audit — comprehensive contract verification test covering all 55 source files, structural integrity, ValidationAttribute contract, metadata attributes, interface compliance, hydration pipeline, serialization, immutable update, state checks, DtoCollection contract, rules resolution, DTOCast, DTOException, metadata cache, DtoMetadataResolver, OpenApi schema generator, cross-DTO consistency, and roundtrip serialization (+1 test file)
+- **Quality**: Manual PHPStan Level 9 compliance verification — strict types, return types, docblocks, typed properties, no mixed types confirmed
 
 ### [1.1.66] - 2026-08-17
 
