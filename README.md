@@ -3,7 +3,7 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-|[![Tests: 292](https://img.shields.io/badge/Tests-292-brightgreen)]()
+|[![Tests: 296](https://img.shields.io/badge/Tests-296-brightgreen)]()|
 |[![Version 1.1.54](https://img.shields.io/badge/Version-1.1.54-green)](https://github.com/zeroboiler/dto/releases)
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
@@ -132,7 +132,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 | Class | Namespace | Purpose |
 |-------|-----------|---------|
 | `DataTransferObject` | Root | Abstract base class — provides fromArray, fromRequest, fromJson, fromPartialArray, toArray, with, equals, rules, validation |
-| `DtoCollection` | Root | Type-safe collection wrapper with pluck, pluckKey, map, filter, push, append, merge, ArrayAccess, IteratorAggregate |
+| `DtoCollection` | Root | Type-safe collection wrapper with pluck, pluckKey, map, filter, push, append, merge, sortBy, take, skip, chunk, unique, contains, search, ArrayAccess, IteratorAggregate |
 | `DTOManager` | Root | Runtime helper (injectable/facade) — validate, make, makeFromJson, schema |
 | `DTO` | `Facades` | Laravel facade for `DTOManager` — `DTO::make(...)`, `DTO::validate(...)` |
 | `DTOSServiceProvider` | Root | Registers singleton, artisan commands, dev cache TTL, and Octane flush listeners |
@@ -288,6 +288,11 @@ $col->push($dto3);             // mutates in-place, returns $col
 $col->unique();                // new collection with duplicates removed (by toArray() equality)
 $col->contains(fn($d) => $d->age > 18); // true if any match
 $col->search(fn($d) => $d->email === 'a@b.com'); // first matching DTO or null
+$col->sortBy('name');             // sort by property name (immutable)
+$col->sortBy(fn($d) => $d->age); // sort by callback (immutable)
+$col->take(5);                   // first 5 items (immutable)
+$col->skip(10);                  // skip first 10 (immutable)
+$col->chunk(20);                 // split into 20-item chunks
 $col->count(); $col->isEmpty(); $col->first(); $col->last();
 
 // ── Facade ─────────────────────────────────────────────────
@@ -412,6 +417,8 @@ Validation runs **before** hydration to reject invalid data early.
 │  ├─ pluck() / pluckKey() / map() / filter()  │
 │  ├─ count() / isEmpty() / first() / last()    │
 │  ├─ push() / items() / toArray()              │
+│  ├─ sortBy() / take() / skip() / chunk()       │
+│  ├─ unique() / contains() / search()          │
 │  └─ ArrayAccess + IteratorAggregate             │
 └───────────────────────────────────────────────┘
 ```
@@ -610,6 +617,18 @@ $keyed = $collection->toArrayBy('id');
 // toDictionary: map one property to another
 $dict = $collection->toDictionary('id', 'name');
 // [42 => 'Alice', 43 => 'Bob', ...]
+
+// ── Unique, Contains, Search ───────────────────────────
+$unique = $collection->unique();              // remove duplicates by toArray() equality
+$has = $collection->contains(fn ($d) => $d->age > 18); // true if any match
+$admin = $collection->search(fn ($d) => $d->role === 'admin'); // first match or null
+
+// ── Sorting, Pagination ─────────────────────────────────
+$sorted = $collection->sortBy('createdAt');  // sort by property name
+$sorted = $collection->sortBy(fn ($d) => $d->priority->value); // sort by callback
+$first5 = $collection->take(5);               // first 5 items
+$rest = $collection->skip(10);               // skip first 10
+$pages = $collection->chunk(20);             // split into 20-item chunks
 ```
 
 ### Partial Updates (PATCH)
@@ -2837,6 +2856,18 @@ $collection->isNotEmpty();  // true
 $collection->first();       // $dto1
 $collection->last();        // $dto3
 $collection->items();       // raw DTO array (no serialization)
+
+// ── Unique & Search ─────────────────────────────────────────────
+$unique = $collection->unique();                 // remove duplicates (by toArray() equality)
+$has = $collection->contains(fn ($d) => $d->age > 18); // true if any match
+$admin = $collection->search(fn ($d) => $d->role === 'admin'); // first match or null
+
+// ── Sorting & Pagination ───────────────────────────────────────
+$sorted = $collection->sortBy('createdAt');      // sort by property name (nulls last)
+$sorted = $collection->sortBy(fn ($d) => $d->priority->value); // sort by callback
+$first5 = $collection->take(5);                  // first N items (immutable)
+$rest = $collection->skip(10);                   // skip first N items (immutable)
+$pages = $collection->chunk(20);                  // split into N-sized sub-collections
 
 // ── Serialization ───────────────────────────────────────────────
 $collection->toArray();     // array of toArray() results
