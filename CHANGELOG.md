@@ -5,17 +5,15 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Added
-- `DtoCollection::unique()` — returns a new collection with duplicate DTOs removed (based on toArray() strict equality)
-- `DtoCollection::contains()` — checks if any DTO in the collection matches a callback condition (short-circuits)
-- `DtoCollection::search()` — finds the first DTO matching a callback condition, or null
+- `DtoV40AdvancedEdgeCaseAndCollectionContractTest` — comprehensive test suite covering: DtoCollection sortBy (property name + callback, null handling), take/skip/chunk edge cases, immutability verification (filter/append/merge don't mutate, clone throws), ArrayAccess (offsetExists/Get/Set/Unset, re-indexing, type rejection), fromJson edge cases (sequential arrays, empty arrays, invalid JSON, non-object JSON, numeric JSON), isEmpty/isNotEmpty semantics, toArray vs allValues hidden field exclusion, equals value comparison, only/except field filtering, toJson output validation, DtoCollection JSON serialization, unique deduplication, contains/search callback matching, pluck/pluckKey/toDictionary/toArrayBy key-value extraction, map transformation, first/last with empty collection, make factory, constructor type rejection, __debugInfo hidden field exclusion, DTOException named constructors and __toString (~70 test methods)
 
 ### Fixed
-- `DtoCollection::sortBy()` PHPDoc — removed duplicate `string` type in callable return annotation
-- `DtoCollection::search()` PHPDoc — removed redundant `@template T` that shadowed class-level template
+- `OpenApiSchemaGenerator::componentName()` — added missing `@return` docblock and parameter description
+- `DtoCollection::sortBy()` — improved docblock to document both `callable` and `string` parameter variants with usage notes on toArray-based key extraction and null value sorting behavior
 
 ### Changed
-- Updated README test count badge (296 → 336) to match actual test file count
-- Bumped version to 1.1.55
+- Updated README test count badge (336 → 338), version badge (1.1.55 → 1.1.56)
+- Bumped version to 1.1.56
 
 ### Added
 - `DtoV37PhpStanLevel9StrictTypeSafetyAuditTest` — comprehensive PHPStan L9 strict type safety audit covering: return type strictness (toArray/allValues/toJson/jsonSerialize/rules/rulesFor/only/except/equals/isEmpty/isNotEmpty), hydration type safety (fromArray/fromJson/fromPartialArray/with immutability), DtoCollection type safety (make/constructor/toArray/count/isEmpty/push/append/filter/first/last/map/pluck/pluckKey/merge/clone prevention/jsonSerialize/ArrayAccess), DTOManager delegation type safety (make/validate/rules/rulesFor/schema/fromPartialArray/fromJson/makeFromJson), DTOCast type strictness (get/set/serialize return types), DTOException named constructors, Hidden attribute behavior, MapFrom and Cast attribute behavior, ValidationAttribute interface contract compliance (all 37 attributes implement interface, all ruleKey() return non-empty strings), edge-case DTOs (NoConstructorDTO/AllDefaultsDTO/EmptyDTO), and cross-package type consistency (fromArray/toArray/fromJson/toJson/with roundtrips) (~80 test methods)

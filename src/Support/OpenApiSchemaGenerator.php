@@ -289,7 +289,8 @@ final class OpenApiSchemaGenerator
      * an OpenAPI component schema key. Uses string parsing instead
      * of reflection to avoid unnecessary class loading.
      *
-     * @param  class-string  $className
+     * @param  class-string  $className  The fully-qualified DTO class name
+     * @return string The short class name (e.g. 'CreateUserDTO' from 'App\DTO\CreateUserDTO')
      */
     private static function componentName(string $className): string
     {

@@ -609,7 +609,11 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *   $sorted = $collection->sortBy('createdAt');
      *   $sorted = $collection->sortBy(fn ($dto) => $dto->priority->value);
      *
-     * @param  callable(T): int|float|string|null  $callback
+     * When a string is passed, the sort key is extracted from each DTO's
+     * toArray() output (e.g. 'name' sorts by `$dto->toArray()['name']`).
+     * Null values are pushed to the end of the sorted collection.
+     *
+     * @param  callable(T): int|float|string|null | string  $callback  Property name or sort callback
      * @return self A new sorted DtoCollection
      *
      * @phpstan-return DtoCollection<T>
