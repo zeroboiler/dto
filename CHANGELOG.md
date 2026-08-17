@@ -5,10 +5,9 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Fixed
-- Corrected README test count badges (304 → 273 for enums, 339 → 297 for dto) to match actual test file counts
-
-### Changed
-- Bumped version to 1.1.60
+- Fixed README badge markdown table alignment (Tests and Version badges were misaligned causing rendering issues)
+- Corrected test count badges to match actual file counts (301 → 302 for dto)
+- Bumped version to 1.1.64
 - `DtoV40AdvancedEdgeCaseAndCollectionContractTest` — comprehensive test suite covering: DtoCollection sortBy (property name + callback, null handling), take/skip/chunk edge cases, immutability verification (filter/append/merge don't mutate, clone throws), ArrayAccess (offsetExists/Get/Set/Unset, re-indexing, type rejection), fromJson edge cases (sequential arrays, empty arrays, invalid JSON, non-object JSON, numeric JSON), isEmpty/isNotEmpty semantics, toArray vs allValues hidden field exclusion, equals value comparison, only/except field filtering, toJson output validation, DtoCollection JSON serialization, unique deduplication, contains/search callback matching, pluck/pluckKey/toDictionary/toArrayBy key-value extraction, map transformation, first/last with empty collection, make factory, constructor type rejection, __debugInfo hidden field exclusion, DTOException named constructors and __toString (~70 test methods)
 
 ### Fixed
