@@ -2076,6 +2076,248 @@ The test suite includes **325 test files** covering:
 | **PHPStan** | `DTOPhpStanComplianceTest`, `DTOStanComplianceTest`, `PhpStanCleanTest` | No mixed types, strict comparisons |
 | **Fixtures** | `CreateUserDTO`, `AddressDTO`, `OrderDTO`, `ProductDTO`, `MixedAttributesDTO`, `DeepNestedDTO`, etc. | Various DTO patterns and configurations |
 
+## Real-World Integration Examples
+
+### Full CRUD API with Nested DTOs
+
+```php
+// app/DTO/AddressDTO.php
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Pattern;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class AddressDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Min(5), Max(200)]
+        public readonly string $street,
+
+        #[Required, Min(2), Max(100)]
+        public readonly string $city,
+
+        #[Required, Pattern('/^[A-Z]{2}$/')]
+        public readonly string $state,
+
+        #[Required, Pattern('/^\d{5}(-\d{4})?$/')]
+        public readonly string $zip,
+
+        #[Required, Max(100)]
+        public readonly string $country = 'US',
+    ) {}
+}
+
+// app/DTO/CreateOrderDTO.php
+use ZeroBoiler\DTO\Attributes\{Required, Email, Min, Max, Numeric, Between, Hidden, MapFrom, Cast, Enum, DefaultValue, Collection};
+use ZeroBoiler\DTO\DataTransferObject;
+use App\Enums\OrderStatus;
+
+class CreateOrderDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Numeric, Min(1)]
+        public readonly int $userId,
+
+        #[Required]
+        public readonly AddressDTO $shippingAddress,
+
+        #[Collection(OrderItemDTO::class)]
+        public readonly DtoCollection $items,
+
+        #[Cast('integer')]
+        #[DefaultValue(0)]
+        public readonly int $discountCents = 0,
+
+        #[Required, Email]
+        #[MapFrom('customer_email')]
+        public readonly string $customerEmail,
+
+        #[Enum(OrderStatus::class)]
+        #[DefaultValue('pending')]
+        public readonly OrderStatus $status,
+
+        #[Hidden]
+        public readonly ?string $internalNotes = null,
+    ) {}
+}
+
+// app/Http/Controllers/OrderController.php
+class OrderController extends Controller
+{
+    public function store(Request $request): JsonResponse
+    {
+        $dto = CreateOrderDTO::fromRequest($request);
+        // All fields validated, nested AddressDTO hydrated, items wrapped in DtoCollection
+
+        $order = Order::create([
+            'user_id' => $dto->userId,
+            'shipping_address' => $dto->shippingAddress->toArray(), // nested DTO serialized
+            'items' => $dto->items->toArray(),                      // collection serialized
+            'discount_cents' => $dto->discountCents,
+            'customer_email' => $dto->customerEmail,
+            'status' => $dto->status,
+            'internal_notes' => $dto->internalNotes,                // available but hidden from API
+        ]);
+
+        return response()->json($order, 201);
+    }
+
+    public function update(Request $request, Order $order): JsonResponse
+    {
+        // PATCH semantics — only present fields are updated
+        $dto = CreateOrderDTO::fromPartialRequest($request);
+
+        $order->update($dto->only('customerEmail', 'status', 'discountCents'));
+
+        return response()->json($order);
+    }
+}
+```
+
+### Eloquent Model with JSON DTO Cast
+
+```php
+// app/Models/Order.php
+class Order extends Model
+{
+    protected $casts = [
+        'shipping_address' => AddressDTO::class,    // auto JSON encode/decode
+        'metadata' => OrderMetadataDTO::class,
+        'status' => OrderStatus::class,            // enum cast (from zeroboiler/enums)
+    ];
+
+    // DTO cast stores as JSON, hydrates on access
+    $order->shipping_address;  // AddressDTO instance
+    $order->shipping_address->city;  // 'New York'
+
+    $order->shipping_address = AddressDTO::fromArray([...]); // auto-saves as JSON
+}
+```
+
+### Action-Scoped Validation (Create vs Update Rules)
+
+```php
+// app/DTO/UpdateProfileDTO.php
+class UpdateProfileDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required, Min(2), Max(50)]
+        public readonly string $name,
+
+        #[Email, Nullable]
+        public readonly ?string $email,
+
+        #[Url, Nullable]
+        public readonly ?string $website,
+
+        #[Max(500)]
+        public readonly ?string $bio = null,
+    ) {}
+
+    // Stricter rules for creation
+    public static function rulesFor(string $action): array
+    {
+        if ($action === 'create') {
+            return [
+                'name' => ['required', 'min:2', 'max:50'],
+                'email' => ['required', 'email'],
+                'website' => ['required', 'url'],
+                'bio' => ['max:500'],
+            ];
+        }
+
+        return parent::rulesFor($action);
+    }
+}
+
+// Usage
+UpdateProfileDTO::rulesFor('create');   // stricter — email and website required
+UpdateProfileDTO::rulesFor('update');   // relaxed — email and website nullable
+```
+
+### DTOCollection Pipeline Operations
+
+```php
+// Build a collection from multiple DTOs
+$users = DtoCollection::make([
+    UserDTO::fromArray(['name' => 'Alice', 'role' => 'admin']),
+    UserDTO::fromArray(['name' => 'Bob', 'role' => 'user']),
+    UserDTO::fromArray(['name' => 'Charlie', 'role' => 'admin']),
+]);
+
+// Type-safe collection operations
+$admins = $users->filter(fn ($dto) => $dto->role === 'admin');
+$names = $users->map(fn ($dto) => $dto->name);         // ['Alice', 'Bob', 'Charlie']
+$emails = $users->pluck('email');                        // ['alice@...', 'bob@...', ...]
+$lookup = $users->pluckKey('email', 'name');             // ['alice@...' => 'Alice', ...]
+$sorted = $users->sortBy('name');                       // new collection sorted by name
+$page = $users->skip(10)->take(10);                     // pagination
+$unique = $users->unique();                              // remove duplicates by toArray()
+$hasAdmin = $users->contains(fn ($dto) => $dto->role === 'admin'); // true
+$firstAdmin = $users->search(fn ($dto) => $dto->role === 'admin');
+
+// Immutable append/merge
+$updated = $users->append($newUser);
+$combined = $users->merge($otherCollection);
+```
+
+### OpenAPI Schema Generation for API Documentation
+
+```php
+// CLI command
+php artisan zeroboiler:dto-schema "App\DTO\CreateOrderDTO" --json --with-components
+
+// Programmatic via facade
+$schema = DTO::schema(CreateOrderDTO::class);
+
+// Result: full OpenAPI 3.0 schema with types, required fields, constraints
+// {
+//   "type": "object",
+//   "required": ["userId", "shippingAddress", "customerEmail"],
+//   "properties": {
+//     "userId": { "type": "integer", "minimum": 1 },
+//     "shippingAddress": { "$ref": "#/components/schemas/AddressDTO" },
+//     "discountCents": { "type": "integer", "default": 0 },
+//     "customerEmail": { "type": "string", "format": "email" },
+//     "status": { "type": "string", "enum": ["pending", "confirmed", ...] }
+//   }
+// }
+```
+
+### Value Object Integration with DTOs
+
+```php
+use ZeroBoiler\ValueObjects\Email as EmailVO;
+use ZeroBoiler\ValueObjects\Money;
+use ZeroBoiler\DTO\DataTransferObject;
+
+class PaymentDTO extends DataTransferObject
+{
+    public function __construct(
+        #[Required]
+        public readonly EmailVO $payerEmail,     // auto-instantiated from string or EmailVO
+
+        #[Required]
+        public readonly Money $amount,           // auto-instantiated from int/string/array
+
+        #[Required]
+        public readonly string $currency = 'USD',
+    ) {}
+}
+
+// Hydration handles ValueObject construction automatically
+$dto = PaymentDTO::fromArray([
+    'payerEmail' => 'customer@example.com',  // → EmailVO instance
+    'amount' => ['amount' => 1999, 'currency' => 'USD'],  // → Money instance
+    'currency' => 'USD',
+]);
+
+// Serialization uses toPrimitive()/toArray()
+$dto->payerEmail->toPrimitive();  // 'customer@example.com'
+$dto->amount->toPrimitive();      // 1999 (or toArray() for composite VOs)
+```
+
 ## Contributing
 
 1. Fork the repository
