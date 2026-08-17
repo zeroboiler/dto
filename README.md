@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-![Tests: 345](https://img.shields.io/badge/Tests-345-brightgreen)]()
-[![Version 1.1.62](https://img.shields.io/badge/Version-1.1.62-green)](https://github.com/zeroboiler/dto/releases)]|
+![Tests: 343](https://img.shields.io/badge/Tests-343-brightgreen)]()
+|[![Version 1.1.62](https://img.shields.io/badge/Version-1.1.62-green)](https://github.com/zeroboiler/dto/releases)]|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
@@ -122,7 +122,7 @@ The package auto-registers via Laravel's package discovery. No manual configurat
 
 **Package Statistics:**
 | - 55 source files in `src/` (41 attributes, 4 contracts, 10 infrastructure) |
-| - 345 test files in `tests/` (42 fixtures) |
+| - 301 test files in `tests/` (42 fixtures) |
 | - PHPStan Level 9 (`phpstan.neon`)
 | - 100% `declare(strict_types=1)` coverage
 | - Zero `mixed` return types in public API
