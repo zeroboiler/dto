@@ -404,7 +404,11 @@ final class OpenApiSchemaGenerator
     /**
      * Determine whether the current schema type represents a numeric value.
      *
-     * @param  array<string, mixed>  $propSchema
+     * Used by Min/Max/Between constraint appliers to decide between
+     * `minimum`/`maximum` (numeric) vs `minLength`/`maxLength` (string).
+     *
+     * @param  array<string, mixed>  $propSchema  The current OpenAPI property schema
+     * @return bool True if the schema type is 'integer' or 'number'
      */
     private static function isNumericType(array $propSchema): bool
     {
