@@ -18,6 +18,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *   public readonly string $code;
  *
  * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\StartsWith For prefix-based string validation
+ * @see \ZeroBoiler\DTO\Attributes\EndsWith For suffix-based string validation
+ * @see \ZeroBoiler\DTO\Attributes\In For whitelist-based value validation
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Pattern implements ValidationAttribute

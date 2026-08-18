@@ -14,10 +14,18 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 /**
  * Minimum length/value constraint.
  *
+ * For strings, validates minimum length. For numeric values, validates minimum value.
+ *
  *   #[Min(3)]
  *   public readonly string $name;
  *
+ *   #[Min(0)]
+ *   public readonly int $age;
+ *
  * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Max For the maximum constraint
+ * @see \ZeroBoiler\DTO\Attributes\Between For combined min/max constraint
+ * @see \ZeroBoiler\DTO\Attributes\Size For exact length/value constraint
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Min implements ValidationAttribute

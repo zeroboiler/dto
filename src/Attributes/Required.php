@@ -24,6 +24,9 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
  *   public readonly string $email;
  *
  * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Nullable For allowing null values
+ * @see \ZeroBoiler\DTO\Attributes\Present For requiring field presence without requiring a value
+ * @see \ZeroBoiler\DTO\Attributes\Prohibited For preventing the field entirely
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Required implements ValidationAttribute

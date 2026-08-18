@@ -12,10 +12,15 @@ use Attribute;
 use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 
 /**
- * Validate property as email.
+ * Validate property as email address.
  *
  *   #[Email]
  *   public readonly string $email;
+ *
+ * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
+ * @see \ZeroBoiler\DTO\Attributes\Url For URL validation
+ * @see \ZeroBoiler\DTO\Attributes\Uuid For UUID format validation
+ * @see \ZeroBoiler\DTO\Attributes\Max For constraining email length
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Email implements ValidationAttribute

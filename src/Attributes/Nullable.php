@@ -14,11 +14,22 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 /**
  * Explicitly allow the field to be null.
  *
+ * When applied, the Laravel `nullable` rule is added so that null values
+ * pass validation. This is useful when you want to make the nullability
+ * explicit in the validation layer, even if the PHP type already uses `?`
+ * (e.g., `?string $bio`).
+ *
+ * Note: Properties with `?` type hints are already nullable at the PHP level.
+ * This attribute is primarily for controlling validation behavior — ensuring
+ * that `null` passes Laravel's validator without triggering `required` errors.
+ *
  *   #[Nullable]
  *   public readonly ?string $bio;
  *
  * @see \ZeroBoiler\DTO\Contracts\ValidationAttribute For the validation attribute contract
- * @see \ZeroBoiler\DTO\Attributes\Sometimes For conditional validation
+ * @see \ZeroBoiler\DTO\Attributes\Sometimes For conditional validation (only validate when field is present)
+ * @see \ZeroBoiler\DTO\Attributes\Present For requiring field presence (even if null)
+ * @see \ZeroBoiler\DTO\Attributes\Required For requiring a non-null value
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Nullable implements ValidationAttribute
