@@ -521,6 +521,10 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
      * Check if the DTO has at least one non-empty property.
      *
      * Negation of {@see isEmpty()}.
+     *
+     *   if ($dto->isNotEmpty()) { ... }
+     *
+     * @return bool True if at least one property has a meaningful value
      */
     public function isNotEmpty(): bool
     {

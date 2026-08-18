@@ -107,6 +107,12 @@ final class DtoMetadataResolver
 
     /**
      * Check if a type name is a PHP builtin.
+     *
+     * Used to skip scalar/builtin type names during ValueObject,
+     * BackedEnum, and DTO class detection to avoid false positives.
+     *
+     * @param  string  $typeName  The type name to check
+     * @return bool True if the type is a PHP builtin (int, string, array, etc.)
      */
     private static function isBuiltinType(string $typeName): bool
     {

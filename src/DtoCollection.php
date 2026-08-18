@@ -454,6 +454,10 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
     /**
      * Check if the collection is not empty.
      *
+     * Negation of {@see isEmpty()}.
+     *
+     *   if ($collection->isNotEmpty()) { ... }
+     *
      * @return bool True when the collection contains at least one item
      */
     public function isNotEmpty(): bool
