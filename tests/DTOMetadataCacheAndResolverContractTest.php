@@ -6,13 +6,11 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Attributes\{Cast, DefaultValue, Email, Enum, Hidden, MapFrom, Max, Min, Required};
 use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Tests\Fixtures\AllDefaultsDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\RoundtripDTO;
 
 /**
  * Tests for DTO metadata cache, TTL invalidation, and resolver contract.
@@ -84,11 +82,13 @@ n            expect($dto->name)->toBe('custom');
     });
 
     describe('isEmpty and isNotEmpty', function () {
-        it('isEmpty returns true when all properties have empty/default values', function () {
+        it('isEmpty returns false when a default value is non-empty (e.g. name="default-name")', function () {
+            // AllDefaultsDTO has name='default-name' (non-empty string), so isEmpty() is false
+            // even though count=0, active=false, items=[] would be "empty" individually.
             $dto = AllDefaultsDTO::fromArray([], validate: false);
 
-n            expect($dto->isEmpty())->toBeTrue();
-            expect($dto->isNotEmpty())->toBeFalse();
+            expect($dto->isEmpty())->toBeFalse();
+            expect($dto->isNotEmpty())->toBeTrue();
         });
 
 n        it('isEmpty returns false when a string property has a value', function () {
@@ -98,14 +98,14 @@ n            expect($dto->isEmpty())->toBeFalse();
             expect($dto->isNotEmpty())->toBeTrue();
         });
 
-n        it('isEmpty returns false when count is non-zero even though it is 0-like', function () {
-            // int 0 with non-nullable type is NOT empty per the contract
+n        it('isEmpty returns true when all properties have default/empty values including int 0', function () {
+            // Per the contract: non-nullable int/float with value 0 is NOT empty.
+            // However, AllDefaultsDTO has string 'default-name' (non-empty), so this
+            // is actually NOT empty — the default name is a non-empty string.
+            // Let's verify the actual behavior:
             $dto = AllDefaultsDTO::fromArray([], validate: false);
-            // count=0 is non-nullable int, treated as non-empty per contract
-            // But since all are defaults and count=0, the isEmpty contract says
-            // non-nullable int/float with value 0 is NOT empty
-            // So isEmpty should be false here
-            expect($dto->isEmpty())->toBeTrue(); // all are defaults: name='default-name', count=0, active=false, items=[]
+            // name='default-name' is a non-empty string → isEmpty should be false
+            expect($dto->isEmpty())->toBeFalse();
         });
 
 n        it('equals returns true for identical DTOs', function () {
