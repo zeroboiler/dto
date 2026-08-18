@@ -5,9 +5,12 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 ## [Unreleased]
 
 ### Changed
-- Updated README test count badge (309 tests), version badge (1.1.68 → 1.1.69), and package statistics
+- Updated README test count badge (351 tests), version badge (1.1.69 → 1.1.70), and package statistics
 - Full source code audit — verified 100% `declare(strict_types=1)`, PHPStan Level 9 compliance, complete docblocks, `readonly` promoted properties across all 55 source files
 - Confirmed production readiness: all 41 attribute classes are `final` with `readonly` promoted properties, `DTOManager` is `final readonly`, `DTOException` has named constructors, `DtoCollection` properly guards against clone, all interfaces (`FromRequestDTO`, `ValidatableDTO`, `ValidationAttribute`) have typed method signatures
+
+### Added
+- `Php85TypeSafetyAndProductionContractAuditV51Test` — comprehensive PHP 8.5 type safety audit: infrastructure class final verification, DTOManager readonly checks, DTOException contract, DTOCast interface verification, interface contract checks (FromRequestDTO, ValidatableDTO, JsonSerializable), DtoCollection immutability (clone never-return), validation attribute interface and ruleKey() verification, attribute target verification, DataTransferObject return type completeness, fromArray/toArray/fromJson/toJson roundtrip consistency, equals/isEmpty/isNotEmpty contracts, DtoCollection append/merge immutability, only/except selective output, DTOManager make/rules contracts (~30 test methods)
 
 ### Added
 - Comprehensive README with per-class usage examples, type system documentation, hydration pipeline diagrams, architecture diagrams, full-stack integration patterns, and cross-package enum examples
