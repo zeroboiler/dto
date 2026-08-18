@@ -4,8 +4,11 @@ All notable changes to the ZeroBoiler DTO package will be documented in this fil
 
 ## [Unreleased]
 
+### Added
+- `DtoV52ProductionHardeningAndEdgeCaseAuditTest` — comprehensive production hardening: DataTransferObject fromJson() sequential array rejection, empty array acceptance, invalid JSON rejection, with() always validates and throws on invalid, fromPartialArray() empty data returns defaults, DtoCollection immutability (clone throws, append/merge return new instances), sortBy with property name and callback, chunk/take/skip, unique deduplication, search first match, contains short-circuit, toDictionary key-value extraction, toArrayBy re-keying, ArrayAccess (offsetSet/offsetUnset re-indexing), allValues includes hidden properties, make() empty factory, constructor type rejection, DTOCast serialize/get edge cases (null, invalid JSON, non-array), ProductDTO MapFrom mapping, DTOException __toString and invalidJson, DTO facade accessor, DTOManager readonly class, DTOSServiceProvider structure, metadata cache flush (null=clear all, class=specific), isEmpty() boundary (int 0, float 0.0 valid), RoundtripDTO hidden property exclusion, Cast integer/array edge cases, DtoCollection filter/pluck/pluckKey with null key skipping, JsonSerializable contract, interface contract verification (~65 test methods)
+
 ### Changed
-- Updated README test count badge (351 tests), version badge (1.1.69 → 1.1.70), and package statistics
+- Updated README test count badge (355 tests), version badge (1.1.70 → 1.1.71)
 - Full source code audit — verified 100% `declare(strict_types=1)`, PHPStan Level 9 compliance, complete docblocks, `readonly` promoted properties across all 55 source files
 - Confirmed production readiness: all 41 attribute classes are `final` with `readonly` promoted properties, `DTOManager` is `final readonly`, `DTOException` has named constructors, `DtoCollection` properly guards against clone, all interfaces (`FromRequestDTO`, `ValidatableDTO`, `ValidationAttribute`) have typed method signatures
 

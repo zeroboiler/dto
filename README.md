@@ -3,8 +3,8 @@
 |[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
 |[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
 |[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-| [![Tests: 352](https://img.shields.io/badge/Tests-352-brightgreen)](tests)|
-| [![Version 1.1.70](https://img.shields.io/badge/Version-1.1.70-green)](https://github.com/zeroboiler/dto/releases) |
+| [![Tests: 355](https://img.shields.io/badge/Tests-355-brightgreen)](tests)|
+| [![Version 1.1.71](https://img.shields.io/badge/Version-1.1.71-green)](https://github.com/zeroboiler/dto/releases) |
 |[![Source: 55 files](https://img.shields.io/badge/Source-55%20files-informational)](src)|
 |[![Fixtures: 42 DTOs](https://img.shields.io/badge/Fixtures-42%20DTOs-blue)](tests/Fixtures)|
 |[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
