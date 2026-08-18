@@ -416,6 +416,9 @@ final class OpenApiSchemaGenerator
      * Strip leading and trailing regex delimiters from a pattern string.
      *
      * Handles common delimiters: /, #, ~, and |.
+     *
+     * @param  string  $regex  The regex pattern with delimiters
+     * @return string The pattern without delimiters
      */
     private static function stripRegexDelimiters(string $regex): string
     {
@@ -661,7 +664,8 @@ final class OpenApiSchemaGenerator
     /**
      * Infer the OpenAPI type from a ValueObject's columnType() method.
      *
-     * @param  class-string<ValueObjectContract>  $voClass
+     * @param  class-string<ValueObjectContract>  $voClass  The ValueObject class to infer the type for
+     * @return string OpenAPI type identifier ('string', 'integer', 'number', 'boolean', 'object')
      */
     private static function inferVoType(string $voClass): string
     {
