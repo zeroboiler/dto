@@ -8,26 +8,27 @@ declare(strict_types=1);
 
 use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\DtoCollection;
-use ZeroBoiler\DTO\Tests\Fixtures\SimpleUserDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\NestedAddressDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\UserWithAddressDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\RoundtripDTO;
 
 /**
  * DTO serialization roundtrip contract tests.
  *
  * Verifies that:
- * - fromArray → toArray produces identical output for scalar DTOs
+ * - fromArray → toArray preserves all scalar values (string, int, float, bool)
  * - fromArray → toJson → fromJson produces equivalent DTOs
  * - with() returns a new instance (immutability)
  * - equals() compares by toArray() output
  * - only()/except() produce correct subsets
- * - allValues() includes hidden fields
+ * - Hidden fields are excluded from toArray() but present in allValues()
  * - DtoCollection serialization is consistent
  * - jsonSerialize() matches toArray()
  * - __debugInfo() matches toArray()
  *
  * @see \ZeroBoiler\DTO\DataTransferObject
  * @see \ZeroBoiler\DTO\DtoCollection
+ * @see \ZeroBoiler\DTO\Tests\Fixtures\RoundtripDTO
+ * @see \ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO
  */
 describe('DTO serialization roundtrip contract', function (): void {
     // -----------------------------------------------------------------------
@@ -35,35 +36,33 @@ describe('DTO serialization roundtrip contract', function (): void {
     // -----------------------------------------------------------------------
     describe('Scalar DTO roundtrip', function (): void {
         it('fromArray → toArray preserves all scalar values', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
-n            $arr = $dto->toArray();
+            $arr = $dto->toArray();
 
-n            expect($arr['name'])->toBe('Alice');
-            expect($arr['email'])->toBe('alice@example.com');
+            expect($arr['name'])->toBe('Alice');
             expect($arr['age'])->toBe(30);
+            expect($arr['active'])->toBe(true);
         });
 
-n        it('fromJson → toArray produces equivalent output', function (): void {
-            $json = '{"name":"Bob","email":"bob@example.com","age":25}';
-            $dto = SimpleUserDTO::fromJson($json, validate: false);
+        it('fromJson → toArray produces equivalent output', function (): void {
+            $json = '{"name":"Bob","age":25,"active":true}';
+            $dto = RoundtripDTO::fromJson($json, validate: false);
 
-n            expect($dto->toArray())->toBe([
-                'name' => 'Bob',
-                'email' => 'bob@example.com',
-                'age' => 25,
-            ]);
+            expect($dto->toArray()['name'])->toBe('Bob');
+            expect($dto->toArray()['age'])->toBe(25);
+            expect($dto->toArray()['active'])->toBe(true);
         });
 
         it('toJson produces valid JSON that decodes to toArray output', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Charlie',
-                'email' => 'charlie@example.com',
                 'age' => '35',
+                'active' => 'false',
             ], validate: false);
 
             $json = $dto->toJson();
@@ -73,23 +72,71 @@ n            expect($dto->toArray())->toBe([
         });
 
         it('jsonSerialize() matches toArray()', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Dave',
-                'email' => 'dave@example.com',
                 'age' => '40',
+                'active' => '1',
             ], validate: false);
 
-n            expect($dto->jsonSerialize())->toBe($dto->toArray());
+            expect($dto->jsonSerialize())->toBe($dto->toArray());
         });
 
         it('__debugInfo() matches toArray()', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Eve',
-                'email' => 'eve@example.com',
                 'age' => '28',
+                'active' => '0',
             ], validate: false);
 
-n            expect($dto->__debugInfo())->toBe($dto->toArray());
+            expect($dto->__debugInfo())->toBe($dto->toArray());
+        });
+
+        it('roundtrip preserves defaults and cast results', function (): void {
+            $dto = RoundtripDTO::fromArray([
+                'name' => 'Frank',
+                'age' => '22',
+                'active' => 'true',
+                'score' => '99.5',
+                'tags' => 'a,b,c',
+            ], validate: false);
+
+            $arr = $dto->toArray();
+
+            expect($arr['name'])->toBe('Frank');
+            expect($arr['age'])->toBe(22);
+            expect($arr['active'])->toBe(true);
+            expect($arr['score'])->toBe(99.5);
+            expect($arr['tags'])->toBe(['a', 'b', 'c']);
+            expect($arr['role'])->toBe('user'); // default value
+            expect($arr)->not->toHaveKey('secret'); // Hidden field excluded
+        });
+
+        it('hidden field is excluded from toArray but present in allValues', function (): void {
+            $dto = RoundtripDTO::fromArray([
+                'name' => 'HiddenTest',
+                'age' => '30',
+                'active' => 'true',
+                'secret' => 's3cret',
+            ], validate: false);
+
+            $arr = $dto->toArray();
+            $all = $dto->allValues();
+
+            expect($arr)->not->toHaveKey('secret');
+            expect($all)->toHaveKey('secret');
+            expect($all['secret'])->toBe('s3cret');
+        });
+
+        it('MapFrom maps source key to property correctly', function (): void {
+            $dto = RoundtripDTO::fromArray([
+                'name' => 'MappedTest',
+                'age' => '25',
+                'active' => 'true',
+                'source_bio' => 'Hello World',
+            ], validate: false);
+
+            expect($dto->bio)->toBe('Hello World');
+            expect($dto->toArray()['bio'])->toBe('Hello World');
         });
     });
 
@@ -98,10 +145,10 @@ n            expect($dto->__debugInfo())->toBe($dto->toArray());
     // -----------------------------------------------------------------------
     describe('Immutability contract', function (): void {
         it('with() returns a new instance', function (): void {
-            $original = SimpleUserDTO::fromArray([
+            $original = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             $modified = $original->with(['name' => 'Bob']);
@@ -112,16 +159,31 @@ n            expect($dto->__debugInfo())->toBe($dto->toArray());
         });
 
         it('with() preserves unchanged fields', function (): void {
-            $original = SimpleUserDTO::fromArray([
+            $original = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             $modified = $original->with(['name' => 'Bob']);
 
-            expect($modified->email)->toBe('alice@example.com');
             expect($modified->age)->toBe(30);
+            expect($modified->active)->toBe(true);
+            expect($modified->role)->toBe('user'); // default preserved
+        });
+
+        it('with() handles multiple fields at once', function (): void {
+            $original = RoundtripDTO::fromArray([
+                'name' => 'Alice',
+                'age' => '30',
+                'active' => 'true',
+            ], validate: false);
+
+            $modified = $original->with(['name' => 'Bob', 'age' => '25']);
+
+            expect($modified->name)->toBe('Bob');
+            expect($modified->age)->toBe(25);
+            expect($modified->active)->toBe(true); // unchanged
         });
     });
 
@@ -130,24 +192,34 @@ n            expect($dto->__debugInfo())->toBe($dto->toArray());
     // -----------------------------------------------------------------------
     describe('Equality contract', function (): void {
         it('equals() returns true for identical data', function (): void {
-            $data = ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'];
-            $a = SimpleUserDTO::fromArray($data, validate: false);
-            $b = SimpleUserDTO::fromArray($data, validate: false);
+            $data = ['name' => 'Alice', 'age' => '30', 'active' => 'true'];
+            $a = RoundtripDTO::fromArray($data, validate: false);
+            $b = RoundtripDTO::fromArray($data, validate: false);
 
             expect($a->equals($b))->toBeTrue();
         });
 
         it('equals() returns false for different data', function (): void {
-            $a = SimpleUserDTO::fromArray(
-                ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+            $a = RoundtripDTO::fromArray(
+                ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                 validate: false,
             );
-            $b = SimpleUserDTO::fromArray(
-                ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+            $b = RoundtripDTO::fromArray(
+                ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                 validate: false,
             );
 
             expect($a->equals($b))->toBeFalse();
+        });
+
+        it('equals() returns false for different types', function (): void {
+            $dto = RoundtripDTO::fromArray(
+                ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
+                validate: false,
+            );
+            $minimal = MinimalDTO::fromArray(['name' => 'Alice', 'value' => 'test'], validate: false);
+
+            expect($dto->equals($minimal))->toBeFalse();
         });
     });
 
@@ -156,81 +228,83 @@ n            expect($dto->__debugInfo())->toBe($dto->toArray());
     // -----------------------------------------------------------------------
     describe('Selective output', function (): void {
         it('only() returns specified fields', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
-            $result = $dto->only('name', 'email');
+            $result = $dto->only('name', 'age');
 
-n            expect($result)->toHaveKeys(['name', 'email']);
-            expect($result)->not->toHaveKey('age');
+            expect($result)->toHaveKeys(['name', 'age']);
+            expect($result)->not->toHaveKey('active');
         });
 
         it('only() with single string returns one field', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
-            $result = $dto->only('email');
+            $result = $dto->only('name');
 
-n            expect($result)->toHaveCount(1);
-            expect($result['email'])->toBe('alice@example.com');
+            expect($result)->toHaveCount(1);
+            expect($result['name'])->toBe('Alice');
         });
 
         it('except() excludes specified fields', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
-            $result = $dto->except('age');
+            $result = $dto->except('active', 'score');
 
-            expect($result)->toHaveKeys(['name', 'email']);
-            expect($result)->not->toHaveKey('age');
+            expect($result)->toHaveKeys(['name', 'age']);
+            expect($result)->not->toHaveKey('active');
         });
 
         it('except() with single string excludes one field', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             $result = $dto->except('name');
 
             expect($result)->not->toHaveKey('name');
-            expect($result)->toHaveKey('email');
             expect($result)->toHaveKey('age');
+            expect($result)->toHaveKey('active');
         });
 
         it('only() ignores non-existent keys silently', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             $result = $dto->only('name', 'nonexistent');
 
-n            expect($result)->toHaveCount(1);
+            expect($result)->toHaveCount(1);
             expect($result)->toHaveKey('name');
         });
 
         it('except() ignores non-existent keys silently', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             $result = $dto->except('nonexistent');
 
-            expect($result)->toHaveCount(3);
+            // Should have name, age, active, score, tags, bio, role (all visible fields)
+            expect($result)->toHaveKey('name');
+            expect($result)->toHaveKey('age');
         });
     });
 
@@ -238,24 +312,21 @@ n            expect($result)->toHaveCount(1);
     // State checks
     // -----------------------------------------------------------------------
     describe('State checks', function (): void {
-        it('isEmpty() returns true when all properties are empty/default', function (): void {
-            // Create a DTO with all default/empty values
-            DataTransferObject::flushMetadataCache(SimpleUserDTO::class);
-            $dto = SimpleUserDTO::fromPartialArray([], validate: false);
-
-            // At minimum, a DTO with defaults should be checkable
-            expect(is_bool($dto->isEmpty()))->toBeTrue();
-        });
-
-        it('isNotEmpty() is the inverse of isEmpty()', function (): void {
-            $dto = SimpleUserDTO::fromArray([
+        it('isNotEmpty() returns true for populated DTO', function (): void {
+            $dto = RoundtripDTO::fromArray([
                 'name' => 'Alice',
-                'email' => 'alice@example.com',
                 'age' => '30',
+                'active' => 'true',
             ], validate: false);
 
             expect($dto->isNotEmpty())->toBeTrue();
             expect($dto->isEmpty())->toBeFalse();
+        });
+
+        it('MinimalDTO with required fields is not empty', function (): void {
+            $dto = MinimalDTO::fromArray(['name' => 'test', 'value' => 'ok'], validate: false);
+
+            expect($dto->isNotEmpty())->toBeTrue();
         });
     });
 
@@ -264,28 +335,27 @@ n            expect($result)->toHaveCount(1);
     // -----------------------------------------------------------------------
     describe('DtoCollection serialization', function (): void {
         it('toArray() serializes all DTOs', function (): void {
-            $dtoList = [];
             $dataList = [
-                ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
-                ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+                ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
+                ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
             ];
-
-            foreach ($dataList as $data) {
-                $dtoList[] = SimpleUserDTO::fromArray($data, validate: false);
-            }
+            $dtoList = array_map(
+                fn (array $d): RoundtripDTO => RoundtripDTO::fromArray($d, validate: false),
+                $dataList,
+            );
 
             $col = new DtoCollection($dtoList);
             $arr = $col->toArray();
 
-n            expect($arr)->toHaveCount(2);
+            expect($arr)->toHaveCount(2);
             expect($arr[0]['name'])->toBe('Alice');
             expect($arr[1]['name'])->toBe('Bob');
         });
 
         it('jsonSerialize() matches toArray()', function (): void {
             $dtoList = [
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
             ];
@@ -298,8 +368,8 @@ n            expect($arr)->toHaveCount(2);
         it('count() returns correct item count', function (): void {
             $dtoList = [];
             for ($i = 0; $i < 5; $i++) {
-                $dtoList[] = SimpleUserDTO::fromArray(
-                    ['name' => "User{$i}", 'email' => "user{$i}@example.com", 'age' => 20 + $i],
+                $dtoList[] = RoundtripDTO::fromArray(
+                    ['name' => "User{$i}", 'age' => (string) (20 + $i), 'active' => 'true'],
                     validate: false,
                 );
             }
@@ -313,8 +383,8 @@ n            expect($arr)->toHaveCount(2);
         it('isEmpty() and isNotEmpty() work correctly', function (): void {
             $empty = new DtoCollection([]);
             $nonEmpty = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
             ]);
@@ -327,16 +397,16 @@ n            expect($arr)->toHaveCount(2);
 
         it('first() and last() return correct items', function (): void {
             $dtoList = [
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                     validate: false,
                 ),
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Charlie', 'email' => 'charlie@example.com', 'age' => '35'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Charlie', 'age' => '35', 'active' => 'true'],
                     validate: false,
                 ),
             ];
@@ -349,14 +419,14 @@ n            expect($arr)->toHaveCount(2);
 
         it('push() mutates in place and returns self', function (): void {
             $col = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
             ]);
 
-            $item = SimpleUserDTO::fromArray(
-                ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+            $item = RoundtripDTO::fromArray(
+                ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                 validate: false,
             );
 
@@ -369,14 +439,14 @@ n            expect($arr)->toHaveCount(2);
 
         it('append() returns a new collection without mutating', function (): void {
             $original = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
             ]);
 
-            $item = SimpleUserDTO::fromArray(
-                ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+            $item = RoundtripDTO::fromArray(
+                ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                 validate: false,
             );
 
@@ -389,34 +459,34 @@ n            expect($arr)->toHaveCount(2);
 
         it('map() returns plain array with correct types', function (): void {
             $col = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                     validate: false,
                 ),
             ]);
 
-            $names = $col->map(fn (SimpleUserDTO $dto): string => $dto->name);
+            $names = $col->map(fn (RoundtripDTO $dto): string => $dto->name);
 
             expect($names)->toEqual(['Alice', 'Bob']);
         });
 
         it('filter() returns new collection with matching items', function (): void {
             $col = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                     validate: false,
                 ),
             ]);
 
-            $filtered = $col->filter(fn (SimpleUserDTO $dto): bool => $dto->age >= 30);
+            $filtered = $col->filter(fn (RoundtripDTO $dto): bool => $dto->age >= 30);
 
             expect($filtered->count())->toBe(1);
             expect($filtered->first()->name)->toBe('Alice');
@@ -424,19 +494,19 @@ n            expect($arr)->toHaveCount(2);
 
         it('pluck() extracts a single property from all DTOs', function (): void {
             $col = new DtoCollection([
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Alice', 'email' => 'alice@example.com', 'age' => '30'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Alice', 'age' => '30', 'active' => 'true'],
                     validate: false,
                 ),
-                SimpleUserDTO::fromArray(
-                    ['name' => 'Bob', 'email' => 'bob@example.com', 'age' => '25'],
+                RoundtripDTO::fromArray(
+                    ['name' => 'Bob', 'age' => '25', 'active' => 'false'],
                     validate: false,
                 ),
             ]);
 
-            $emails = $col->pluck('email');
+            $names = $col->pluck('name');
 
-            expect($emails)->toEqual(['alice@example.com', 'bob@example.com']);
+            expect($names)->toEqual(['Alice', 'Bob']);
         });
     });
 
@@ -445,7 +515,7 @@ n            expect($arr)->toHaveCount(2);
     // -----------------------------------------------------------------------
     describe('Validation rules contract', function (): void {
         it('rules() returns an array keyed by field name', function (): void {
-            $rules = SimpleUserDTO::rules();
+            $rules = RoundtripDTO::rules();
 
             expect($rules)->toBeArray();
 
@@ -455,9 +525,15 @@ n            expect($arr)->toHaveCount(2);
             }
         });
 
+        it('rules() contains expected fields', function (): void {
+            $rules = RoundtripDTO::rules();
+
+            expect($rules)->toHaveKeys(['name', 'age', 'active']);
+        });
+
         it('rulesFor() returns the same as rules() by default', function (): void {
-            expect(SimpleUserDTO::rulesFor('create'))->toBe(SimpleUserDTO::rules());
-            expect(SimpleUserDTO::rulesFor('update'))->toBe(SimpleUserDTO::rules());
+            expect(RoundtripDTO::rulesFor('create'))->toBe(RoundtripDTO::rules());
+            expect(RoundtripDTO::rulesFor('update'))->toBe(RoundtripDTO::rules());
         });
     });
 
@@ -466,7 +542,8 @@ n            expect($arr)->toHaveCount(2);
     // -----------------------------------------------------------------------
     describe('Partial update contract', function (): void {
         it('fromPartialArray hydrates only provided fields', function (): void {
-            $dto = SimpleUserDTO::fromPartialArray(
+            DataTransferObject::flushMetadataCache(RoundtripDTO::class);
+            $dto = RoundtripDTO::fromPartialArray(
                 ['name' => 'Updated Name'],
                 validate: false,
             );
@@ -475,15 +552,34 @@ n            expect($arr)->toHaveCount(2);
         });
 
         it('fromPartialArray uses defaults for missing fields', function (): void {
-            DataTransferObject::flushMetadataCache(SimpleUserDTO::class);
-            $dto = SimpleUserDTO::fromPartialArray([], validate: false);
+            DataTransferObject::flushMetadataCache(RoundtripDTO::class);
+            $dto = RoundtripDTO::fromPartialArray([], validate: false);
 
-            // Should have all properties set (to defaults or empty values)
             $arr = $dto->allValues();
 
-            foreach (SimpleUserDTO::rules() as $field => $_rules) {
+            // Should have all properties set (to defaults or null)
+            foreach (RoundtripDTO::rules() as $field => $_rules) {
                 expect($arr)->toHaveKey($field);
             }
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // MinimalDTO edge cases
+    // -----------------------------------------------------------------------
+    describe('MinimalDTO basic contract', function (): void {
+        it('fromArray → toArray roundtrip for minimal DTO', function (): void {
+            $dto = MinimalDTO::fromArray(['name' => 'test', 'value' => 'ok'], validate: false);
+
+            expect($dto->toArray())->toBe(['name' => 'test', 'value' => 'ok']);
+        });
+
+        it('equals() works for minimal DTO', function (): void {
+            $data = ['name' => 'test', 'value' => 'ok'];
+            $a = MinimalDTO::fromArray($data, validate: false);
+            $b = MinimalDTO::fromArray($data, validate: false);
+
+            expect($a->equals($b))->toBeTrue();
         });
     });
 });
