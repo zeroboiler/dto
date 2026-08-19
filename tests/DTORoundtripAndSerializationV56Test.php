@@ -10,6 +10,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\Exceptions\DTOException;
 use ZeroBoiler\DTO\Tests\Fixtures\AddressDTO;
+use ZeroBoiler\DTO\Tests\Fixtures\AllDefaultsDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CollectionItemDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\CreateUserDTO;
 use ZeroBoiler\DTO\Tests\Fixtures\DeepNestedDTO;
@@ -106,11 +107,12 @@ describe('DTO fromJson edge cases', function (): void {
             ->toThrow(DTOException::class);
     });
 
-    it('accepts empty JSON object', function (): void {
-        // All fields have defaults or are nullable
-        $dto = ProductDTO::fromJson('{}', validate: false);
+    it('accepts empty JSON object for all-defaults DTO', function (): void {
+        // AllDefaultsDTO has no required fields — all have defaults
+        $dto = AllDefaultsDTO::fromJson('{}', validate: false);
 
-        expect($dto)->toBeInstanceOf(ProductDTO::class);
+        expect($dto)->toBeInstanceOf(AllDefaultsDTO::class);
+        expect($dto->name)->toBe('default-name');
     });
 
     it('throws DTOException (not JsonException) on invalid JSON', function (): void {
