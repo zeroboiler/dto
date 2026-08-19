@@ -1,13 +1,13 @@
 # ZeroBoiler DTO
 
-|[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
-|[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
-|[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
-| [![Tests: 323 files](https://img.shields.io/badge/Tests-323%20files-brightgreen)](tests)|
-| [![Version 1.1.74](https://img.shields.io/badge/Version-1.1.74-green)](https://github.com/zeroboiler/dto/releases) |
-|[![Source: 55 files](https://img.shields.io/badge/Source-55%20files-informational)](src)|
-|[![Fixtures: 42 DTOs](https://img.shields.io/badge/Fixtures-42%20DTOs-blue)](tests/Fixtures)|
-|[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
+[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-777BB4)](https://php.net)
+[![Laravel 13+](https://img.shields.io/badge/Laravel-13%2B-FF2D20)](https://laravel.com)
+[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-blue)](https://phpstan.org)
+[![Tests: 323 files](https://img.shields.io/badge/Tests-323%20files-brightgreen)](tests)
+[![Version 1.1.74](https://img.shields.io/badge/Version-1.1.74-green)](https://github.com/zeroboiler/dto/releases)
+[![Source: 55 files](https://img.shields.io/badge/Source-55%20files-informational)](src)
+[![Fixtures: 42 DTOs](https://img.shields.io/badge/Fixtures-42%20DTOs-blue)](tests/Fixtures)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-yellow)]()
 
 Zero-boilerplate type-safe DTO system for Laravel — attribute-based validation,
 auto-hydration, serialization, request mapping, and OpenAPI schema generation.
@@ -23,6 +23,7 @@ auto-hydration, serialization, request mapping, and OpenAPI schema generation.
   - [Property Types](#property-types)
   - [Hydration Pipeline](#hydration-pipeline)
   - [Architecture](#architecture)
+  - [Resolved Metadata Shape](#resolved-metadata-shape)
 - [Features](#features)
 - [Usage](#usage)
   - [Basic DTO](#basic-dto)
@@ -424,6 +425,44 @@ Validation runs **before** hydration to reject invalid data early.
 │  └─ ArrayAccess + IteratorAggregate             │
 └───────────────────────────────────────────────┘
 ```
+
+### Resolved Metadata Shape
+
+The metadata resolved by `DtoMetadataResolver` for each DTO class has this shape.
+This is the same structure cached by `DataTransferObject::resolveMetadata()`:
+
+```php
+// @phpstan-type DtoResolvedMetadata
+[
+    'properties' => [                // Per-property metadata, keyed by property name
+        'email' => [
+            'map_from'           => null,                    // string|null — #[MapFrom] key
+            'default'            => null,                    // mixed — constructor default value
+            'has_default'        => false,                   // bool — whether a default exists
+            'cast'               => null,                    // string|null — #[Cast] type
+            'hidden'             => false,                   // bool — #[Hidden] flag
+            'nullable'           => false,                   // bool — property accepts null
+            'value_object_class' => null,                    // class-string<ValueObject>|null
+            'dto_class'          => null,                    // class-string<static>|null
+            'enum_class'         => null,                    // class-string<BackedEnum>|null
+            'nested_array_class' => null,                    // class-string<static>|null
+            'collection_class'   => null,                    // class-string<static>|null
+        ],
+        // ... one entry per constructor parameter
+    ],
+    'rules'    => [                    // Laravel validation rules per field
+        'email' => ['required', 'email'],
+        'name'  => ['required', 'min:2', 'max:50'],
+    ],
+    'messages' => [                   // Custom validation messages per field
+        'email.email' => 'Custom email message',
+    ],
+]
+```
+
+Type detection is automatic — `DtoMetadataResolver` inspects the constructor parameter's
+reflection type to detect `ValueObject`, `BackedEnum`, nested `DataTransferObject`,
+and `DtoCollection`/`NestedArray` relationships without any manual configuration.
 
 ## Features
 
