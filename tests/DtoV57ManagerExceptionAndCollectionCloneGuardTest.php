@@ -28,8 +28,7 @@ use ZeroBoiler\DTO\DataTransferObject;
 use ZeroBoiler\DTO\DtoCollection;
 use ZeroBoiler\DTO\DTOManager;
 use ZeroBoiler\DTO\Exceptions\DTOException;
-use ZeroBoiler\DTO\Tests\Fixtures\CollectionItemDTO;
-use ZeroBoiler\DTO\Tests\Fixtures\MinimalDTO;
+
 
 // ── Inline test DTOs ──────────────────────────────────
 
