@@ -6,20 +6,10 @@
 
 declare(strict_types=1);
 
-use ZeroBoiler\DTO\Attributes\Cast;
-use ZeroBoiler\DTO\Attributes\DefaultValue;
-use ZeroBoiler\DTO\Attributes\Hidden;
-use ZeroBoiler\DTO\Attributes\MapFrom;
-use ZeroBoiler\DTO\Attributes\Max;
-use ZeroBoiler\DTO\Attributes\Min;
-use ZeroBoiler\DTO\Attributes\Nullable;
-use ZeroBoiler\DTO\Attributes\Required;
-use ZeroBoiler\DTO\DtoCollection;
-use ZeroBoiler\DTO\DataTransferObject;
 
 // ─── Test Fixtures ───────────────────────────────────────────────────────────
 
-namespace ZeroBoiler\DTO\Tests\DtoEdgeCaseFixture;
+namespace ZeroBoiler\DTO\Tests\DtoEdgeCaseFixture {
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class Label
@@ -129,7 +119,19 @@ class ValidatedDTO extends \ZeroBoiler\DTO\DataTransferObject
     ) {}
 }
 
-namespace ZeroBoiler\DTO\Tests;
+}
+
+namespace ZeroBoiler\DTO\Tests {
+use ZeroBoiler\DTO\Attributes\Cast;
+use ZeroBoiler\DTO\Attributes\DefaultValue;
+use ZeroBoiler\DTO\Attributes\Hidden;
+use ZeroBoiler\DTO\Attributes\MapFrom;
+use ZeroBoiler\DTO\Attributes\Max;
+use ZeroBoiler\DTO\Attributes\Min;
+use ZeroBoiler\DTO\Attributes\Nullable;
+use ZeroBoiler\DTO\Attributes\Required;
+use ZeroBoiler\DTO\DtoCollection;
+use ZeroBoiler\DTO\DataTransferObject;
 
 // ─── Test Suite ───────────────────────────────────────────────────────────────
 
@@ -439,3 +441,4 @@ describe('DTO Edge Cases — Hydration & Serialization', function () {
         });
     });
 });
+}
