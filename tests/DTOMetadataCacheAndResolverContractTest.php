@@ -26,32 +26,32 @@ describe('DTO metadata cache and resolver contract', function () {
             // Resolve metadata for a DTO (populates cache)
             MinimalDTO::rules();
 
-n            // Flush and re-resolve — should work without error
+            // Flush and re-resolve — should work without error
             MinimalDTO::flushMetadataCache();
             $rules = MinimalDTO::rules();
 
-n            expect($rules)->toBeArray();
+            expect($rules)->toBeArray();
         });
 
-n        it('flushMetadataCache with class argument clears only that class', function () {
+        it('flushMetadataCache with class argument clears only that class', function () {
             MinimalDTO::rules();
             AllDefaultsDTO::rules();
 
-n            MinimalDTO::flushMetadataCache(MinimalDTO::class);
+            MinimalDTO::flushMetadataCache(MinimalDTO::class);
 
-n            // Re-resolving should work fine (cache was cleared, will re-resolve)
+            // Re-resolving should work fine (cache was cleared, will re-resolve)
             $rules = MinimalDTO::rules();
             expect($rules)->toBeArray();
         });
 
-n        it('setMetadataCacheTtl accepts float values', function () {
+        it('setMetadataCacheTtl accepts float values', function () {
             MinimalDTO::setMetadataCacheTtl(0.5);
             MinimalDTO::flushMetadataCache();
             $rules = MinimalDTO::rules();
 
-n            expect($rules)->toBeArray();
+            expect($rules)->toBeArray();
 
-n            // Reset to 0 for other tests
+            // Reset to 0 for other tests
             MinimalDTO::setMetadataCacheTtl(0.0);
         });
     });
@@ -60,23 +60,23 @@ n            // Reset to 0 for other tests
         it('fromPartialArray uses constructor defaults for missing fields', function () {
             $dto = AllDefaultsDTO::fromPartialArray([]);
 
-n            expect($dto->name)->toBe('default-name');
+            expect($dto->name)->toBe('default-name');
             expect($dto->count)->toBe(0);
             expect($dto->active)->toBeFalse();
             expect($dto->items)->toBe([]);
         });
 
-n        it('fromArray uses constructor defaults for missing fields', function () {
+        it('fromArray uses constructor defaults for missing fields', function () {
             $dto = AllDefaultsDTO::fromArray([], validate: false);
 
-n            expect($dto->name)->toBe('default-name');
+            expect($dto->name)->toBe('default-name');
             expect($dto->count)->toBe(0);
         });
 
-n        it('fromPartialArray with explicit value overrides default', function () {
+        it('fromPartialArray with explicit value overrides default', function () {
             $dto = AllDefaultsDTO::fromPartialArray(['name' => 'custom']);
 
-n            expect($dto->name)->toBe('custom');
+            expect($dto->name)->toBe('custom');
             expect($dto->count)->toBe(0); // still default
         });
     });
@@ -91,14 +91,14 @@ n            expect($dto->name)->toBe('custom');
             expect($dto->isNotEmpty())->toBeTrue();
         });
 
-n        it('isEmpty returns false when a string property has a value', function () {
+        it('isEmpty returns false when a string property has a value', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->isEmpty())->toBeFalse();
+            expect($dto->isEmpty())->toBeFalse();
             expect($dto->isNotEmpty())->toBeTrue();
         });
 
-n        it('isEmpty returns true when all properties have default/empty values including int 0', function () {
+        it('isEmpty returns true when all properties have default/empty values including int 0', function () {
             // Per the contract: non-nullable int/float with value 0 is NOT empty.
             // However, AllDefaultsDTO has string 'default-name' (non-empty), so this
             // is actually NOT empty — the default name is a non-empty string.
@@ -108,18 +108,18 @@ n        it('isEmpty returns true when all properties have default/empty values 
             expect($dto->isEmpty())->toBeFalse();
         });
 
-n        it('equals returns true for identical DTOs', function () {
+        it('equals returns true for identical DTOs', function () {
             $a = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $b = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($a->equals($b))->toBeTrue();
+            expect($a->equals($b))->toBeTrue();
         });
 
-n        it('equals returns false for different DTOs', function () {
+        it('equals returns false for different DTOs', function () {
             $a = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $b = AllDefaultsDTO::fromArray(['name' => 'Bob'], validate: false);
 
-n            expect($a->equals($b))->toBeFalse();
+            expect($a->equals($b))->toBeFalse();
         });
     });
 
@@ -127,26 +127,26 @@ n            expect($a->equals($b))->toBeFalse();
         it('excludes hidden fields from toArray', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->toArray())->not->toHaveKey('token');
+            expect($dto->toArray())->not->toHaveKey('token');
         });
 
-n        it('includes hidden fields in allValues', function () {
+        it('includes hidden fields in allValues', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->allValues())->toHaveKey('token');
+            expect($dto->allValues())->toHaveKey('token');
         });
 
         it('toJson excludes hidden fields', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            $json = $dto->toJson();
+            $json = $dto->toJson();
             expect($json)->not->toContain('token');
         });
 
-n        it('__debugInfo excludes hidden fields', function () {
+        it('__debugInfo excludes hidden fields', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            $debug = $dto->__debugInfo();
+            $debug = $dto->__debugInfo();
             expect($debug)->not->toHaveKey('token');
         });
     });
@@ -156,23 +156,23 @@ n            $debug = $dto->__debugInfo();
             $original = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $updated = $original->with(['name' => 'Bob']);
 
-n            expect($original->name)->toBe('Alice');
+            expect($original->name)->toBe('Alice');
             expect($updated->name)->toBe('Bob');
             expect($original)->not->toBe($updated);
         });
 
-n        it('with() result toArray contains updated value', function () {
+        it('with() result toArray contains updated value', function () {
             $original = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $updated = $original->with(['name' => 'Bob']);
 
-n            expect($updated->toArray()['name'])->toBe('Bob');
+            expect($updated->toArray()['name'])->toBe('Bob');
         });
 
-n        it('with() preserves hidden fields in allValues merge', function () {
+        it('with() preserves hidden fields in allValues merge', function () {
             $original = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $updated = $original->with(['name' => 'Bob']);
 
-n            // allValues() is used internally by with() for the merge
+            // allValues() is used internally by with() for the merge
             // token should still be present in the new DTO
             expect($updated->allValues())->toHaveKey('token');
         });
@@ -182,26 +182,26 @@ n            // allValues() is used internally by with() for the merge
         it('only returns specified keys', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->only('name'))->toBe(['name' => 'Alice']);
+            expect($dto->only('name'))->toBe(['name' => 'Alice']);
         });
 
-n        it('except returns all keys except specified', function () {
+        it('except returns all keys except specified', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            $result = $dto->except('name');
+            $result = $dto->except('name');
             expect($result)->not->toHaveKey('name');
         });
 
-n        it('only with string returns single-key array', function () {
+        it('only with string returns single-key array', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->only('name'))->toHaveCount(1);
+            expect($dto->only('name'))->toHaveCount(1);
         });
 
-n        it('only ignores non-existent keys silently', function () {
+        it('only ignores non-existent keys silently', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->only('name', 'nonexistent'))->toBe(['name' => 'Alice']);
+            expect($dto->only('name', 'nonexistent'))->toBe(['name' => 'Alice']);
         });
     });
 
@@ -211,15 +211,15 @@ n            expect($dto->only('name', 'nonexistent'))->toBe(['name' => 'Alice']
                 ->toThrow(\ZeroBoiler\DTO\Exceptions\DTOException::class);
         });
 
-n        it('rejects invalid JSON with meaningful error', function () {
+        it('rejects invalid JSON with meaningful error', function () {
             expect(fn () => AllDefaultsDTO::fromJson('{invalid json}'))
                 ->toThrow(\ZeroBoiler\DTO\Exceptions\DTOException::class);
         });
 
-n        it('accepts empty object JSON', function () {
+        it('accepts empty object JSON', function () {
             $dto = AllDefaultsDTO::fromJson('{}', validate: false);
 
-n            expect($dto)->toBeInstanceOf(AllDefaultsDTO::class);
+            expect($dto)->toBeInstanceOf(AllDefaultsDTO::class);
         });
     });
 
@@ -228,7 +228,7 @@ n            expect($dto)->toBeInstanceOf(AllDefaultsDTO::class);
             $rules = AllDefaultsDTO::rules();
             $rulesFor = AllDefaultsDTO::rulesFor('create');
 
-n            expect($rules)->toBe($rulesFor);
+            expect($rules)->toBe($rulesFor);
         });
 
         it('returns same rules for any action by default', function () {
@@ -245,14 +245,14 @@ n            expect($rules)->toBe($rulesFor);
         it('jsonSerialize returns the same as toArray', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
 
-n            expect($dto->jsonSerialize())->toBe($dto->toArray());
+            expect($dto->jsonSerialize())->toBe($dto->toArray());
         });
 
         it('can be json_encoded directly', function () {
             $dto = AllDefaultsDTO::fromArray(['name' => 'Alice'], validate: false);
             $json = json_encode($dto);
 
-n            expect($json)->toBeJson();
+            expect($json)->toBeJson();
             expect($json)->toContain('Alice');
         });
     });
@@ -261,13 +261,13 @@ n            expect($json)->toBeJson();
         it('generates email rule from Email attribute', function () {
             $rules = CreateUserDTO::rules();
 
-n            expect($rules['email'])->toContain('email');
+            expect($rules['email'])->toContain('email');
         });
 
         it('generates required rule from Required attribute', function () {
             $rules = CreateUserDTO::rules();
 
-n            expect($rules['email'])->toContain('required');
+            expect($rules['email'])->toContain('required');
         });
     });
 
@@ -490,13 +490,13 @@ n            expect($rules['email'])->toContain('required');
         it('DTO::rules returns array', function () {
             $rules = \ZeroBoiler\DTO\Facades\DTO::rules(AllDefaultsDTO::class);
 
-n            expect($rules)->toBeArray();
+            expect($rules)->toBeArray();
         });
 
         it('DTO::rulesFor returns array', function () {
             $rules = \ZeroBoiler\DTO\Facades\DTO::rulesFor(AllDefaultsDTO::class, 'create');
 
-n            expect($rules)->toBeArray();
+            expect($rules)->toBeArray();
         });
     });
 
