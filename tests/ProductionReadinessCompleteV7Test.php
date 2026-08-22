@@ -59,14 +59,14 @@ final class ProductionReadyDTO
         #[Nullable]
         #[MapFrom('display_name')]
         #[Max(100)]
-        public readonly ?string $name = null,
+        public ?string $name = null,
 
         #[Boolean]
         #[DefaultValue(false)]
-        public readonly bool $active = false,
+        public bool $active = false,
 
         #[Hidden]
-        public readonly string $secret = '',
+        public string $secret = '',
 
         #[ArrayRule(min: 1, max: 10)]
         public readonly array $tags = [],
@@ -96,10 +96,10 @@ final class ConditionalValidationDTO
         public readonly string $type,
 
         #[RequiredIf(field: 'type', value: 'card')]
-        public readonly ?string $cardNumber = null,
+        public ?string $cardNumber = null,
 
         #[RequiredIf(field: 'type', value: 'bank')]
-        public readonly ?string $bankAccount = null,
+        public ?string $bankAccount = null,
     ) {}
 }
 
@@ -112,13 +112,13 @@ final class EmptyStateDTO
 
     public function __construct(
         #[DefaultValue(null)]
-        public readonly ?string $name = null,
+        public ?string $name = null,
 
         #[DefaultValue([])]
-        public readonly array $tags = [],
+        public array $tags = [],
 
         #[DefaultValue(false)]
-        public readonly bool $active = false,
+        public bool $active = false,
 
         #[DefaultValue('')]
         public readonly string $role = '',

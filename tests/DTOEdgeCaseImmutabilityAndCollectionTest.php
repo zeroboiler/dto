@@ -33,10 +33,10 @@ class EdgeCaseAddressDTO extends DataTransferObject
         public readonly string $city,
 
         #[MapFrom('zip_code')]
-        public readonly ?string $zip = null,
+        public ?string $zip = null,
 
         #[Hidden]
-        public readonly ?string $internalNotes = null,
+        public ?string $internalNotes = null,
     ) {}
 }
 
@@ -47,7 +47,7 @@ class EdgeCaseProfileDTO extends DataTransferObject
         public readonly string $email,
 
         #[MapFrom('display_name')]
-        public readonly ?string $displayName = null,
+        public ?string $displayName = null,
 
         #[DefaultValue(false)]
         public readonly bool $isActive = false,

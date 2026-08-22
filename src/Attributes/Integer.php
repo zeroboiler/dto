@@ -33,7 +33,7 @@ final class Integer implements ValidationAttribute
      *                              Format: 'The :attribute must be an integer.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

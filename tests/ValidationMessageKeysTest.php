@@ -158,7 +158,7 @@ describe('Issue #9: Message key correctness with custom messages', function (): 
         {
             public function __construct(
                 #[Pattern('/^[A-Z]{3}$/', message: 'Code must be 3 uppercase letters')]
-                public readonly string $code = '',
+                public string $code = '',
             ) {}
         };
 
@@ -172,8 +172,8 @@ describe('Issue #9: Message key correctness with custom messages', function (): 
         {
             public function __construct(
                 #[RequiredWith(['email'], message: 'Username required with email')]
-                public readonly ?string $username = null,
-                public readonly ?string $email = null,
+                public ?string $username = null,
+                public ?string $email = null,
             ) {}
         };
 

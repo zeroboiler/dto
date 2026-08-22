@@ -39,7 +39,7 @@ final class Nullable implements ValidationAttribute
      *                              Format: 'The :attribute may be null.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

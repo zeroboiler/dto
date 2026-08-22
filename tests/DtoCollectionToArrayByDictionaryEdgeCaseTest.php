@@ -31,9 +31,9 @@ class IdNameDto extends DataTransferObject
 class NullableKeyDto extends DataTransferObject
 {
     public function __construct(
-        public readonly ?int $id = null,
+        public ?int $id = null,
         #[Required]
-        public readonly string $name = '',
+        public string $name = '',
     ) {}
 }
 

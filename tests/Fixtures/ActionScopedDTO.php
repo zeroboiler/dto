@@ -32,10 +32,10 @@ final class ActionScopedDTO extends DataTransferObject implements ValidatableDTO
         public readonly string $password,
 
         #[Nullable]
-        public readonly ?string $name = null,
+        public ?string $name = null,
 
         #[DefaultValue('user')]
-        public readonly string $role = 'user',
+        public string $role = 'user',
     ) {}
 
     /**

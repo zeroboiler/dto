@@ -34,7 +34,7 @@ final class Boolean implements ValidationAttribute
      *                              Format: 'The :attribute field must be true or false.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

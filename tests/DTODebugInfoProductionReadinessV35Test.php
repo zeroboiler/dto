@@ -13,8 +13,8 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DataTransferObject __debugInfo returns toArray output', function (): void {
         $dto = new class(['name' => 'Alice', 'age' => 30]) extends DataTransferObject {
             public function __construct(
-                public readonly string $name = '',
-                public readonly int $age = 0,
+                public string $name = '',
+                public int $age = 0,
             ) {}
         };
 
@@ -29,9 +29,9 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DataTransferObject __debugInfo excludes hidden properties', function (): void {
         $dto = new class(['email' => 'test@example.com', 'password' => 'secret123']) extends DataTransferObject {
             public function __construct(
-                public readonly string $email = '',
+                public string $email = '',
                 #[\ZeroBoiler\DTO\Attributes\Hidden]
-                public readonly string $password = '',
+                public string $password = '',
             ) {}
         };
 
@@ -44,7 +44,7 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DataTransferObject __debugInfo returns array type', function (): void {
         $dto = new class([]) extends DataTransferObject {
             public function __construct(
-                public readonly ?string $value = null,
+                public ?string $value = null,
             ) {}
         };
 
@@ -58,8 +58,8 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
         for ($i = 1; $i <= 10; $i++) {
             $items[] = new class(['id' => $i, 'name' => "Item {$i}"]) extends DataTransferObject {
                 public function __construct(
-                    public readonly int $id = 0,
-                    public readonly string $name = '',
+                    public int $id = 0,
+                    public string $name = '',
                 ) {}
             };
         }
@@ -87,7 +87,7 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DtoCollection __debugInfo with single item', function (): void {
         $dto = new class(['id' => 42]) extends DataTransferObject {
             public function __construct(
-                public readonly int $id = 0,
+                public int $id = 0,
             ) {}
         };
 
@@ -102,7 +102,7 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DtoCollection __debugInfo items are arrays not DTO objects', function (): void {
         $dto = new class(['key' => 'value']) extends DataTransferObject {
             public function __construct(
-                public readonly string $key = '',
+                public string $key = '',
             ) {}
         };
 
@@ -117,9 +117,9 @@ describe('DTO __debugInfo Production Readiness V35', function (): void {
     it('DtoCollection __debugInfo respects hidden on nested DTOs', function (): void {
         $dto = new class(['public' => 'visible', 'secret' => 'hidden']) extends DataTransferObject {
             public function __construct(
-                public readonly string $public = '',
+                public string $public = '',
                 #[\ZeroBoiler\DTO\Attributes\Hidden]
-                public readonly string $secret = '',
+                public string $secret = '',
             ) {}
         };
 

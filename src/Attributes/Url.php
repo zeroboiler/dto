@@ -29,7 +29,7 @@ final class Url implements ValidationAttribute
      *                              Format: 'The :attribute must be a valid URL.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

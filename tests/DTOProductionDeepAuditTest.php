@@ -68,13 +68,13 @@ final class AllConstraintsDTO extends DataTransferObject
         public readonly string $age,
 
         #[Boolean]
-        public readonly bool $isActive = true,
+        public bool $isActive = true,
 
         #[Numeric, Min(0)]
-        public readonly ?float $score = null,
+        public ?float $score = null,
 
         #[Url]
-        public readonly ?string $website = null,
+        public ?string $website = null,
 
         #[Uuid]
         public readonly ?string $uuid = null,

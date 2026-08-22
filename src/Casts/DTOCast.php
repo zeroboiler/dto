@@ -43,7 +43,7 @@ final class DTOCast implements CastsAttributes
      */
     public function __construct(
         private readonly string $dtoClass,
-        private readonly bool $validate = true,
+        private bool $validate = true,
     ) {}
 
     /**
@@ -63,7 +63,7 @@ final class DTOCast implements CastsAttributes
             try {
                 /** @var mixed $data */
                 $data = json_decode($value, true, 512, JSON_THROW_ON_ERROR | JSON_OBJECT_AS_ARRAY);
-            } catch (\JsonException) {
+            } catch (\JsonException $e) {
                 return null;
             }
         } else {
@@ -100,7 +100,7 @@ final class DTOCast implements CastsAttributes
         if ($value instanceof DataTransferObject) {
             try {
                 return json_encode($value->toArray(), JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
+            } catch (\JsonException $e) {
                 return '';
             }
         }
@@ -115,7 +115,7 @@ final class DTOCast implements CastsAttributes
 
             try {
                 return json_encode($dto->toArray(), JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
+            } catch (\JsonException $e) {
                 return '';
             }
         }

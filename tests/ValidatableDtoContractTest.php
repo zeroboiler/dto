@@ -91,8 +91,8 @@ describe('Issue #18: rulesFor() override capability', function (): void {
         $dtoClass = new class extends DataTransferObject
         {
             public function __construct(
-                public readonly string $name = '',
-                public readonly ?string $email = null,
+                public string $name = '',
+                public ?string $email = null,
             ) {}
 
             public static function rulesFor(string $action): array

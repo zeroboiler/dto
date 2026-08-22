@@ -29,9 +29,9 @@ use ZeroBoiler\ValueObjects\Contracts\ValueObject as ValueObjectContract;
  */
 final class MakeDtoTestCommand extends Command
 {
-    protected string $signature = 'zeroboiler:dto-test {class : The DTO class FQN} {--dir= : Output directory}';
+    protected $signature = 'zeroboiler:dto-test {class : The DTO class FQN} {--dir= : Output directory}';
 
-    protected string $description = 'Generate Pest tests for a ZeroBoiler DTO class';
+    protected $description = 'Generate Pest tests for a ZeroBoiler DTO class';
 
     public function handle(): int
     {

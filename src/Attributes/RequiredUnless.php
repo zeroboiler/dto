@@ -30,8 +30,8 @@ final class RequiredUnless implements ValidationAttribute
      */
     public function __construct(
         public readonly string $field,
-        public readonly mixed $value = null,
-        public readonly ?string $message = null,
+        public mixed $value = null,
+        public ?string $message = null,
     ) {}
 
     /**

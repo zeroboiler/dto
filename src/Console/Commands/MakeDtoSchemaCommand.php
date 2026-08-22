@@ -26,13 +26,13 @@ use ZeroBoiler\DTO\Support\OpenApiSchemaGenerator;
  */
 final class MakeDtoSchemaCommand extends Command
 {
-    protected string $signature = 'zeroboiler:dto-schema {class : The DTO class FQN}
+    protected $signature = 'zeroboiler:dto-schema {class : The DTO class FQN}
         {--output= : Output directory for the generated JSON schema file}
         {--with-components : Include component schemas for nested DTOs}
         {--json : Output as JSON string to stdout (alias for --print)}
         {--print : Print the schema to stdout instead of writing to a file}';
 
-    protected string $description = 'Generate OpenAPI 3.0 schema for a ZeroBoiler DTO class';
+    protected $description = 'Generate OpenAPI 3.0 schema for a ZeroBoiler DTO class';
 
     public function handle(): int
     {

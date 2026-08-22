@@ -85,7 +85,7 @@ final class DTOSServiceProvider extends ServiceProvider
         try {
             /** @var \Illuminate\Contracts\Events\Dispatcher $events */
             $events = $this->app->make('events');
-        } catch (\Illuminate\Contracts\Container\BindingResolutionException) {
+        } catch (\Illuminate\Contracts\Container\BindingResolutionException $e) {
             return;
         }
 

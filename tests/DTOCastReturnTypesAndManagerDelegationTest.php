@@ -21,7 +21,7 @@ describe('DTOCast return type safety', function () {
     it('set() returns null for null value', function () {
         $cast = new DTOCast(CreateUserDTO::class, validate: false);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         $result = $cast->set($model, 'payload', null, []);
@@ -31,7 +31,7 @@ describe('DTOCast return type safety', function () {
     it('set() returns string for valid DTO instance', function () {
         $cast = new DTOCast(CreateUserDTO::class, validate: false);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         $dto = new CreateUserDTO(
@@ -48,7 +48,7 @@ describe('DTOCast return type safety', function () {
     it('set() returns string for valid array', function () {
         $cast = new DTOCast(CreateUserDTO::class, validate: false);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         $result = $cast->set($model, 'payload', [
@@ -64,7 +64,7 @@ describe('DTOCast return type safety', function () {
     it('set() throws InvalidArgumentException for invalid type', function () {
         $cast = new DTOCast(CreateUserDTO::class, validate: false);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         expect(fn () => $cast->set($model, 'payload', 12345, []))
@@ -74,7 +74,7 @@ describe('DTOCast return type safety', function () {
     it('serialize() returns null for null value', function () {
         $cast = new DTOCast(CreateUserDTO::class);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         $result = $cast->serialize($model, 'payload', null, []);
@@ -84,7 +84,7 @@ describe('DTOCast return type safety', function () {
     it('serialize() returns array for DTO instance', function () {
         $cast = new DTOCast(CreateUserDTO::class);
         $model = new class {
-            public array $attributes = [];
+            public $attributes = [];
         };
 
         $dto = new CreateUserDTO(

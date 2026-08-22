@@ -33,13 +33,13 @@ class QaUserDTO extends DataTransferObject
         public readonly string $name,
 
         #[MapFrom('display_name')]
-        public readonly ?string $displayName = null,
+        public ?string $displayName = null,
 
         #[Cast('integer')]
-        public readonly int $age = 0,
+        public int $age = 0,
 
         #[DefaultValue('active')]
-        public readonly string $status = 'active',
+        public string $status = 'active',
 
         #[Hidden]
         public readonly ?string $password = null,

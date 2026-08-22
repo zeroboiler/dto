@@ -43,7 +43,7 @@ class SimpleDTO extends DataTransferObject
         public readonly string $name,
 
         #[DefaultValue('active')]
-        public readonly string $status = 'active',
+        public string $status = 'active',
     ) {}
 }
 
@@ -54,7 +54,7 @@ class HiddenFieldDTO extends DataTransferObject
         public readonly string $public,
 
         #[Hidden]
-        public readonly string $secret = '',
+        public string $secret = '',
     ) {}
 }
 
@@ -62,7 +62,7 @@ class MapFromDTO extends DataTransferObject
 {
     public function __construct(
         #[MapFrom('user_email')]
-        public readonly string $email = '',
+        public string $email = '',
 
         #[MapFrom('user_name')]
         public readonly string $name = '',

@@ -28,7 +28,7 @@ final class Accepted implements ValidationAttribute
      *                              Format: 'The :attribute must be accepted.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

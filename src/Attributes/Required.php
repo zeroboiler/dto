@@ -36,7 +36,7 @@ final class Required implements ValidationAttribute
      *                              Format: 'The :attribute field is required.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

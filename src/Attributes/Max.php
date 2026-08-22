@@ -37,7 +37,7 @@ final class Max implements ValidationAttribute
      */
     public function __construct(
         public readonly int|float $value,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

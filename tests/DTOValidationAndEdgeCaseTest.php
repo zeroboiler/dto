@@ -215,7 +215,7 @@ describe('DTO — equals() and isEmpty() edge cases', function (): void {
         final class ZeroDTO extends DataTransferObject
         {
             public function __construct(
-                public readonly int $count = 0,
+                public $count = 0,
             ) {}
         }
 
@@ -228,7 +228,7 @@ describe('DTO — equals() and isEmpty() edge cases', function (): void {
         final class FalseDTO extends DataTransferObject
         {
             public function __construct(
-                public readonly bool $active = false,
+                public bool $active = false,
             ) {}
         }
 

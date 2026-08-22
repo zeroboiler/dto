@@ -407,7 +407,7 @@ describe('V30 DTO Production Behavior Contract', function () {
         it('get() hydrates DTO from JSON string', function () {
             $cast = new DTOCast(CreateUserDTO::class);
             $model = new class {
-                public array $attributes = [];
+                public $attributes = [];
             };
 
             $dto = $cast->get($model, 'data', '{"email":"a@b.com","name":"Alice"}', []);
@@ -419,7 +419,7 @@ describe('V30 DTO Production Behavior Contract', function () {
         it('get() returns null for null value', function () {
             $cast = new DTOCast(CreateUserDTO::class);
             $model = new class {
-                public array $attributes = [];
+                public $attributes = [];
             };
 
             $result = $cast->get($model, 'data', null, []);
@@ -429,7 +429,7 @@ describe('V30 DTO Production Behavior Contract', function () {
         it('set() serializes DTO to JSON', function () {
             $cast = new DTOCast(CreateUserDTO::class);
             $model = new class {
-                public array $attributes = [];
+                public $attributes = [];
             };
 
             $dto = CreateUserDTO::fromArray([
@@ -448,7 +448,7 @@ describe('V30 DTO Production Behavior Contract', function () {
         it('set() rejects unexpected types', function () {
             $cast = new DTOCast(CreateUserDTO::class);
             $model = new class {
-                public array $attributes = [];
+                public $attributes = [];
             };
 
             expect(fn () => $cast->set($model, 'data', 42, []))
@@ -458,7 +458,7 @@ describe('V30 DTO Production Behavior Contract', function () {
         it('serialize() returns toArray output', function () {
             $cast = new DTOCast(CreateUserDTO::class);
             $model = new class {
-                public array $attributes = [];
+                public $attributes = [];
             };
 
             $dto = CreateUserDTO::fromArray([

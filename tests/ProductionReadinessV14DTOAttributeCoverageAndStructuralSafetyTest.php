@@ -78,13 +78,13 @@ final class V14CastDTO extends DataTransferObject
 {
     public function __construct(
         #[Cast('integer')]
-        public readonly int $count = 0,
+        public $count = 0,
 
         #[Cast('boolean')]
-        public readonly bool $active = false,
+        public bool $active = false,
 
         #[Cast('string')]
-        public readonly string $label = '',
+        public string $label = '',
 
         #[Cast('array')]
         public readonly array $tags = [],

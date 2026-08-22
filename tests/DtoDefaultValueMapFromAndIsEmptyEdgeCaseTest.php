@@ -20,9 +20,9 @@ use ZeroBoiler\DTO\DtoMetadataResolver;
 final class NumericEdgeCaseDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly int $count = 0,
-        public readonly float $price = 0.0,
-        public readonly bool $active = false,
+        public $count = 0,
+        public float $price = 0.0,
+        public bool $active = false,
         public readonly ?string $name = null,
         public readonly array $tags = [],
     ) {}

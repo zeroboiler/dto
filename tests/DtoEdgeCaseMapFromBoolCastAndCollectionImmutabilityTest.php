@@ -29,14 +29,14 @@ final class DotNotationMapFromDTO extends DataTransferObject
 {
     public function __construct(
         #[MapFrom('user.profile.name')]
-        public readonly ?string $name = null,
+        public ?string $name = null,
 
         #[MapFrom('user.profile.email')]
-        public readonly ?string $email = null,
+        public ?string $email = null,
 
         #[MapFrom('settings.preferences.theme')]
         #[DefaultValue('light')]
-        public readonly string $theme = 'light',
+        public string $theme = 'light',
     ) {}
 }
 

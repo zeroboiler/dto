@@ -58,7 +58,7 @@ class V16NullableFieldDTO extends DataTransferObject
 {
     public function __construct(
         public readonly string $name,
-        public readonly ?string $email = null,
+        public ?string $email = null,
     ) {}
 }
 

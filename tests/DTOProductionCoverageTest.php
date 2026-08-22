@@ -243,9 +243,9 @@ describe('DTO production readiness coverage', function () {
         it('isEmpty handles zero, empty string, false, and empty array as empty', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly int $zero = 0,
-                    public readonly string $empty = '',
-                    public readonly bool $false = false,
+                    public int $zero = 0,
+                    public string $empty = '',
+                    public bool $false = false,
                     public readonly array $arr = [],
                     public readonly ?string $null = null,
                 ) {}

@@ -21,9 +21,9 @@ use ZeroBoiler\DTO\DataTransferObject;
 final class AllOptionalDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly ?string $name = null,
-        public readonly string $role = 'guest',
-        public readonly int $age = 0,
+        public ?string $name = null,
+        public string $role = 'guest',
+        public int $age = 0,
         public readonly bool $active = false,
         public readonly array $meta = [],
     ) {}
@@ -138,10 +138,10 @@ final class HiddenNullableDTO extends DataTransferObject
         public readonly string $name,
 
         #[Hidden, Nullable]
-        public readonly ?string $secret = null,
+        public ?string $secret = null,
 
         #[DefaultValue('user')]
-        public readonly string $role = 'user',
+        public string $role = 'user',
     ) {}
 }
 

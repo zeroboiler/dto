@@ -34,9 +34,9 @@ final class ArrayRule implements ValidationAttribute
      *                              Format: 'The :attribute must have between :min and :max items.'
      */
     public function __construct(
-        public readonly ?int $min = null,
-        public readonly ?int $max = null,
-        public readonly ?string $message = null,
+        public ?int $min = null,
+        public ?int $max = null,
+        public ?string $message = null,
     ) {}
 
     /**

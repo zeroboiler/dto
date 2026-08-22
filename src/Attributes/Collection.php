@@ -38,7 +38,7 @@ final class Collection implements ValidationAttribute
      */
     public function __construct(
         public readonly string $dtoClass,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

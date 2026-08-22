@@ -29,7 +29,7 @@ final class Sometimes implements ValidationAttribute
      *                              Format: 'The :attribute validation should only run if the field is present.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

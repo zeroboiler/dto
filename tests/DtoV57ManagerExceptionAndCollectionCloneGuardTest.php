@@ -36,7 +36,7 @@ class V57SimpleDTO extends DataTransferObject
 {
     public function __construct(
         public readonly string $name,
-        public readonly int $value = 0,
+        public int $value = 0,
     ) {}
 }
 
@@ -44,7 +44,7 @@ class V57HiddenDTO extends DataTransferObject
 {
     public function __construct(
         public readonly string $public,
-        public readonly string $secret = 'hidden',
+        public string $secret = 'hidden',
     ) {}
 }
 

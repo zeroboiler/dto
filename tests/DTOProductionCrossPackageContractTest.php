@@ -86,7 +86,7 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $name,
 
                 #[Nullable, Max(500)]
-                public readonly ?string $bio = null,
+                public ?string $bio = null,
             ) {}
         }
 
@@ -171,10 +171,10 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $name,
 
                 #[Hidden]
-                public readonly ?string $password = null,
+                public ?string $password = null,
 
                 #[DefaultValue('active')]
-                public readonly string $status = 'active',
+                public string $status = 'active',
             ) {}
         }
 
@@ -256,10 +256,10 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $displayName,
 
                 #[Cast('integer')]
-                public readonly int $age = 0,
+                public int $age = 0,
 
                 #[Cast('boolean')]
-                public readonly bool $isActive = false,
+                public bool $isActive = false,
             ) {}
         }
 
@@ -298,8 +298,8 @@ describe('DTO Production Cross-Package Contract', function () {
         class TestWithDTO extends DataTransferObject
         {
             public function __construct(
-                public readonly string $name = '',
-                public readonly string $status = 'active',
+                public string $name = '',
+                public string $status = 'active',
             ) {}
         }
 
@@ -319,13 +319,13 @@ describe('DTO Production Cross-Package Contract', function () {
         {
             public function __construct(
                 #[Nullable]
-                public readonly ?string $name = null,
+                public ?string $name = null,
 
                 #[Nullable]
-                public readonly ?string $email = null,
+                public ?string $email = null,
 
                 #[DefaultValue('active')]
-                public readonly string $status = 'active',
+                public string $status = 'active',
             ) {}
         }
 
@@ -400,10 +400,10 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $name,
 
                 #[DefaultValue('active')]
-                public readonly string $status = 'active',
+                public string $status = 'active',
 
                 #[Nullable]
-                public readonly ?string $email = null,
+                public ?string $email = null,
             ) {}
         }
 
@@ -427,7 +427,7 @@ describe('DTO Production Cross-Package Contract', function () {
         {
             public function __construct(
                 public readonly string $name,
-                public readonly int $score = 0,
+                public int $score = 0,
             ) {}
         }
 
@@ -561,7 +561,7 @@ describe('DTO Production Cross-Package Contract', function () {
         class TestCastDTO extends DataTransferObject
         {
             public function __construct(
-                public readonly string $name = '',
+                public string $name = '',
             ) {}
         }
 
@@ -772,7 +772,7 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $name,
 
                 #[Nullable]
-                public readonly ?TestAddressDTO $address = null,
+                public ?TestAddressDTO $address = null,
             ) {}
         }
 
@@ -831,7 +831,7 @@ describe('DTO Production Cross-Package Contract', function () {
                 public readonly string $name,
 
                 #[DefaultValue('user')]
-                public readonly string $role = 'user',
+                public string $role = 'user',
             ) {}
         }
 
@@ -865,7 +865,7 @@ describe('DTO Production Cross-Package Contract', function () {
         class TestImmutableDTO extends DataTransferObject
         {
             public function __construct(
-                public readonly string $value = '',
+                public string $value = '',
             ) {}
         }
 

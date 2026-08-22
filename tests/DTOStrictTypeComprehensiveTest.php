@@ -53,7 +53,7 @@ class StrictUserDTO extends DataTransferObject
         public readonly bool $active,
 
         #[Hidden]
-        public readonly ?string $password = null,
+        public ?string $password = null,
     ) {}
 }
 
@@ -67,10 +67,10 @@ class StrictProductDTO extends DataTransferObject
         public readonly int|float $price,
 
         #[MapFrom('category_id')]
-        public readonly ?int $categoryId = null,
+        public ?int $categoryId = null,
 
         #[DefaultValue([])]
-        public readonly array $tags = [],
+        public array $tags = [],
     ) {}
 }
 

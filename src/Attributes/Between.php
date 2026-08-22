@@ -36,7 +36,7 @@ final class Between implements ValidationAttribute
     public function __construct(
         public readonly int|float $min,
         public readonly int|float $max,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

@@ -31,7 +31,7 @@ final class Uuid implements ValidationAttribute
      *                              Format: 'The :attribute must be a valid UUID.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

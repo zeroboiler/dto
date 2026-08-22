@@ -43,13 +43,13 @@ class IntegrationUserDTO extends DataTransferObject
         public readonly string $name,
 
         #[Nullable, Max(500)]
-        public readonly ?string $bio = null,
+        public ?string $bio = null,
 
         #[Hidden]
-        public readonly ?string $password = null,
+        public ?string $password = null,
 
         #[Cast('integer')]
-        public readonly int $age = 0,
+        public int $age = 0,
 
         #[DefaultValue('active')]
         public readonly string $status = 'active',

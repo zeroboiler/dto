@@ -29,7 +29,7 @@ final class EndsWith implements ValidationAttribute
      */
     public function __construct(
         public readonly string|array $suffix,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

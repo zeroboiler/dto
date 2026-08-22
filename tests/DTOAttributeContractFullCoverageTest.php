@@ -60,13 +60,13 @@ class FullAttributeDTO extends DataTransferObject
         public readonly string $name,
 
         #[MapFrom('user_phone')]
-        public readonly ?string $phone = null,
+        public ?string $phone = null,
 
         #[Cast('integer')]
-        public readonly int $age = 0,
+        public int $age = 0,
 
         #[DefaultValue('active')]
-        public readonly string $status = 'active',
+        public string $status = 'active',
 
         #[Boolean]
         public readonly bool $isActive = true,

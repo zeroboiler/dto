@@ -77,7 +77,7 @@ class V28AddressDTO extends DataTransferObject
         public readonly string $zip,
 
         #[DefaultValue('US')]
-        public readonly string $country = 'US',
+        public string $country = 'US',
     ) {}
 }
 
@@ -92,10 +92,10 @@ class V28UserDTO extends DataTransferObject
 
         #[MapFrom('user_age')]
         #[Cast('integer')]
-        public readonly int $age = 0,
+        public int $age = 0,
 
         #[MapFrom('is_active')]
-        public readonly bool $active = true,
+        public bool $active = true,
 
         #[DefaultValue('user')]
         public readonly string $role = 'user',

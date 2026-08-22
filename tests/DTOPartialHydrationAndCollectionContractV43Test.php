@@ -21,10 +21,10 @@ class SimpleItemDTO extends DataTransferObject
         public readonly string $name,
 
         #[DefaultValue(0)]
-        public readonly int $quantity = 0,
+        public int $quantity = 0,
 
         #[DefaultValue(false)]
-        public readonly bool $active = false,
+        public bool $active = false,
     ) {}
 }
 
@@ -35,7 +35,7 @@ class MappedFieldDTO extends DataTransferObject
         public readonly string $name,
 
         #[MapFrom('user_email')]
-        public readonly ?string $email = null,
+        public ?string $email = null,
     ) {}
 }
 

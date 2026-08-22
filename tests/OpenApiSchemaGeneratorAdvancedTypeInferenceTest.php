@@ -52,7 +52,7 @@ final class SchemaUnionTypeDTO extends DataTransferObject
 final class SchemaIntersectionTypeDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly mixed $value = null,
+        public mixed $value = null,
     ) {}
 }
 

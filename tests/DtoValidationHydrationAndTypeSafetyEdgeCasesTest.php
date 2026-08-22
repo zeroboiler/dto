@@ -227,9 +227,9 @@ describe('DtoValidationHydrationAndTypeSafetyEdgeCases', function () {
         it('only() returns specified fields only', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly string $a = '1',
-                    public readonly string $b = '2',
-                    public readonly string $c = '3',
+                    public string $a = '1',
+                    public string $b = '2',
+                    public string $c = '3',
                 ) {}
             };
 
@@ -241,9 +241,9 @@ describe('DtoValidationHydrationAndTypeSafetyEdgeCases', function () {
         it('except() returns all fields except specified', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly string $x = '10',
-                    public readonly string $y = '20',
-                    public readonly string $z = '30',
+                    public string $x = '10',
+                    public string $y = '20',
+                    public string $z = '30',
                 ) {}
             };
 
@@ -255,8 +255,8 @@ describe('DtoValidationHydrationAndTypeSafetyEdgeCases', function () {
         it('only() accepts single string key', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly string $foo = 'bar',
-                    public readonly string $baz = 'qux',
+                    public string $foo = 'bar',
+                    public string $baz = 'qux',
                 ) {}
             };
 
@@ -327,9 +327,9 @@ describe('DtoValidationHydrationAndTypeSafetyEdgeCases', function () {
         it('isEmpty returns true when all properties are empty defaults', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly ?string $name = null,
-                    public readonly string $status = '',
-                    public readonly array $tags = [],
+                    public ?string $name = null,
+                    public string $status = '',
+                    public array $tags = [],
                     public readonly bool $active = false,
                 ) {}
             };
@@ -343,7 +343,7 @@ describe('DtoValidationHydrationAndTypeSafetyEdgeCases', function () {
         it('isEmpty returns false when a non-zero numeric value exists', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly int $count = 0,
+                    public $count = 0,
                 ) {}
             };
 

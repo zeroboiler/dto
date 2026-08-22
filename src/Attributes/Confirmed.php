@@ -30,7 +30,7 @@ final class Confirmed implements ValidationAttribute
      *                              Format: 'The :attribute confirmation does not match.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

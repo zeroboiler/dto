@@ -399,7 +399,7 @@ describe('V45 — Production Quality Deep Edge Cases', function () {
         it('isEmpty returns true for all-empty property DTO', function () {
             $dto = new class extends DataTransferObject {
                 public function __construct(
-                    public readonly ?string $name = null,
+                    public ?string $name = null,
                 ) {}
             };
 

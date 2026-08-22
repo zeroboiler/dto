@@ -50,7 +50,7 @@ class FromJsonWithHiddenDTO extends DataTransferObject
         #[Hidden]
         public readonly string $password,
         #[Hidden]
-        public readonly int $secret = 0,
+        public int $secret = 0,
     ) {}
 }
 
@@ -72,14 +72,14 @@ class FromJsonWithMapFromDTO extends DataTransferObject
         #[MapFrom('user_name')]
         public readonly string $name,
         #[MapFrom('contact.email')]
-        public readonly ?string $email = null,
+        public ?string $email = null,
     ) {}
 }
 
 class EmptyValueDetectionDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly ?string $name = null,
+        public ?string $name = null,
         public readonly int $count = 0,
         public readonly string $status = '',
         public readonly bool $active = false,

@@ -23,8 +23,8 @@ class ItemDTO extends DataTransferObject
 class NullableKeyDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly ?string $code = null,
-        public readonly string $label = '',
+        public ?string $code = null,
+        public string $label = '',
     ) {}
 }
 

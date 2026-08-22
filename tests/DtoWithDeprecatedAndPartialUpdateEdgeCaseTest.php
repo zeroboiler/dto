@@ -22,10 +22,10 @@ final class WithDeprecatedParamDTO extends DataTransferObject
 {
     public function __construct(
         #[Required, Min(1), Max(100)]
-        public readonly int $quantity = 1,
+        public int $quantity = 1,
 
         #[Required]
-        public readonly string $sku = '',
+        public string $sku = '',
     ) {}
 }
 
@@ -47,7 +47,7 @@ final class MixedDefaultsPartialDTO extends DataTransferObject
         #[DefaultValue(true)]
         public readonly bool $active,
 
-        public readonly ?string $note = null,
+        public ?string $note = null,
     ) {}
 }
 

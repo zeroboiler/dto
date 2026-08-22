@@ -294,7 +294,7 @@ final class OpenApiSchemaGenerator
      */
     private static function componentName(string $className): string
     {
-        $separator = strrpos($className, '\');
+        $separator = strrpos($className, '\\');
 
         return $separator === false ? $className : substr($className, $separator + 1);
     }

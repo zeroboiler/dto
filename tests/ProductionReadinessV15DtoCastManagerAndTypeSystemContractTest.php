@@ -77,10 +77,10 @@ class V15MapFromAndDefaultDTO extends DataTransferObject
         public readonly string $email,
 
         #[DefaultValue('active'), MapFrom('user_status')]
-        public readonly string $status = 'active',
+        public string $status = 'active',
 
         #[DefaultValue(0), MapFrom('user_age')]
-        public readonly int $age = 0,
+        public int $age = 0,
     ) {}
 }
 
@@ -91,7 +91,7 @@ class V15HiddenAndNullableDTO extends DataTransferObject
         public readonly string $name,
 
         #[Hidden]
-        public readonly ?string $secret = null,
+        public ?string $secret = null,
 
         #[Nullable]
         public readonly ?string $middleName = null,

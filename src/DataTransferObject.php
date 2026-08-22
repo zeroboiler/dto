@@ -431,7 +431,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
     {
         try {
             return json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
+        } catch (\JsonException $e) {
             return '';
         }
     }
@@ -865,7 +865,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         if (is_int($value) || is_string($value)) {
             try {
                 return $enumClass::from($value);
-            } catch (\ValueError) {
+            } catch (\ValueError $e) {
                 // from() failed, try tryFrom() for a graceful null check,
                 // then fall back to name-based lookup
             }
@@ -993,7 +993,7 @@ abstract class DataTransferObject implements Arrayable, FromRequestDTO, JsonSeri
         if (method_exists($voClass, 'fromPrimitive')) {
             try {
                 return $voClass::fromPrimitive($value);
-            } catch (\InvalidArgumentException) {
+            } catch (\InvalidArgumentException $e) {
                 // fromPrimitive failed, try direct construction below
             }
         }

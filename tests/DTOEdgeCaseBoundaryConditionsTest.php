@@ -18,7 +18,7 @@ class ExceptOnlyDTO extends DataTransferObject
         public readonly string $name,
         public readonly string $email,
         #[Hidden]
-        public readonly string $secret = '',
+        public string $secret = '',
     ) {}
 }
 
@@ -27,8 +27,8 @@ class PartialNullHandlingDTO extends DataTransferObject
     public function __construct(
         public readonly string $name,
         #[Nullable]
-        public readonly ?string $nickname = null,
-        public readonly int $score = 0,
+        public ?string $nickname = null,
+        public int $score = 0,
     ) {}
 }
 

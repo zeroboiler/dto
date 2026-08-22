@@ -41,7 +41,7 @@ final class Enum implements ValidationAttribute
      */
     public function __construct(
         public readonly string $enumClass,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

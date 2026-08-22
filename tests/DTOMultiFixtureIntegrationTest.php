@@ -38,17 +38,17 @@ final class ProductDto extends DataTransferObject
         public readonly int $stock,
 
         #[Boolean]
-        public readonly bool $isActive = true,
+        public bool $isActive = true,
 
         #[Uuid]
-        public readonly ?string $sku = null,
+        public ?string $sku = null,
     ) {}
 }
 
 final class SearchFilterDto extends DataTransferObject
 {
     public function __construct(
-        public readonly ?string $query = null,
+        public ?string $query = null,
 
         #[Integer, Min(1), Max(100)]
         #[DefaultValue(20)]

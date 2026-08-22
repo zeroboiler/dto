@@ -55,7 +55,7 @@ describe('DTO production edge cases', function () {
         $dto = new class([]) extends DataTransferObject {
             public function __construct(
                 #[DefaultValue('fallback')]
-                public readonly string $name = 'fallback',
+                public string $name = 'fallback',
             ) {}
         };
 

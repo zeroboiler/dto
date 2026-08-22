@@ -28,7 +28,7 @@ use ZeroBoiler\DTO\Contracts\ValidationAttribute;
 final class RequiredWithoutAll implements ValidationAttribute
 {
     /** @var array<int, string> */
-    public readonly array $fields;
+    public array $fields;
 
     /**
      * @param  string|array<int, string>  $fields  Field name(s); required if ALL are absent.
@@ -36,7 +36,7 @@ final class RequiredWithoutAll implements ValidationAttribute
      */
     public function __construct(
         string|array $fields = [],
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {
         $this->fields = is_array($fields) ? $fields : [$fields];
     }

@@ -33,7 +33,7 @@ final class Numeric implements ValidationAttribute
      *                              Format: 'The :attribute must be a number.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

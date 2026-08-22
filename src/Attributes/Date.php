@@ -33,8 +33,8 @@ final class Date implements ValidationAttribute
      *                              Format: 'The :attribute is not a valid date.'
      */
     public function __construct(
-        public readonly ?string $format = null,
-        public readonly ?string $message = null,
+        public ?string $format = null,
+        public ?string $message = null,
     ) {}
 
     /**

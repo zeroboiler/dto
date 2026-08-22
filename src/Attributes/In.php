@@ -33,7 +33,7 @@ final class In implements ValidationAttribute
      */
     public function __construct(
         public readonly array $values,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

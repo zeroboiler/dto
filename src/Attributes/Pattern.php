@@ -32,7 +32,7 @@ final class Pattern implements ValidationAttribute
      */
     public function __construct(
         public readonly string $regex,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

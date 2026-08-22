@@ -34,7 +34,7 @@ final class Size implements ValidationAttribute
      */
     public function __construct(
         public readonly int $value,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

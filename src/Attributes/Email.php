@@ -30,7 +30,7 @@ final class Email implements ValidationAttribute
      *                              Format: 'The :attribute must be a valid email address.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

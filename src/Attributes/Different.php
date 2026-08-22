@@ -30,7 +30,7 @@ final class Different implements ValidationAttribute
      */
     public function __construct(
         public readonly string $field,
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

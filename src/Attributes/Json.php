@@ -28,7 +28,7 @@ final class Json implements ValidationAttribute
      *                              Format: 'The :attribute must be a valid JSON string.'
      */
     public function __construct(
-        public readonly ?string $message = null,
+        public ?string $message = null,
     ) {}
 
     /**

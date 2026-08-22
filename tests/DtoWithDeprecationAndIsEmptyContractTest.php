@@ -30,15 +30,15 @@ final class WithDeprecationTestDTO extends DataTransferObject
         public readonly string $password,
 
         #[Min(0)]
-        public readonly int $score = 0,
+        public int $score = 0,
     ) {}
 }
 
 final class IsEmptyAllDefaultsDTO extends DataTransferObject
 {
     public function __construct(
-        public readonly string $name = '',
-        public readonly int $age = 0,
+        public string $name = '',
+        public int $age = 0,
         public readonly float $rate = 0.0,
         public readonly bool $active = false,
         public readonly ?string $nickname = null,
