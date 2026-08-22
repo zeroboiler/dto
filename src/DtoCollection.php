@@ -147,7 +147,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @return int The number of items
      */
-    #[\Override]
     public function count(): int
     {
         return count($this->items);
@@ -160,7 +159,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @return Traversable<int, T>
      */
-    #[\Override]
     public function getIterator(): Traversable
     {
         foreach ($this->items as $key => $item) {
@@ -174,7 +172,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @param  mixed  $offset  The index to check (0-based)
      * @return bool True if the offset exists in the collection
      */
-    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->items[$offset]);
@@ -188,7 +185,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @phpstan-return T|null
      */
-    #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->items[$offset] ?? null;
@@ -203,7 +199,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @throws \InvalidArgumentException If value is not a DataTransferObject instance
      * @return void
      */
-    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if (! $value instanceof DataTransferObject) {
@@ -228,7 +223,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      * @param  mixed  $offset  The index to remove (0-based)
      * @return void
      */
-    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         unset($this->items[$offset]);
@@ -244,7 +238,6 @@ final class DtoCollection implements ArrayAccess, Countable, IteratorAggregate, 
      *
      * @return array<int, array<string, mixed>>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();

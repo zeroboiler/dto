@@ -54,7 +54,6 @@ final class DTOException extends Exception
      * Useful for logging and display contexts where catching and
      * re-throwing as a string is needed (e.g., custom error pages).
      */
-    #[\Override]
     public function __toString(): string
     {
         return self::class.': '.$this->getMessage();

@@ -53,7 +53,6 @@ final class DTOCast implements CastsAttributes
      * @param  array<string, mixed>  $attributes  All model attributes
      * @return T|null
      */
-    #[\Override]
     public function get(object $model, string $key, mixed $value, array $attributes): ?DataTransferObject
     {
         if ($value === null) {
@@ -92,7 +91,6 @@ final class DTOCast implements CastsAttributes
      * @throws \InvalidArgumentException When value is not a DTO, array, or null
      * @throws ValidationException When validation is enabled and data is invalid
      */
-    #[\Override]
     public function set(object $model, string $key, mixed $value, array $attributes): array|string|null
     {
         if ($value === null) {

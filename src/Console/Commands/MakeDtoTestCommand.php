@@ -33,7 +33,6 @@ final class MakeDtoTestCommand extends Command
 
     protected string $description = 'Generate Pest tests for a ZeroBoiler DTO class';
 
-    #[\Override]
     public function handle(): int
     {
         /** @var string $dtoClass */

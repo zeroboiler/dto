@@ -40,7 +40,6 @@ use Illuminate\Support\Facades\Facade;
  */
 final class DTO extends Facade
 {
-    #[\Override]
     protected static function getFacadeAccessor(): string
     {
         return 'zeroboiler.dto';

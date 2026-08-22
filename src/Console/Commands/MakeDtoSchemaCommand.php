@@ -34,7 +34,6 @@ final class MakeDtoSchemaCommand extends Command
 
     protected string $description = 'Generate OpenAPI 3.0 schema for a ZeroBoiler DTO class';
 
-    #[\Override]
     public function handle(): int
     {
         /** @var string $dtoClass */
